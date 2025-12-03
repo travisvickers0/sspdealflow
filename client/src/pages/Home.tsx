@@ -86,13 +86,15 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-3 sm:h-4 w-3 sm:w-4" />
                 </Button>
               </Link>
-              <Button 
-                size="sm"
-                variant="outline" 
-                className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-6 sm:px-8 h-10 sm:h-12 bg-white/60 backdrop-blur-sm w-full sm:w-auto text-sm sm:text-base"
-              >
-                Schedule Demo
-              </Button>
+              <Link href="/how-it-works" className="w-full sm:w-auto">
+                <Button 
+                  size="sm"
+                  variant="outline" 
+                  className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-6 sm:px-8 h-10 sm:h-12 bg-white/60 backdrop-blur-sm w-full sm:w-auto text-sm sm:text-base"
+                >
+                  How It Works
+                </Button>
+              </Link>
             </div>
             </div>
 
