@@ -47,7 +47,7 @@ export default function Home() {
 
             {/* Subheading */}
             <p className="text-lg sm:text-xl text-gray-600 max-w-xl mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 font-light">
-              Discover curated commercial real estate deals with transparent structures, real-time dashboards, and institutional returns. All in one place.
+              Discover curated real estate deals with transparent structures, real-time dashboards, and institutional returns. All in one place.
             </p>
 
             {/* Stats Row */}
