@@ -15,7 +15,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <span>SSP Deal Flow</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/" ? "text-foreground" : "text-muted-foreground"}`}>
+              <Link href="/properties" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/properties" ? "text-foreground" : "text-muted-foreground"}`}>
                 Marketplace
               </Link>
               <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"}`}>
