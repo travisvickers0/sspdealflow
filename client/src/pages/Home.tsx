@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, SlidersHorizontal } from "lucide-react";
-import heroImg from "@assets/contentcreationteamkova_modern_home_with_new_vinyl_siding_--ar_1764790436690.png";
+import heroImg from "@assets/generated_images/modern_luxury_home_exterior_at_twilight.png";
 
 export default function Home() {
   return (
