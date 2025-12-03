@@ -97,9 +97,9 @@ export default function Home() {
             </div>
 
             {/* Right Side - Stacked Property Cards */}
-            <div className="hidden lg:block relative h-[600px]">
+            <div className="hidden lg:block relative h-[700px]">
               {/* Card 1 - Front */}
-              <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 z-30 animate-in fade-in slide-in-from-right-4 duration-700 delay-500">
+              <div className="absolute right-0 top-0 w-96 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 z-30 animate-in fade-in slide-in-from-right-4 duration-700 delay-500">
                 <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
                   {properties[0].images[0] && (
                     <img 
@@ -108,14 +108,14 @@ export default function Home() {
                       className="w-full h-full object-cover"
                     />
                   )}
-                  <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
                     ${(properties[0].purchase_price / 1000).toFixed(0)}k
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">{properties[0].address}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{properties[0].city}, {properties[0].state}</p>
-                  <div className="flex justify-between text-xs">
+                <div className="p-5">
+                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{properties[0].address}</h3>
+                  <p className="text-sm text-gray-600 mb-4">{properties[0].city}, {properties[0].state}</p>
+                  <div className="flex justify-between text-sm">
                     <span className="text-primary font-semibold">${(properties[0].equity_available / 1000).toFixed(0)}k Available</span>
                     <span className="text-gray-600">20% ROI</span>
                   </div>
@@ -123,7 +123,7 @@ export default function Home() {
               </div>
 
               {/* Card 2 - Middle */}
-              <div className="absolute right-12 top-32 w-80 bg-white rounded-2xl shadow-xl overflow-hidden transform -rotate-6 z-20 animate-in fade-in slide-in-from-right-4 duration-700 delay-700">
+              <div className="absolute right-8 top-40 w-96 bg-white rounded-2xl shadow-xl overflow-hidden transform -rotate-6 z-20 animate-in fade-in slide-in-from-right-4 duration-700 delay-700">
                 <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
                   {properties[1].images[0] && (
                     <img 
@@ -132,14 +132,14 @@ export default function Home() {
                       className="w-full h-full object-cover"
                     />
                   )}
-                  <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
                     ${(properties[1].purchase_price / 1000).toFixed(0)}k
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">{properties[1].address}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{properties[1].city}, {properties[1].state}</p>
-                  <div className="flex justify-between text-xs">
+                <div className="p-5">
+                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{properties[1].address}</h3>
+                  <p className="text-sm text-gray-600 mb-4">{properties[1].city}, {properties[1].state}</p>
+                  <div className="flex justify-between text-sm">
                     <span className="text-primary font-semibold">${(properties[1].equity_available / 1000).toFixed(0)}k Available</span>
                     <span className="text-gray-600">18% ROI</span>
                   </div>
@@ -147,7 +147,7 @@ export default function Home() {
               </div>
 
               {/* Card 3 - Back */}
-              <div className="absolute right-24 top-52 w-80 bg-white rounded-2xl shadow-lg overflow-hidden transform rotate-3 z-10 animate-in fade-in slide-in-from-right-4 duration-700 delay-1000">
+              <div className="absolute right-16 top-80 w-96 bg-white rounded-2xl shadow-lg overflow-hidden transform rotate-3 z-10 animate-in fade-in slide-in-from-right-4 duration-700 delay-1000">
                 <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
                   {properties[2].images[0] && (
                     <img 
@@ -156,14 +156,14 @@ export default function Home() {
                       className="w-full h-full object-cover"
                     />
                   )}
-                  <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
                     ${(properties[2].purchase_price / 1000).toFixed(0)}k
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1">{properties[2].address}</h3>
-                  <p className="text-sm text-gray-600 mb-3">{properties[2].city}, {properties[2].state}</p>
-                  <div className="flex justify-between text-xs">
+                <div className="p-5">
+                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{properties[2].address}</h3>
+                  <p className="text-sm text-gray-600 mb-4">{properties[2].city}, {properties[2].state}</p>
+                  <div className="flex justify-between text-sm">
                     <span className="text-primary font-semibold">Fully Funded</span>
                     <span className="text-gray-600">24% ROI</span>
                   </div>
