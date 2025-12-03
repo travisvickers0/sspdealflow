@@ -20,6 +20,8 @@ interface ExtendedDoc extends Document {
 }
 
 export default function Admin() {
+  const [activeSection, setActiveSection] = useState<"dashboard" | "properties" | "commitments" | "documents" | "comps" | "jv" | "bpo">("properties");
+  
   const [properties, setProperties] = useState(initialProperties);
   const [commitments, setCommitments] = useState(initialCommitments);
   const [comps, setComps] = useState<Comp[]>([]);
@@ -267,23 +269,71 @@ export default function Admin() {
 
       <div className="flex h-[calc(100vh-64px)]">
         {/* Sidebar Rail */}
-        <div className="w-64 border-r bg-muted/20 hidden md:block p-6 space-y-6">
+        <div className="w-64 border-r bg-muted/20 hidden md:flex flex-col p-6 space-y-6">
             <div className="space-y-1">
                 <h3 className="font-semibold text-sm text-muted-foreground px-2 mb-2">Overview</h3>
-                <Button variant="secondary" className="w-full justify-start" data-testid="nav-dashboard">Dashboard</Button>
-                <Button variant="ghost" className="w-full justify-start" data-testid="nav-analytics">Analytics</Button>
+                <Button 
+                  variant={activeSection === "dashboard" ? "secondary" : "ghost"} 
+                  className="w-full justify-start" 
+                  onClick={() => setActiveSection("dashboard")}
+                  data-testid="nav-dashboard"
+                >
+                  Dashboard
+                </Button>
             </div>
             <div className="space-y-1">
                 <h3 className="font-semibold text-sm text-muted-foreground px-2 mb-2">Deal Flow</h3>
-                <Button variant="ghost" className="w-full justify-start" data-testid="nav-properties">Properties</Button>
-                <Button variant="ghost" className="w-full justify-start" data-testid="nav-commitments">Commitments</Button>
-                <Button variant="ghost" className="w-full justify-start" data-testid="nav-documents">Documents</Button>
-                <Button variant="ghost" className="w-full justify-start" data-testid="nav-comps">Comps</Button>
-                <Button variant="ghost" className="w-full justify-start" data-testid="nav-jv">JV Proposals</Button>
+                <Button 
+                  variant={activeSection === "properties" ? "secondary" : "ghost"} 
+                  className="w-full justify-start" 
+                  onClick={() => setActiveSection("properties")}
+                  data-testid="nav-properties"
+                >
+                  Properties
+                </Button>
+                <Button 
+                  variant={activeSection === "commitments" ? "secondary" : "ghost"} 
+                  className="w-full justify-start" 
+                  onClick={() => setActiveSection("commitments")}
+                  data-testid="nav-commitments"
+                >
+                  Commitments
+                </Button>
+                <Button 
+                  variant={activeSection === "documents" ? "secondary" : "ghost"} 
+                  className="w-full justify-start" 
+                  onClick={() => setActiveSection("documents")}
+                  data-testid="nav-documents"
+                >
+                  Documents
+                </Button>
+                <Button 
+                  variant={activeSection === "comps" ? "secondary" : "ghost"} 
+                  className="w-full justify-start" 
+                  onClick={() => setActiveSection("comps")}
+                  data-testid="nav-comps"
+                >
+                  Comps
+                </Button>
+                <Button 
+                  variant={activeSection === "jv" ? "secondary" : "ghost"} 
+                  className="w-full justify-start" 
+                  onClick={() => setActiveSection("jv")}
+                  data-testid="nav-jv"
+                >
+                  JV Proposals
+                </Button>
             </div>
             <div className="space-y-1">
                 <h3 className="font-semibold text-sm text-muted-foreground px-2 mb-2">AI Tools</h3>
-                <Button variant="ghost" className="w-full justify-start" data-testid="nav-bpo">BPO Extraction</Button>
+                <Button 
+                  variant={activeSection === "bpo" ? "secondary" : "ghost"} 
+                  className="w-full justify-start" 
+                  onClick={() => setActiveSection("bpo")}
+                  data-testid="nav-bpo"
+                >
+                  BPO Extraction
+                </Button>
             </div>
         </div>
 
@@ -299,8 +349,8 @@ export default function Admin() {
                 </Button>
             </div>
 
-            <Tabs defaultValue="properties" className="space-y-6">
-                <TabsList className="bg-muted/50 p-1">
+            <Tabs value={activeSection} onValueChange={(val: any) => setActiveSection(val)} className="space-y-6">
+                <TabsList className="bg-muted/50 p-1 md:hidden">
                     <TabsTrigger value="properties">Properties</TabsTrigger>
                     <TabsTrigger value="commitments">Commitments</TabsTrigger>
                     <TabsTrigger value="documents">Documents</TabsTrigger>
