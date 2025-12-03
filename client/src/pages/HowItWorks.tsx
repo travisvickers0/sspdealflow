@@ -1,91 +1,98 @@
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { CheckCircle, Home, DollarSign, TrendingUp, Shield, Zap, ArrowRight, Flame } from "lucide-react";
+import { CheckCircle, Home, DollarSign, TrendingUp, Shield, Users, ArrowRight, Zap, Lock, BarChart3 } from "lucide-react";
 
 export default function HowItWorks() {
   const steps = [
     {
+      number: "01",
+      title: "Browse Properties",
+      description: "Explore our curated marketplace of pre-vetted real estate opportunities. Filter by location, investment size, and expected returns.",
       icon: Home,
-      title: "Browse",
-      subtitle: "Curated Deals",
-      description: "Explore verified real estate opportunities filtered by location, returns, and investment size.",
     },
     {
+      number: "02",
+      title: "Review Deal Terms",
+      description: "Analyze detailed financial models, property metrics, and investment structures. Access transparent deal documentation and market comparables.",
       icon: DollarSign,
-      title: "Analyze",
-      subtitle: "Financial Details",
-      description: "Review detailed metrics, market data, and transparent deal structures with institutional-grade documentation.",
     },
     {
+      number: "03",
+      title: "Commit Capital",
+      description: "Submit your investment commitment with flexible allocation options. Secure your position in high-quality deals with institutional-grade protections.",
       icon: Shield,
-      title: "Invest",
-      subtitle: "Commit Capital",
-      description: "Secure your allocation with flexible terms and comprehensive legal protections.",
     },
     {
+      number: "04",
+      title: "Track Returns",
+      description: "Monitor your portfolio in real-time. Access performance dashboards, quarterly updates, and comprehensive reporting on all your investments.",
       icon: TrendingUp,
-      title: "Earn",
-      subtitle: "Track Returns",
-      description: "Monitor performance in real-time with live dashboards and quarterly distribution reports.",
+    },
+  ];
+
+  const features = [
+    {
+      title: "Curated Opportunities",
+      description: "Every property is rigorously vetted by our team of real estate experts and investment professionals.",
+      icon: BarChart3,
+    },
+    {
+      title: "Transparent Pricing",
+      description: "No hidden fees. Know exactly what you're investing in with clear, upfront deal structures.",
+      icon: Lock,
+    },
+    {
+      title: "Real-Time Dashboards",
+      description: "Track performance metrics, distributions, and portfolio analytics in one unified platform.",
+      icon: Zap,
+    },
+    {
+      title: "Investor Community",
+      description: "Join 250+ accredited investors accessing premium real estate opportunities together.",
+      icon: Users,
     },
   ];
 
   return (
     <Layout>
-      {/* Hero Section - Compact */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-gray-950 via-gray-900 to-background pt-16 pb-20 sm:pt-20 sm:pb-24">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full filter blur-3xl animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-orange-500/10 rounded-full filter blur-3xl animate-pulse delay-700" />
-        </div>
-
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-primary/10 backdrop-blur border border-primary/20 rounded-full">
-            <Flame className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">The Modern Way to Invest</span>
+      {/* Hero Section - Condensed */}
+      <div className="relative min-h-[50vh] w-full overflow-hidden bg-gradient-to-b from-amber-50 via-white to-white pt-12 pb-8 sm:pt-16 sm:pb-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-2 sm:mb-3 text-gray-900 leading-tight">
+              How It Works
+            </h1>
+            <p className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed font-light">
+              Four simple steps to access premium real estate investment opportunities and build wealth through institutional-grade deals.
+            </p>
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-white">
-            Build Wealth <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-400 to-yellow-400">the Smart Way</span>
-          </h1>
-          <p className="text-base sm:text-lg text-gray-300 leading-relaxed max-w-2xl mx-auto">
-            Four simple steps to access institutional-grade real estate opportunities. No complexity, just results.
-          </p>
         </div>
       </div>
 
-      {/* Steps Timeline - Compact Grid */}
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        {/* Timeline Connector - Hidden on Mobile */}
-        <div className="hidden lg:block absolute top-1/4 left-0 right-0 h-1 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0" />
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 relative z-10">
+      {/* Steps Section - Compact */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {steps.map((step, index) => {
             const IconComponent = step.icon;
             return (
-              <div key={index} className="group">
-                {/* Number Indicator */}
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-primary to-orange-500 text-white font-bold text-sm shadow-lg group-hover:scale-110 transition-transform">
-                      {index + 1}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-primary uppercase tracking-wide">{step.subtitle}</p>
-                  </div>
-                </div>
-
+              <div key={index} className="relative group">
                 {/* Card */}
-                <div className="relative p-5 sm:p-6 bg-gradient-to-br from-white/80 to-white/60 backdrop-blur border border-white/20 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl hover:from-white hover:to-white/80 transition-all duration-300 group-hover:-translate-y-1">
+                <div className="relative p-5 sm:p-6 bg-white rounded-xl sm:rounded-2xl border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-300 h-full">
+                  {/* Number Badge */}
+                  <div className="absolute -top-3 -left-3 w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg">
+                    {step.number}
+                  </div>
+
                   {/* Icon */}
-                  <div className="mb-4 p-3 bg-gradient-to-br from-primary/20 to-orange-500/10 rounded-lg w-fit">
-                    <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                  <div className="mb-4 pt-2">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <IconComponent className="h-5 w-5 text-primary" />
+                    </div>
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                     {step.title}
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
@@ -98,77 +105,93 @@ export default function HowItWorks() {
         </div>
       </div>
 
-      {/* Features Grid - Compact */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background to-gray-50" />
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className="mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Why We're Different</h2>
-            <div className="w-12 h-1 bg-gradient-to-r from-primary to-orange-500 rounded-full" />
+      {/* Features Section - Compact */}
+      <div className="bg-gradient-to-b from-white to-gray-50 py-8 sm:py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-1">
+              Why Choose Us
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 font-light">
+              We combine modern technology with institutional expertise to make real estate investing accessible, transparent, and profitable.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              { title: "Vetted Deals", desc: "Every property hand-picked by experts" },
-              { title: "Zero Hidden Fees", desc: "Transparent pricing, upfront terms" },
-              { title: "Live Tracking", desc: "Real-time dashboards & performance data" },
-              { title: "250+ Investors", desc: "Join our community of accredited investors" },
-            ].map((feature, idx) => (
-              <div key={idx} className="p-4 sm:p-5 bg-white/50 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/80 transition-all hover:shadow-md group">
-                <div className="flex items-start gap-3">
-                  <div className="h-5 w-5 rounded-full bg-gradient-to-br from-primary to-orange-500 flex-shrink-0 mt-1 flex items-center justify-center">
-                    <CheckCircle className="h-3 w-3 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base mb-1">{feature.title}</h4>
-                    <p className="text-xs sm:text-sm text-gray-600">{feature.desc}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            {features.map((feature, index) => {
+              const IconComponent = feature.icon;
+              return (
+                <div key={index} className="p-4 sm:p-5 bg-white rounded-lg sm:rounded-xl border border-gray-200/50 shadow-sm hover:shadow-md transition-all">
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-primary/10">
+                        <IconComponent className="h-5 w-5 text-primary" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1">
+                        {feature.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Stats - Inline */}
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-12">
+      {/* Stats Section - Inline Compact */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
+          <div className="text-center p-4 sm:p-5 bg-gradient-to-br from-primary/5 to-orange-500/5 rounded-lg sm:rounded-xl border border-primary/10">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900">$15M+</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Capital Deployed</p>
+          </div>
+          <div className="text-center p-4 sm:p-5 bg-gradient-to-br from-primary/5 to-orange-500/5 rounded-lg sm:rounded-xl border border-primary/10">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900">250+</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Active Investors</p>
+          </div>
+          <div className="text-center p-4 sm:p-5 bg-gradient-to-br from-primary/5 to-orange-500/5 rounded-lg sm:rounded-xl border border-primary/10">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-900">18-24%</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Avg Returns</p>
+          </div>
+        </div>
+
+        {/* Mini Features Grid */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
           {[
-            { label: "$15M+", desc: "Deployed" },
-            { label: "250+", desc: "Investors" },
-            { label: "18-24%", desc: "Returns" },
-          ].map((stat, idx) => (
-            <div key={idx} className="text-center p-4 sm:p-6 bg-gradient-to-br from-primary/10 to-orange-500/5 rounded-lg sm:rounded-xl border border-primary/20">
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.label}</p>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">{stat.desc}</p>
+            { label: "Vetted Properties", value: "Every deal verified by experts" },
+            { label: "Transparent Terms", value: "No hidden fees or surprises" },
+            { label: "Live Tracking", value: "Real-time performance dashboards" },
+            { label: "Legal Protection", value: "Institutional-grade agreements" },
+          ].map((item, idx) => (
+            <div key={idx} className="p-3 sm:p-4 bg-white rounded-lg border border-gray-200/50 shadow-sm hover:shadow-md transition-all">
+              <p className="text-xs font-semibold text-primary mb-1">{item.label}</p>
+              <p className="text-xs text-gray-600">{item.value}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* CTA - Compact */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-gray-950 via-primary/20 to-gray-950 py-12 sm:py-16">
-        <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-primary/20 rounded-full filter blur-3xl animate-pulse" />
-          <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-orange-500/10 rounded-full filter blur-3xl animate-pulse delay-700" />
-        </div>
-
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Ready to Start Investing?</h2>
-          <p className="text-sm sm:text-base text-gray-300 mb-6 sm:mb-8 max-w-lg mx-auto">Discover premium real estate opportunities tailored for accredited investors.</p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Link href="/properties">
-              <Button className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 h-10 sm:h-12 border-0 shadow-lg hover:shadow-xl transition-all gap-2 w-full sm:w-auto">
-                Explore Properties
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/">
-              <Button variant="outline" className="rounded-full border-white/30 text-white hover:bg-white/10 font-semibold px-6 sm:px-8 h-10 sm:h-12 bg-white/5 backdrop-blur-sm w-full sm:w-auto">
-                Back to Home
-              </Button>
-            </Link>
-          </div>
+      {/* CTA Section - Compact */}
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 py-8 sm:py-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-2 sm:mb-3 text-white">
+            Ready to Get Started?
+          </h2>
+          <p className="text-sm sm:text-base text-gray-300 mb-5 sm:mb-6 max-w-2xl mx-auto font-light">
+            Browse our marketplace and discover high-quality real estate opportunities designed for accredited investors.
+          </p>
+          <Link href="/properties">
+            <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 h-10 sm:h-12 border-0 shadow-lg hover:shadow-xl transition-all gap-2 text-sm sm:text-base">
+              Explore Properties
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </Layout>
