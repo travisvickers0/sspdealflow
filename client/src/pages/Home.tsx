@@ -89,7 +89,16 @@ export default function Home() {
             Access off-market opportunities vetted by our expert team. Simple, transparent, and built for accredited investors.
           </p>
           <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-            <Button size="lg" className="rounded-full bg-white text-black hover:bg-white/90 font-semibold px-8 text-base h-12 border-0 shadow-lg hover:shadow-xl transition-all">
+            <Button 
+                size="lg" 
+                className="rounded-full bg-white text-black hover:bg-white/90 font-semibold px-8 text-base h-12 border-0 shadow-lg hover:shadow-xl transition-all"
+                onClick={() => {
+                    const element = document.getElementById('properties-section');
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }}
+            >
               View Properties
             </Button>
             <Button size="lg" variant="outline" className="rounded-full border-white text-white hover:bg-white/20 font-semibold px-8 text-base h-12 bg-transparent backdrop-blur-sm">
@@ -100,7 +109,7 @@ export default function Home() {
       </div>
 
       {/* Filters Bar */}
-      <div className="sticky top-16 z-40 w-full bg-background/80 backdrop-blur-xl border-b py-4 shadow-sm transition-all">
+      <div id="properties-section" className="sticky top-16 z-40 w-full bg-background/80 backdrop-blur-xl border-b py-4 shadow-sm transition-all">
         <div className="container mx-auto px-4 sm:px-8 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="flex w-full md:w-auto items-center gap-2 bg-muted/50 hover:bg-muted/80 rounded-full px-4 py-2 border transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 focus-within:bg-background">
             <Search className="h-4 w-4 text-muted-foreground" />
