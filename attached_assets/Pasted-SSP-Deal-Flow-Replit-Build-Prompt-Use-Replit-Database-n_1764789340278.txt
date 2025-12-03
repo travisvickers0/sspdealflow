@@ -1,0 +1,494 @@
+SSP Deal Flow – Replit Build Prompt
+
+Use Replit Database, no Supabase, no Monday, no portfolio tracking
+Design like Apple and Airbnb
+
+Build a full stack real estate investment platform called SSP Deal Flow entirely inside Replit using:
+
+Replit Database for all persistent storage
+
+Node and Express backend
+
+React 18 and TypeScript and Vite frontend
+
+Tailwind CSS and shadcn/ui
+
+Google Maps API, Recharts, Gemini API
+
+Local /uploads folder for image and document storage
+
+The app should not include:
+
+Investor portfolio tracking
+
+Investor dashboard or “my investments” pages
+
+Supabase
+
+Monday integration
+
+Focus on:
+
+Properties
+
+Investment commitments
+
+AI BPO extraction
+
+Admin tools
+
+Beautiful Apple / Airbnb style UX and UI
+
+Design and UX Requirements
+
+Match the visual and interaction style of Apple and Airbnb:
+
+Clean, minimal layout with generous white space
+
+Soft rounded cards, smooth shadows, very polished look
+
+Clear visual hierarchy and large readable typography
+
+Neutral color palette with one warm accent color
+
+Simple iconography and subtle micro animations for hover and tap states
+
+Smooth page transitions and modal dialogs
+
+Fully responsive for mobile, tablet, and desktop
+
+Use Tailwind and shadcn/ui components styled to feel like Apple and Airbnb marketing and dashboard pages
+
+Technology Stack
+
+Frontend
+
+React 18
+
+TypeScript
+
+Vite
+
+Tailwind CSS
+
+shadcn/ui
+
+React Router v6
+
+TanStack Query for data fetching
+
+Backend
+
+Node
+
+Express
+
+Replit Database
+
+Other
+
+Google Maps JavaScript API
+
+Recharts for charts on admin side
+
+Gemini 2.5 API for AI BPO extraction
+
+Local /uploads folder for documents and images
+
+JWT based authentication
+
+Project Structure
+root/
+  backend/
+    server.ts
+    routes/
+      properties.ts
+      commitments.ts
+      comps.ts
+      documents.ts
+      auth.ts
+      uploads.ts
+      ai.ts
+    lib/
+      db.ts
+      auth.ts
+      validators.ts
+    uploads/
+  frontend/
+    src/
+      pages/
+      components/
+      api/
+      context/
+      hooks/
+      styles/
+      App.tsx
+      main.tsx
+  package.json
+  vite.config.ts
+
+Authentication
+
+Use a simple JWT auth system.
+
+Implement:
+
+POST /auth/register
+
+POST /auth/login
+
+Optional /auth/me to fetch current user
+
+Password hashing with bcrypt
+
+JWT signing and verification
+
+Middleware: requireAuth, requireAdmin
+
+User roles:
+
+admin
+
+investor
+
+Store users in Replit Database under keys like:
+
+users:<id> = {
+  "id": "string",
+  "name": "string",
+  "email": "string",
+  "passwordHash": "string",
+  "role": "admin" | "investor",
+  "created_at": "ISO string"
+}
+
+Replit Database Schema
+
+Use JSON objects stored by key.
+Maintain simple index arrays for lists, for example properties_index = [ids].
+
+Properties
+
+Key: properties:<id>
+
+{
+  "id": "string",
+  "address": "string",
+  "slug": "string",
+  "city": "string",
+  "state": "string",
+  "zip": "string",
+  "lat": number,
+  "lng": number,
+  "purchase_price": number,
+  "arv": number,
+  "rehab_budget": number,
+  "equity_available": number,
+  "description": "string",
+  "images": ["string"],
+  "status": "needs_funding" | "committed" | "funded" | "archived",
+  "created_at": "ISO string",
+  "updated_at": "ISO string"
+}
+
+Investment Commitments
+
+Key: commitments:<id>
+
+{
+  "id": "string",
+  "user_id": "string",
+  "property_id": "string",
+  "amount": number,
+  "equity_percent": number,
+  "status": "pending" | "approved" | "rejected",
+  "created_at": "ISO string",
+  "updated_at": "ISO string"
+}
+
+Property Documents
+
+Key: documents:<id>
+
+{
+  "id": "string",
+  "property_id": "string",
+  "type": "bpo" | "purchase_contract" | "other",
+  "filename": "string",
+  "filepath": "string",
+  "uploaded_at": "ISO string"
+}
+
+Comparable Sales
+
+Key: comps:<id>
+
+{
+  "id": "string",
+  "property_id": "string",
+  "address": "string",
+  "price": number,
+  "sq_ft": number,
+  "distance": number
+}
+
+JV Proposals
+
+Key: jv:<id>
+
+{
+  "id": "string",
+  "property_id": "string",
+  "investor_split": number,
+  "ssp_split": number,
+  "projected_profit": number,
+  "notes": "string"
+}
+
+Pages
+1. Home Page (/)
+
+Public page with Apple / Airbnb style layout.
+
+Features:
+
+Hero section that explains SSP Deal Flow
+
+Card grid of all available properties with key stats
+
+Filters for state and funding status
+
+Sorting by newest, price, equity
+
+Map component showing property markers
+
+Design:
+
+Large clean hero with headline and subheadline
+
+Three or four simple stat cards in a row
+
+Soft rounded cards with clear hierarchy
+
+Sticky filters bar on desktop
+
+2. Property Detail Page (/property/:slug)
+
+Public page.
+
+Show:
+
+Large primary image and gallery under it
+
+Address and basic property details
+
+Purchase price, ARV, rehab budget, equity available
+
+Funding progress bar (based on commitments, summed from commitments for that property)
+
+Google Map section with pin
+
+Comparable sales list and compact map
+
+JV Proposal Calculator section
+
+Button: “Submit Investment Commitment”
+
+Admin only controls on this page:
+
+Edit property
+
+Upload documents
+
+Add or edit comps
+
+Use side by side layout on desktop and stacked on mobile, with clean Apple / Airbnb feel.
+
+3. Investment Commitment Page (/invest/:propertyId)
+
+Requires login as investor.
+
+Form:
+
+Show brief summary of property
+
+Input for amount
+
+Read only field for equity_percent calculated based on amount and equity_available
+
+Checkbox for accepting terms
+
+Submit button
+
+On submit:
+
+Create commitments:<id> record with status = "pending"
+
+Simple success state with thank you message and next steps.
+
+No portfolio page and no investor dashboard.
+
+4. Admin Dashboard (/admin)
+
+Requires admin role.
+
+Sections:
+
+Properties table with search and filters
+
+Button to create new property
+
+Click row to edit existing property
+
+Section to list commitments with filters by status
+
+Controls to approve or reject commitments
+
+Section to trigger AI BPO extraction for uploaded BPO docs
+
+Section to manage comparable sales for each property
+
+Layout:
+
+Left side navigation rail
+
+Main content area with cards and tables
+
+Consistent Apple / Airbnb style interface
+
+Backend API Routes (Express)
+Properties
+
+GET /api/properties – list properties with filters
+
+GET /api/properties/:id – single property
+
+POST /api/properties – admin create
+
+PUT /api/properties/:id – admin update
+
+DELETE /api/properties/:id – admin delete
+
+Commitments
+
+POST /api/commitments – create commitment
+
+GET /api/commitments/property/:propertyId – admin view commitments for a property
+
+PUT /api/commitments/:id/approve – admin approve
+
+PUT /api/commitments/:id/reject – admin reject
+
+Documents
+
+POST /api/documents/upload – admin upload, save file in /uploads and record in DB
+
+GET /api/documents/:propertyId – list property documents
+
+Comps
+
+POST /api/comps – admin create or bulk create
+
+GET /api/comps/:propertyId – list comps for property
+
+AI BPO Extraction
+
+POST /api/ai/extract-bpo
+
+Input: base64 PDF or JPEG
+
+Use Gemini to extract purchase price, ARV, rehab estimate, list of comparable sales
+
+Update property and comps accordingly
+
+Auth
+
+POST /api/auth/register
+
+POST /api/auth/login
+
+GET /api/auth/me
+
+Use JWT cookies or bearer tokens for the frontend.
+
+JV Proposal Calculator
+
+Frontend component on the property detail page.
+
+Inputs:
+
+Total project cost (purchase price plus rehab)
+
+Projected resale price
+
+Investor contribution amount
+
+Investor and SSP split percentages
+
+Outputs:
+
+Required funding
+
+Projected profit
+
+Investor profit and SSP profit
+
+Simple numeric ROI and cash on cost
+
+Optional: store JV data in jv:<id>.
+
+Email Notifications (Optional but Preferred)
+
+Admin action that sends emails via a provider like Mailgun, SendGrid, or Resend.
+
+Use this for:
+
+New commitment submitted
+
+Commitment approved or rejected
+
+Email templates can be hard coded at first or stored in Replit DB.
+
+Explicitly Do Not Build
+
+Do not include:
+
+Investor portfolio tracking
+
+Investor dashboards
+
+“My investments” pages
+
+Supabase
+
+Monday.com or any Monday related code
+
+Deliverables
+
+Replit should generate:
+
+Backend
+
+Express server with all API routes described
+
+Replit Database helper module
+
+JWT auth middleware
+
+File upload handling using multer or similar to /uploads
+
+AI endpoint that calls Gemini
+
+Frontend
+
+Vite React TypeScript app
+
+Tailwind and shadcn/ui configured
+
+Layouts and components styled like Apple or Airbnb products pages and dashboards
+
+Home, Property Detail, Invest, and Admin pages
+
+React Router routes and TanStack Query hooks for all API endpoints
+
+Protected routes for admin and auth flow for login and register
