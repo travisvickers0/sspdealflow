@@ -27,8 +27,10 @@ export default function Home() {
         <div className="absolute bottom-20 left-20 w-64 h-64 bg-orange-200/10 rounded-full filter blur-3xl animate-pulse delay-1000" />
         
         {/* Content */}
-        <div className="relative container mx-auto px-4 sm:px-8 h-full py-20 flex flex-col justify-center">
-          <div className="max-w-3xl">
+        <div className="relative container mx-auto px-4 sm:px-8 h-full py-20 flex items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full items-center">
+            {/* Left Side - Text & CTAs */}
+            <div className="max-w-2xl">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-white/60 backdrop-blur border border-gray-200/50 rounded-full animate-in fade-in slide-in-from-top duration-700 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -91,6 +93,82 @@ export default function Home() {
               >
                 Schedule Demo
               </Button>
+            </div>
+            </div>
+
+            {/* Right Side - Stacked Property Cards */}
+            <div className="hidden lg:block relative h-[600px]">
+              {/* Card 1 - Front */}
+              <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 z-30 animate-in fade-in slide-in-from-right-4 duration-700 delay-500">
+                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                  {properties[0].images[0] && (
+                    <img 
+                      src={properties[0].images[0]}
+                      alt={properties[0].address}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    ${(properties[0].purchase_price / 1000).toFixed(0)}k
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">{properties[0].address}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{properties[0].city}, {properties[0].state}</p>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-primary font-semibold">${(properties[0].equity_available / 1000).toFixed(0)}k Available</span>
+                    <span className="text-gray-600">20% ROI</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2 - Middle */}
+              <div className="absolute right-12 top-32 w-80 bg-white rounded-2xl shadow-xl overflow-hidden transform -rotate-6 z-20 animate-in fade-in slide-in-from-right-4 duration-700 delay-700">
+                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                  {properties[1].images[0] && (
+                    <img 
+                      src={properties[1].images[0]}
+                      alt={properties[1].address}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    ${(properties[1].purchase_price / 1000).toFixed(0)}k
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">{properties[1].address}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{properties[1].city}, {properties[1].state}</p>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-primary font-semibold">${(properties[1].equity_available / 1000).toFixed(0)}k Available</span>
+                    <span className="text-gray-600">18% ROI</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3 - Back */}
+              <div className="absolute right-24 top-52 w-80 bg-white rounded-2xl shadow-lg overflow-hidden transform rotate-3 z-10 animate-in fade-in slide-in-from-right-4 duration-700 delay-1000">
+                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                  {properties[2].images[0] && (
+                    <img 
+                      src={properties[2].images[0]}
+                      alt={properties[2].address}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    ${(properties[2].purchase_price / 1000).toFixed(0)}k
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-1">{properties[2].address}</h3>
+                  <p className="text-sm text-gray-600 mb-3">{properties[2].city}, {properties[2].state}</p>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-primary font-semibold">Fully Funded</span>
+                    <span className="text-gray-600">24% ROI</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
