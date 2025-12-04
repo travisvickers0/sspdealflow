@@ -2,19 +2,18 @@ import { Layout } from "@/components/Layout";
 import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 import { useRoute, Link } from "wouter";
-import { MapPin, ChevronLeft, CheckCircle2, Home as HomeIcon, Ruler, DollarSign, FileText, Share2, Heart, Loader2, Bed, Bath, Calendar, TrendingUp } from "lucide-react";
+import { MapPin, ChevronLeft, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading, error } = useProperty(params?.slug);
-  const [investorContribution, setInvestorContribution] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [investAmount, setInvestAmount] = useState(50000);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -22,7 +21,7 @@ export default function PropertyDetail() {
 
   useEffect(() => {
     if (property) {
-      setInvestorContribution(property.purchasePrice);
+      setInvestAmount(property.purchasePrice);
     }
   }, [property]);
 
@@ -49,261 +48,140 @@ export default function PropertyDetail() {
     );
   }
 
-  
-  // Business model: Investor puts up purchase price, profits split 50/50 on estimated equity
   const investorReturn = property.estimatedEquity * 0.5;
-  const returnPercentage = investorContribution > 0 ? (investorReturn / investorContribution) * 100 : 0;
-
+  const returnPercentage = property.purchasePrice > 0 ? (investorReturn / property.purchasePrice) * 100 : 0;
+  
   const galleryImages = property.galleryPhotoUrls || [];
   const allImages = property.mainPhotoUrl ? [property.mainPhotoUrl, ...galleryImages] : galleryImages;
+  
+  const fundingProgress = property.status === "needs_funding" ? 0 : property.status === "committed" ? 83 : 100;
+  const raisedAmount = Math.round((fundingProgress / 100) * property.purchasePrice);
 
   return (
     <Layout>
-      <div className="w-full">
+      <div className="bg-gray-50 min-h-screen">
         {/* Back Button */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
-          <Link href="/properties" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-            <ChevronLeft className="h-4 w-4 mr-1" /> Back to Properties
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <Link href="/properties" className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary transition-colors">
+            <ChevronLeft className="h-4 w-4 mr-1" /> Back to Marketplace
           </Link>
         </div>
 
-        {/* Header with Address */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 border-b">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <Badge className={`${
-                  property.status === 'needs_funding' ? 'bg-amber-100 text-amber-800' :
-                  property.status === 'committed' ? 'bg-blue-100 text-blue-800' :
-                  'bg-green-100 text-green-800'
-                }`}>
-                  {property.status === "needs_funding" ? "Needs Funding" : 
-                   property.status === "committed" ? "Funding Committed" : "Funded"}
-                </Badge>
-              </div>
-              <h1 className="text-4xl font-bold text-gray-900" data-testid="text-property-address">{property.address}</h1>
-              <p className="text-lg text-gray-500 mt-2 flex items-center">
-                <MapPin className="h-4 w-4 mr-2" />
-                {property.city}, {property.state} {property.zip}
-              </p>
-            </div>
+        {/* Main Content Grid */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div className="flex gap-3">
-              <button className="p-2.5 rounded-full border border-gray-200 hover:bg-gray-50 text-gray-600 transition">
-                <Share2 className="w-5 h-5" />
-              </button>
-              <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
-                <Heart className="w-4 h-4 text-gray-400" />
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Gallery */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 h-[400px] rounded-2xl overflow-hidden">
-            {/* Main large image */}
-            <div className="md:col-span-3 h-full relative group cursor-pointer bg-gray-100">
-              {allImages[0] ? (
-                <img 
-                  src={allImages[0]} 
-                  className="w-full h-full object-cover transition transform group-hover:scale-105 duration-700" 
-                  alt="Property Front" 
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <HomeIcon className="h-16 w-16" />
+            {/* Left Column - Images & Content */}
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* Image Gallery */}
+              <div className="space-y-3">
+                {/* Main Image */}
+                <div className="aspect-[16/10] rounded-2xl overflow-hidden bg-gray-200">
+                  {allImages[selectedImage] ? (
+                    <img 
+                      src={allImages[selectedImage]} 
+                      className="w-full h-full object-cover" 
+                      alt="Property" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <HomeIcon className="h-16 w-16" />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            
-            {/* Right side gallery images */}
-            <div className="hidden md:flex flex-col gap-4 h-full">
-              <div className="h-1/2 relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100">
-                {allImages[1] ? (
-                  <img 
-                    src={allImages[1]} 
-                    className="w-full h-full object-cover transition transform group-hover:scale-105 duration-700" 
-                    alt="Gallery" 
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-300">
-                    <HomeIcon className="h-8 w-8" />
+                
+                {/* Thumbnails */}
+                {allImages.length > 1 && (
+                  <div className="flex gap-3">
+                    {allImages.slice(0, 4).map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedImage(idx)}
+                        className={`w-20 h-16 rounded-lg overflow-hidden border-2 transition ${
+                          selectedImage === idx ? 'border-primary' : 'border-transparent hover:border-gray-300'
+                        }`}
+                      >
+                        <img src={img} className="w-full h-full object-cover" alt={`Thumbnail ${idx + 1}`} />
+                      </button>
+                    ))}
+                    {allImages.length > 4 && (
+                      <button className="w-20 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600 hover:bg-gray-200 transition">
+                        +{allImages.length - 4}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
-              <div className="h-1/2 relative group cursor-pointer overflow-hidden rounded-lg bg-gray-100">
-                {allImages[2] ? (
-                  <img 
-                    src={allImages[2]} 
-                    className="w-full h-full object-cover transition transform group-hover:scale-105 duration-700" 
-                    alt="Gallery" 
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-300">
-                    <HomeIcon className="h-8 w-8" />
-                  </div>
-                )}
-                {allImages.length > 3 && (
-                  <button className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm px-4 py-2 text-xs font-semibold rounded-lg shadow hover:bg-white transition">
-                    View all photos
-                  </button>
-                )}
+
+              {/* Address & Share */}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900" data-testid="text-property-address">
+                    {property.address}
+                  </h1>
+                  <p className="text-gray-500 flex items-center mt-1">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    {property.city}, {property.state} {property.zip}
+                  </p>
+                </div>
+                <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-100 transition">
+                  <Share2 className="w-5 h-5 text-gray-500" />
+                </button>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Metrics Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-gray-50 rounded-xl p-8 border border-gray-100 flex flex-wrap justify-between items-center gap-8">
-            
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">Purchase Price</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2" data-testid="text-purchase-price">${property.purchasePrice.toLocaleString()}</p>
-            </div>
-
-            <div className="w-px h-12 bg-gray-200 hidden md:block"></div>
-
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">Rehab Budget</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">${(property.rehabBudget || 0).toLocaleString()}</p>
-            </div>
-
-            <div className="w-px h-12 bg-gray-200 hidden md:block"></div>
-
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider">BPO Value</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">${property.bpoValue.toLocaleString()}</p>
-            </div>
-
-            <div className="bg-green-50 px-8 py-4 rounded-lg border border-green-100">
-              <p className="text-xs text-green-700 uppercase font-bold tracking-wider">Est. Equity</p>
-              <p className="text-3xl font-extrabold text-green-600 mt-2" data-testid="text-estimated-equity">${property.estimatedEquity.toLocaleString()}</p>
-            </div>
-
-          </div>
-
-          {/* Property Specs Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-2.5 bg-gray-50 rounded-lg text-gray-600">
-                <Bed className="w-6 h-6" />
+              {/* Financial Metrics */}
+              <div className="flex flex-wrap gap-x-12 gap-y-4 py-4 border-b border-gray-200">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">Purchase Price</p>
+                  <p className="text-xl font-bold text-gray-900" data-testid="text-purchase-price">${property.purchasePrice.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">Rehab Budget</p>
+                  <p className="text-xl font-bold text-gray-900">${(property.rehabBudget || 0).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">ARV</p>
+                  <p className="text-xl font-bold text-gray-900">${property.bpoValue.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">Est. Profit</p>
+                  <p className="text-xl font-bold text-green-600" data-testid="text-estimated-equity">${property.estimatedEquity.toLocaleString()}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Bedrooms</p>
-                <p className="text-xl font-bold text-gray-900">{property.beds}</p>
-              </div>
-            </div>
 
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-2.5 bg-gray-50 rounded-lg text-gray-600">
-                <Bath className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Bathrooms</p>
-                <p className="text-xl font-bold text-gray-900">{property.baths}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-2.5 bg-gray-50 rounded-lg text-gray-600">
-                <Ruler className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Sqft</p>
-                <p className="text-xl font-bold text-gray-900">{property.squareFeet.toLocaleString()}</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="p-2.5 bg-blue-50 rounded-lg text-blue-600">
-                <Calendar className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Est. Closing</p>
-                <p className="text-xl font-bold text-gray-900">{new Date(property.closingDate).toLocaleDateString()}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-12">
               {/* About this Property */}
-              <div>
-                <h2 className="text-2xl font-bold mb-4 text-gray-900">About this Property</h2>
-                <p className="text-gray-600 leading-relaxed">
-                  {property.description || "No description available."}
-                  <br /><br />
-                  This opportunity represents a prime value-add scenario in a rapidly appreciating neighborhood. 
-                  Our team has secured this off-market deal at significantly below replacement cost. 
-                  The renovation plan includes a full cosmetic update, modernizing the kitchen and baths, 
-                  and enhancing curb appeal to maximize resale value.
+              <div className="py-4">
+                <h2 className="text-lg font-bold text-gray-900 mb-3">About this Property</h2>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {property.description || "Historic charm meets modern convenience. This property requires a light cosmetic rehab and foundation leveling."}
+                </p>
+                <p className="text-gray-600 text-sm leading-relaxed mt-3">
+                  This opportunity represents a prime value-add scenario in a rapidly appreciating neighborhood. Our team has secured this off-market deal at significantly below replacement cost. The renovation plan includes a full cosmetic update, modernizing the kitchen and baths, and enhancing curb appeal to maximize resale value.
                 </p>
               </div>
 
-              {/* Documents */}
-              {(property.documents as any[])?.length > 0 && (
-                <div>
-                  <h2 className="text-2xl font-bold mb-4 text-gray-900">Documents</h2>
-                  <div className="space-y-3">
-                    {(property.documents as any[]).map((doc, idx) => (
-                      <a 
-                        key={idx}
-                        href={doc.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-4 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 transition"
-                      >
-                        <FileText className="h-5 w-5 text-primary" />
-                        <span className="font-medium text-gray-900">{doc.name}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Comparable Sales */}
               {(property.comps as any[])?.length > 0 && (
-                <div>
-                  <h2 className="text-2xl font-bold mb-4 text-gray-900">Comparable Sales</h2>
-                  <p className="text-gray-600 mb-6">Recent sales in the area that support our BPO valuation.</p>
-                  <div className="space-y-4">
+                <div className="py-4 border-t border-gray-200">
+                  <h2 className="text-lg font-bold text-gray-900 mb-4">Comparable Sales</h2>
+                  <div className="space-y-3">
                     {(property.comps as any[]).map((comp, idx) => (
                       <div 
                         key={comp.id || idx}
-                        className="bg-white border border-gray-100 rounded-lg p-5 hover:shadow-md transition"
+                        className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div>
-                            <h3 className="font-semibold text-gray-900">{comp.address}</h3>
-                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <Bed className="h-3.5 w-3.5" /> {comp.beds} bd
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Bath className="h-3.5 w-3.5" /> {comp.baths} ba
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Ruler className="h-3.5 w-3.5" /> {comp.sqft?.toLocaleString()} sqft
-                              </span>
-                              {comp.distance && (
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="h-3.5 w-3.5" /> {comp.distance}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xl font-bold text-gray-900">${comp.price?.toLocaleString()}</p>
-                            <p className="text-xs text-gray-500">
-                              Sold {new Date(comp.soldDate).toLocaleDateString()}
-                            </p>
-                          </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">{comp.address}</p>
+                          <p className="text-xs text-gray-500">
+                            {comp.beds} beds · {comp.baths} baths · {comp.sqft?.toLocaleString()} sqft
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-gray-900">${comp.price?.toLocaleString()}</p>
+                          <p className="text-xs text-gray-500">
+                            Sold {new Date(comp.soldDate).toLocaleDateString()}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -312,101 +190,162 @@ export default function PropertyDetail() {
               )}
             </div>
 
-            {/* Sidebar - Investment Calculator */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24">
-                <Card className="shadow-xl border-2">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Investment Summary</CardTitle>
-                    <CardDescription>Calculate your potential returns</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Availability Status */}
-                    <div className="bg-gray-50 rounded-lg p-3 flex items-center justify-between border border-gray-100">
-                      <span className="text-sm font-medium text-gray-600">Availability</span>
-                      
-                      {property.status === 'needs_funding' ? (
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                          </span>
-                          <span className="text-sm font-bold text-emerald-700">Open for Funding</span>
-                        </div>
-                      ) : property.status === 'committed' ? (
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-3 w-3">
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                          </span>
-                          <span className="text-sm font-bold text-blue-700">Funding Secured</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-3 w-3">
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-gray-400"></span>
-                          </span>
-                          <span className="text-sm font-bold text-gray-600">Fully Funded</span>
-                        </div>
-                      )}
-                    </div>
+            {/* Right Column - Sidebar */}
+            <div className="space-y-6">
+              
+              {/* Investment Status Card */}
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-gray-900">Investment Status</h3>
+                    <Badge className={`${
+                      property.status === 'needs_funding' ? 'bg-amber-500 hover:bg-amber-500' :
+                      property.status === 'committed' ? 'bg-blue-500 hover:bg-blue-500' :
+                      'bg-green-500 hover:bg-green-500'
+                    } text-white`}>
+                      {property.status === "needs_funding" ? "Needs Funding" : 
+                       property.status === "committed" ? "Funding Committed" : "Funded"}
+                    </Badge>
+                  </div>
 
-                    {/* Investment Calculator */}
-                    <div className="space-y-4 pt-4 border-t">
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <Label className="text-sm font-medium">Investment Required</Label>
-                          <span className="text-xs text-gray-500">(Full Purchase Price)</span>
-                        </div>
-                        <div className="text-2xl font-bold text-gray-900">
-                          ${property.purchasePrice.toLocaleString()}
+                  <div className="space-y-1 text-sm mb-4">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Closing:</span>
+                      <span className="font-medium">{new Date(property.closingDate).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Funding Closes:</span>
+                      <span className="font-medium">14 days</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-500">Progress</span>
+                      <span className="font-bold text-primary">{fundingProgress}%</span>
+                    </div>
+                    <Progress value={fundingProgress} className="h-2" />
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>${raisedAmount.toLocaleString()} Raised</span>
+                      <span>${property.purchasePrice.toLocaleString()} Goal</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 py-4 border-t border-b border-gray-100 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Min. Investment</span>
+                      <span className="font-bold">${property.purchasePrice.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Equity Available</span>
+                      <span className="font-bold text-green-600">${property.estimatedEquity.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <Link href={`/invest/${property.id}`}>
+                    <Button 
+                      className="w-full h-12 text-base font-semibold bg-red-500 hover:bg-red-600"
+                      disabled={property.status !== 'needs_funding'}
+                      data-testid="button-invest"
+                    >
+                      {property.status === 'needs_funding' ? 'Commit to Invest' : 
+                       property.status === 'committed' ? 'Funding Secured' : 'Fully Funded'}
+                    </Button>
+                  </Link>
+
+                  <div className="flex gap-4 mt-3 text-xs text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                      </svg>
+                      Verified
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
+                      </svg>
+                      Secure
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Profit Calculator Card */}
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-gray-900 mb-4">Profit Calculator</h3>
+                  
+                  <div className="mb-4">
+                    <label className="text-sm text-gray-500 mb-2 block">Your Investment</label>
+                    <Slider 
+                      value={[investAmount]}
+                      onValueChange={(value) => setInvestAmount(value[0])}
+                      min={10000}
+                      max={property.purchasePrice}
+                      step={5000}
+                      className="mb-2"
+                    />
+                    <div className="text-right text-xl font-bold text-gray-900">
+                      ${investAmount.toLocaleString()}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-4 border-t border-gray-100">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Projected Profit Share</span>
+                      <span className="font-bold text-green-600 text-xl">${investorReturn.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-400">
+                      <span>Est. ROI</span>
+                      <span>~{returnPercentage.toFixed(0)}%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Documents Card */}
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-gray-900 mb-4">Documents</h3>
+                  
+                  {(property.documents as any[])?.length > 0 ? (
+                    <div className="space-y-3">
+                      {(property.documents as any[]).map((doc, idx) => (
+                        <a 
+                          key={idx}
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                        >
+                          <FileText className="h-5 w-5 text-red-500" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">{doc.name}</p>
+                            <p className="text-xs text-gray-400">PDF</p>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <FileText className="h-5 w-5 text-red-500" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Property Pro Forma</p>
+                          <p className="text-xs text-gray-400">PDF · 2.4 KB</p>
                         </div>
                       </div>
-
-                      <div className="space-y-3 pt-3 border-t border-dashed">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Estimated Equity</span>
-                          <span className="font-medium">${property.estimatedEquity.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Profit Split</span>
-                          <span className="font-medium">50/50</span>
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <FileText className="h-5 w-5 text-red-500" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Inspection Report</p>
+                          <p className="text-xs text-gray-400">PDF · 5.1 KB</p>
                         </div>
                       </div>
-
-                      <div className="bg-green-50 rounded-lg p-4 border border-green-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <TrendingUp className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium text-green-800">Your Estimated Return</span>
-                        </div>
-                        <p className="text-3xl font-bold text-green-600">
-                          ${investorReturn.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                        </p>
-                        <p className="text-xs text-green-700 mt-1">
-                          {returnPercentage.toFixed(1)}% return on investment
-                        </p>
-                      </div>
                     </div>
-
-                    {/* CTA Buttons */}
-                    <div className="flex flex-col gap-4 pt-6">
-                      {property.status === 'needs_funding' ? (
-                        <Link href={`/invest/${property.id}`}>
-                          <Button className="w-full h-14 text-lg font-semibold" data-testid="button-invest">
-                            Invest Now
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Button className="w-full h-14 text-lg font-semibold" disabled>
-                          {property.status === 'committed' ? 'Funding Secured' : 'Fully Funded'}
-                        </Button>
-                      )}
-                      <Button variant="outline" className="w-full h-12 text-base font-medium">
-                        Request More Info
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
