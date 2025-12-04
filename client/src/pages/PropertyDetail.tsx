@@ -1,11 +1,9 @@
 import { Layout } from "@/components/Layout";
 import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRoute, Link } from "wouter";
-import { MapPin, ChevronLeft, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, TrendingUp } from "lucide-react";
+import { MapPin, ChevronLeft, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 
@@ -53,9 +51,6 @@ export default function PropertyDetail() {
   
   const galleryImages = property.galleryPhotoUrls || [];
   const allImages = property.mainPhotoUrl ? [property.mainPhotoUrl, ...galleryImages] : galleryImages;
-  
-  const fundingProgress = property.status === "needs_funding" ? 0 : property.status === "committed" ? 83 : 100;
-  const raisedAmount = Math.round((fundingProgress / 100) * property.purchasePrice);
 
   return (
     <Layout>
@@ -74,6 +69,41 @@ export default function PropertyDetail() {
             {/* Left Column - Images & Content */}
             <div className="lg:col-span-2 space-y-6">
               
+              {/* Address Header - Above Gallery */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                  <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold border mb-3 ${
+                    property.status === 'needs_funding' 
+                      ? 'bg-amber-100 text-amber-800 border-amber-200' 
+                      : property.status === 'committed'
+                      ? 'bg-blue-100 text-blue-800 border-blue-200'
+                      : 'bg-green-100 text-green-800 border-green-200'
+                  }`}>
+                    {property.status === "needs_funding" ? "Needs Funding" : 
+                     property.status === "committed" ? "Funding Committed" : "Funded"}
+                  </span>
+                  
+                  <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight" data-testid="text-property-address">
+                    {property.address}
+                  </h1>
+                  
+                  <div className="flex items-center gap-2 mt-2 text-gray-500">
+                    <MapPin className="w-5 h-5 text-gray-400" />
+                    <span className="text-lg">{property.city}, {property.state} {property.zip}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button className="p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-500 transition-colors">
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                  <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                    <Heart className="w-5 h-5 text-gray-400" />
+                    Save Deal
+                  </button>
+                </div>
+              </div>
+
               {/* Image Gallery */}
               <div className="space-y-3">
                 {/* Main Image */}
@@ -114,22 +144,6 @@ export default function PropertyDetail() {
                 )}
               </div>
 
-              {/* Address & Share */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900" data-testid="text-property-address">
-                    {property.address}
-                  </h1>
-                  <p className="text-gray-500 flex items-center mt-1">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {property.city}, {property.state} {property.zip}
-                  </p>
-                </div>
-                <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-100 transition">
-                  <Share2 className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-
               {/* Financial Metrics */}
               <div className="flex flex-wrap gap-x-12 gap-y-4 py-4 border-b border-gray-200">
                 <div>
@@ -147,6 +161,49 @@ export default function PropertyDetail() {
                 <div>
                   <p className="text-xs text-gray-400 uppercase tracking-wide">Est. Profit</p>
                   <p className="text-xl font-bold text-green-600" data-testid="text-estimated-equity">${property.estimatedEquity.toLocaleString()}</p>
+                </div>
+              </div>
+
+              {/* Property Specs Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
+                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
+                    <Bed className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Bedrooms</p>
+                    <p className="text-lg md:text-xl font-bold text-gray-900">{property.beds}</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
+                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
+                    <Bath className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Bathrooms</p>
+                    <p className="text-lg md:text-xl font-bold text-gray-900">{property.baths}</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
+                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
+                    <Ruler className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Sqft</p>
+                    <p className="text-lg md:text-xl font-bold text-gray-900">{property.squareFeet.toLocaleString()}</p>
+                  </div>
+                </div>
+
+                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                    <Calendar className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Closing</p>
+                    <p className="text-lg md:text-xl font-bold text-gray-900">{new Date(property.closingDate).toLocaleDateString()}</p>
+                  </div>
                 </div>
               </div>
 
@@ -198,15 +255,65 @@ export default function PropertyDetail() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-gray-900">Investment Status</h3>
-                    <Badge className={`${
-                      property.status === 'needs_funding' ? 'bg-amber-500 hover:bg-amber-500' :
-                      property.status === 'committed' ? 'bg-blue-500 hover:bg-blue-500' :
-                      'bg-green-500 hover:bg-green-500'
-                    } text-white`}>
-                      {property.status === "needs_funding" ? "Needs Funding" : 
-                       property.status === "committed" ? "Funding Committed" : "Funded"}
-                    </Badge>
                   </div>
+
+                  {/* Single Investor Status Indicator */}
+                  {property.status === 'needs_funding' ? (
+                    <div className="bg-emerald-50 rounded-lg p-4 mb-6 border border-emerald-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700">Status</span>
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                          </span>
+                          <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Live</span>
+                        </div>
+                      </div>
+                      <div className="text-emerald-800 text-sm font-medium">
+                        Availability: <span className="font-bold">Open for Funding</span>
+                      </div>
+                      <p className="text-xs text-emerald-600 mt-1">
+                        Secure this deal with full funding.
+                      </p>
+                    </div>
+                  ) : property.status === 'committed' ? (
+                    <div className="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700">Status</span>
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-2.5 w-2.5">
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                          </span>
+                          <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">Secured</span>
+                        </div>
+                      </div>
+                      <div className="text-blue-800 text-sm font-medium">
+                        Availability: <span className="font-bold">Funding Committed</span>
+                      </div>
+                      <p className="text-xs text-blue-600 mt-1">
+                        This deal has been secured by an investor.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700">Status</span>
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-2.5 w-2.5">
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-400"></span>
+                          </span>
+                          <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">Closed</span>
+                        </div>
+                      </div>
+                      <div className="text-gray-700 text-sm font-medium">
+                        Availability: <span className="font-bold">Fully Funded</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        This deal has been fully funded.
+                      </p>
+                    </div>
+                  )}
 
                   <div className="space-y-1 text-sm mb-4">
                     <div className="flex justify-between">
@@ -216,18 +323,6 @@ export default function PropertyDetail() {
                     <div className="flex justify-between">
                       <span className="text-gray-500">Funding Closes:</span>
                       <span className="font-medium">14 days</span>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-500">Progress</span>
-                      <span className="font-bold text-primary">{fundingProgress}%</span>
-                    </div>
-                    <Progress value={fundingProgress} className="h-2" />
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
-                      <span>${raisedAmount.toLocaleString()} Raised</span>
-                      <span>${property.purchasePrice.toLocaleString()} Goal</span>
                     </div>
                   </div>
 
