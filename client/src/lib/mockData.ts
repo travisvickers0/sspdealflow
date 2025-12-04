@@ -25,6 +25,7 @@ export interface Property {
   images: string[];
   status: PropertyStatus;
   created_at: string;
+  closing_date: string;
 }
 
 export const properties: Property[] = [
@@ -45,6 +46,7 @@ export const properties: Property[] = [
     images: [prop1Img, prop2Img, prop3Img, heroImg],
     status: "needs_funding",
     created_at: "2023-10-01T10:00:00Z",
+    closing_date: "2024-12-18",
   },
   {
     id: "2",
@@ -63,6 +65,7 @@ export const properties: Property[] = [
     images: [prop3Img, heroImg, prop1Img],
     status: "committed",
     created_at: "2023-10-05T14:30:00Z",
+    closing_date: "2024-12-20",
   },
   {
     id: "3",
@@ -81,6 +84,7 @@ export const properties: Property[] = [
     images: [heroImg, prop1Img, prop2Img],
     status: "funded",
     created_at: "2023-09-15T09:15:00Z",
+    closing_date: "2024-12-25",
   },
 ];
 

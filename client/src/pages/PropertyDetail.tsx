@@ -106,7 +106,10 @@ export default function PropertyDetail() {
             <Card className="shadow-lg border-0 ring-1 ring-gray-200 sticky top-24">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl">Investment Status</CardTitle>
-                <CardDescription>Funding closes in 14 days</CardDescription>
+                <CardDescription className="space-y-1">
+                  <div className="text-xs font-semibold text-gray-700">Closing: {new Date(property.closing_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                  <div className="text-xs text-muted-foreground">Funding closes in 14 days</div>
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
