@@ -1,8 +1,9 @@
 import { Property } from "@/lib/mockData";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
+import { cn } from "@/lib/utils";
 
 interface PropertyCardProps {
   property: Property;
@@ -89,16 +90,26 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 <span className="text-muted-foreground font-medium">Funding Progress</span>
                 <span className="font-semibold text-gray-900">{fundingProgress}%</span>
               </div>
-              <Progress value={fundingProgress} className="h-1.5" />
+              <Progress 
+                value={fundingProgress} 
+                className={cn(
+                  "h-1.5",
+                  property.status === 'needs_funding' && "[&>div]:bg-amber-500",
+                  property.status === 'committed' && "[&>div]:bg-blue-500",
+                  property.status === 'funded' && "[&>div]:bg-green-500"
+                )}
+              />
             </div>
 
             {/* Closes Date and BPO Price */}
             <div className="flex justify-between text-xs pt-2">
-              <div className="text-muted-foreground">
-                <div className="font-medium">🕐 Closes {new Date(property.closing_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Clock className="h-3.5 w-3.5" />
+                <div className="font-medium">Closes {new Date(property.closing_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
               </div>
-              <div className="text-right text-primary">
-                <div className="font-bold">📈 BPO: ${property.arv.toLocaleString()}</div>
+              <div className="flex items-center gap-1.5 text-right">
+                <TrendingUp className="h-3.5 w-3.5 text-green-600" />
+                <div className="font-bold text-green-600">BPO: ${property.arv.toLocaleString()}</div>
               </div>
             </div>
           </CardContent>
