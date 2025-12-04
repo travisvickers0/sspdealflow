@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { useProperties, useAdminProperties, useBulkEditor, useUpload } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,61 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import type { Property, InsertProperty, UpdateProperty } from "@shared/schema";
+
+interface NewPropertyRow {
+  id: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  status: string;
+  purchasePrice: number;
+  estimatedEquity: number;
+  beds: number;
+  baths: number;
+  squareFeet: number;
+  closingDate: string;
+  bpoValue: number;
+  rehabBudget: number;
+  isValid: boolean;
+}
+
+const createEmptyRow = (): NewPropertyRow => ({
+  id: crypto.randomUUID(),
+  address: "",
+  city: "",
+  state: "",
+  zip: "",
+  status: "needs_funding",
+  purchasePrice: 0,
+  estimatedEquity: 0,
+  beds: 0,
+  baths: 0,
+  squareFeet: 0,
+  closingDate: "",
+  bpoValue: 0,
+  rehabBudget: 0,
+  isValid: false,
+});
+
+const validateRow = (row: NewPropertyRow): boolean => {
+  return !!(
+    row.address.trim() &&
+    row.city.trim() &&
+    row.state.trim() &&
+    row.zip.trim() &&
+    row.purchasePrice > 0 &&
+    row.estimatedEquity > 0 &&
+    row.bpoValue > 0 &&
+    row.beds > 0 &&
+    row.baths > 0 &&
+    row.squareFeet > 0 &&
+    row.closingDate
+  );
+};
 
 export default function Admin() {
   const { data: properties, isLoading, refetch } = useProperties();
@@ -20,6 +73,7 @@ export default function Admin() {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const stats = {
     total: properties?.length || 0,
@@ -57,6 +111,10 @@ export default function Admin() {
                   onSubmit={async (data) => {
                     await createProperty.mutateAsync(data as InsertProperty);
                     setIsCreateDialogOpen(false);
+                    toast({
+                      title: "Property Created",
+                      description: "The property has been added successfully.",
+                    });
                   }}
                   isLoading={createProperty.isPending}
                   uploadPhoto={uploadPhoto}
@@ -127,7 +185,8 @@ export default function Admin() {
         <Tabs defaultValue="properties" className="space-y-6">
           <TabsList>
             <TabsTrigger value="properties" data-testid="tab-properties">Properties</TabsTrigger>
-            <TabsTrigger value="bulk" data-testid="tab-bulk">Bulk Editor</TabsTrigger>
+            <TabsTrigger value="bulk-add" data-testid="tab-bulk-add">Bulk Add</TabsTrigger>
+            <TabsTrigger value="bulk-edit" data-testid="tab-bulk-edit">Bulk Edit</TabsTrigger>
           </TabsList>
 
           <TabsContent value="properties">
@@ -203,6 +262,10 @@ export default function Admin() {
                               onClick={() => {
                                 if (confirm("Are you sure you want to delete this property?")) {
                                   deleteProperty.mutate(property.id);
+                                  toast({
+                                    title: "Property Deleted",
+                                    description: "The property has been removed.",
+                                  });
                                 }
                               }}
                               data-testid={`button-delete-${property.id}`}
@@ -224,8 +287,27 @@ export default function Admin() {
             )}
           </TabsContent>
 
-          <TabsContent value="bulk">
-            <BulkEditor properties={properties || []} />
+          <TabsContent value="bulk-add">
+            <BulkAddEditor onSuccess={() => {
+              refetch();
+              toast({
+                title: "Properties Added",
+                description: "All properties have been created successfully.",
+              });
+            }} />
+          </TabsContent>
+
+          <TabsContent value="bulk-edit">
+            <BulkEditor 
+              properties={properties || []} 
+              onSuccess={() => {
+                refetch();
+                toast({
+                  title: "Changes Saved",
+                  description: "All property updates have been saved.",
+                });
+              }} 
+            />
           </TabsContent>
         </Tabs>
 
@@ -242,6 +324,10 @@ export default function Admin() {
                   await updateProperty.mutateAsync({ id: editingProperty.id, data });
                   setIsEditDialogOpen(false);
                   setEditingProperty(null);
+                  toast({
+                    title: "Property Updated",
+                    description: "The property has been updated successfully.",
+                  });
                 }}
                 isLoading={updateProperty.isPending}
                 uploadPhoto={uploadPhoto}
@@ -483,17 +569,6 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               />
             </div>
           </div>
-          <div>
-            <Label>Funding Progress (%)</Label>
-            <Input 
-              type="number"
-              min="0"
-              max="100"
-              value={formData.fundingProgress} 
-              onChange={(e) => setFormData(prev => ({ ...prev, fundingProgress: parseInt(e.target.value) || 0 }))}
-              data-testid="input-funding-progress"
-            />
-          </div>
         </div>
       </div>
 
@@ -604,10 +679,427 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
   );
 }
 
-function BulkEditor({ properties }: { properties: Property[] }) {
+function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
+  const { bulkImport } = useBulkEditor();
+  const [rows, setRows] = useState<NewPropertyRow[]>([createEmptyRow(), createEmptyRow(), createEmptyRow()]);
+  const [jsonInput, setJsonInput] = useState("");
+  const [importMode, setImportMode] = useState<"table" | "json">("table");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const updateRow = (id: string, field: keyof NewPropertyRow, value: any) => {
+    setRows(prev => prev.map(row => {
+      if (row.id !== id) return row;
+      const updated = { ...row, [field]: value };
+      updated.isValid = validateRow(updated);
+      return updated;
+    }));
+  };
+
+  const addRow = () => {
+    setRows(prev => [...prev, createEmptyRow()]);
+  };
+
+  const removeRow = (id: string) => {
+    setRows(prev => prev.filter(row => row.id !== id));
+  };
+
+  const validRows = rows.filter(r => r.isValid);
+
+  const handleTableSubmit = async () => {
+    if (validRows.length === 0) return;
+    
+    setIsSubmitting(true);
+    try {
+      const properties = validRows.map(row => ({
+        address: row.address,
+        city: row.city,
+        state: row.state,
+        zip: row.zip,
+        status: row.status,
+        purchasePrice: row.purchasePrice,
+        estimatedEquity: row.estimatedEquity,
+        beds: row.beds,
+        baths: row.baths,
+        squareFeet: row.squareFeet,
+        closingDate: row.closingDate,
+        bpoValue: row.bpoValue,
+        rehabBudget: row.rehabBudget,
+        fundingProgress: 0,
+        mainPhotoUrl: "",
+        galleryPhotoUrls: [],
+        documents: [],
+        description: "",
+      }));
+      
+      await bulkImport.mutateAsync(properties as InsertProperty[]);
+      setRows([createEmptyRow(), createEmptyRow(), createEmptyRow()]);
+      onSuccess();
+    } catch (error: any) {
+      console.error("Bulk import error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleJsonSubmit = async () => {
+    try {
+      const parsed = JSON.parse(jsonInput);
+      const properties = Array.isArray(parsed) ? parsed : [parsed];
+      
+      setIsSubmitting(true);
+      await bulkImport.mutateAsync(properties);
+      setJsonInput("");
+      onSuccess();
+    } catch (error: any) {
+      console.error("JSON import error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      
+      if (file.name.endsWith('.json')) {
+        setJsonInput(text);
+        setImportMode("json");
+      } else if (file.name.endsWith('.csv')) {
+        const lines = text.split('\n').filter(l => l.trim());
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        
+        const newRows: NewPropertyRow[] = lines.slice(1).map(line => {
+          const values = line.split(',').map(v => v.trim());
+          const row = createEmptyRow();
+          
+          headers.forEach((header, idx) => {
+            const value = values[idx] || "";
+            switch (header) {
+              case 'address': row.address = value; break;
+              case 'city': row.city = value; break;
+              case 'state': row.state = value; break;
+              case 'zip': row.zip = value; break;
+              case 'status': row.status = value || 'needs_funding'; break;
+              case 'purchaseprice': case 'purchase_price': row.purchasePrice = parseInt(value) || 0; break;
+              case 'estimatedequity': case 'estimated_equity': case 'equity': row.estimatedEquity = parseInt(value) || 0; break;
+              case 'beds': case 'bedrooms': row.beds = parseInt(value) || 0; break;
+              case 'baths': case 'bathrooms': row.baths = parseFloat(value) || 0; break;
+              case 'squarefeet': case 'sqft': case 'square_feet': row.squareFeet = parseInt(value) || 0; break;
+              case 'closingdate': case 'closing_date': row.closingDate = value; break;
+              case 'bpovalue': case 'bpo_value': case 'bpo': row.bpoValue = parseInt(value) || 0; break;
+              case 'rehabbudget': case 'rehab_budget': case 'rehab': row.rehabBudget = parseInt(value) || 0; break;
+            }
+          });
+          
+          row.isValid = validateRow(row);
+          return row;
+        });
+        
+        setRows(newRows);
+        setImportMode("table");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const downloadTemplate = () => {
+    const headers = "address,city,state,zip,status,purchasePrice,estimatedEquity,beds,baths,squareFeet,closingDate,bpoValue,rehabBudget";
+    const example = "123 Main St,Atlanta,GA,30301,needs_funding,250000,50000,3,2,1500,2025-03-15,300000,25000";
+    const csv = `${headers}\n${example}`;
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'property_template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="flex gap-3">
+          <Button
+            variant={importMode === "table" ? "default" : "outline"}
+            onClick={() => setImportMode("table")}
+            size="sm"
+          >
+            Spreadsheet
+          </Button>
+          <Button
+            variant={importMode === "json" ? "default" : "outline"}
+            onClick={() => setImportMode("json")}
+            size="sm"
+          >
+            JSON Import
+          </Button>
+        </div>
+        <div className="flex gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.json"
+            onChange={handleFileImport}
+            className="hidden"
+          />
+          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+            <FileUp className="h-4 w-4 mr-2" />
+            Import File
+          </Button>
+          <Button variant="outline" size="sm" onClick={downloadTemplate}>
+            <Download className="h-4 w-4 mr-2" />
+            Download Template
+          </Button>
+        </div>
+      </div>
+
+      {importMode === "table" ? (
+        <>
+          <div className="bg-white rounded-xl border shadow-sm overflow-x-auto">
+            <table className="w-full min-w-[1200px]">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600 w-8"></th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Address *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">City *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">State *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">ZIP *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Status</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Price *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Equity *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Beds *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Baths *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">SqFt *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">BPO *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Closing *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600 w-8"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {rows.map((row, idx) => (
+                  <tr key={row.id} className={row.isValid ? "bg-green-50/50" : "hover:bg-gray-50"}>
+                    <td className="px-2 py-1.5 text-center">
+                      {row.isValid ? (
+                        <Check className="h-4 w-4 text-green-500 mx-auto" />
+                      ) : (
+                        <span className="text-gray-400 text-xs">{idx + 1}</span>
+                      )}
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        value={row.address}
+                        onChange={(e) => updateRow(row.id, "address", e.target.value)}
+                        className="h-7 text-xs"
+                        placeholder="123 Main St"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        value={row.city}
+                        onChange={(e) => updateRow(row.id, "city", e.target.value)}
+                        className="h-7 text-xs w-20"
+                        placeholder="Atlanta"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        value={row.state}
+                        onChange={(e) => updateRow(row.id, "state", e.target.value)}
+                        className="h-7 text-xs w-12"
+                        placeholder="GA"
+                        maxLength={2}
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        value={row.zip}
+                        onChange={(e) => updateRow(row.id, "zip", e.target.value)}
+                        className="h-7 text-xs w-16"
+                        placeholder="30301"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Select value={row.status} onValueChange={(v) => updateRow(row.id, "status", v)}>
+                        <SelectTrigger className="h-7 text-xs w-28">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="needs_funding">Needs Funding</SelectItem>
+                          <SelectItem value="committed">Committed</SelectItem>
+                          <SelectItem value="funded">Funded</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        type="number"
+                        value={row.purchasePrice || ""}
+                        onChange={(e) => updateRow(row.id, "purchasePrice", parseInt(e.target.value) || 0)}
+                        className="h-7 text-xs w-24"
+                        placeholder="250000"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        type="number"
+                        value={row.estimatedEquity || ""}
+                        onChange={(e) => updateRow(row.id, "estimatedEquity", parseInt(e.target.value) || 0)}
+                        className="h-7 text-xs w-20"
+                        placeholder="50000"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        type="number"
+                        value={row.beds || ""}
+                        onChange={(e) => updateRow(row.id, "beds", parseInt(e.target.value) || 0)}
+                        className="h-7 text-xs w-12"
+                        placeholder="3"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        type="number"
+                        step="0.5"
+                        value={row.baths || ""}
+                        onChange={(e) => updateRow(row.id, "baths", parseFloat(e.target.value) || 0)}
+                        className="h-7 text-xs w-12"
+                        placeholder="2"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        type="number"
+                        value={row.squareFeet || ""}
+                        onChange={(e) => updateRow(row.id, "squareFeet", parseInt(e.target.value) || 0)}
+                        className="h-7 text-xs w-16"
+                        placeholder="1500"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        type="number"
+                        value={row.bpoValue || ""}
+                        onChange={(e) => updateRow(row.id, "bpoValue", parseInt(e.target.value) || 0)}
+                        className="h-7 text-xs w-24"
+                        placeholder="300000"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input 
+                        type="date"
+                        value={row.closingDate}
+                        onChange={(e) => updateRow(row.id, "closingDate", e.target.value)}
+                        className="h-7 text-xs w-32"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => removeRow(row.id)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <Button variant="outline" onClick={addRow}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Row
+            </Button>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-500">
+                {validRows.length} of {rows.length} rows valid
+              </span>
+              <Button 
+                onClick={handleTableSubmit}
+                disabled={validRows.length === 0 || isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add {validRows.length} Properties
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="space-y-4">
+          <div>
+            <Label>JSON Data</Label>
+            <Textarea 
+              value={jsonInput}
+              onChange={(e) => setJsonInput(e.target.value)}
+              rows={15}
+              placeholder={`[
+  {
+    "address": "123 Main St",
+    "city": "Atlanta",
+    "state": "GA",
+    "zip": "30301",
+    "status": "needs_funding",
+    "purchasePrice": 250000,
+    "estimatedEquity": 50000,
+    "beds": 3,
+    "baths": 2,
+    "squareFeet": 1500,
+    "closingDate": "2025-03-15",
+    "bpoValue": 300000,
+    "rehabBudget": 25000
+  }
+]`}
+              className="font-mono text-sm"
+            />
+          </div>
+          <div className="flex justify-end">
+            <Button 
+              onClick={handleJsonSubmit}
+              disabled={!jsonInput.trim() || isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import JSON
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BulkEditor({ properties, onSuccess }: { properties: Property[], onSuccess: () => void }) {
   const { bulkUpdate } = useBulkEditor();
   const [editedRows, setEditedRows] = useState<Map<string, Partial<Property>>>(new Map());
   const [filter, setFilter] = useState({ status: "", state: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const filteredProperties = properties.filter(p => {
     if (filter.status && p.status !== filter.status) return false;
@@ -630,9 +1122,21 @@ function BulkEditor({ properties }: { properties: Property[] }) {
       data: data as any,
     }));
     if (updates.length > 0) {
-      await bulkUpdate.mutateAsync(updates);
-      setEditedRows(new Map());
+      setIsSubmitting(true);
+      try {
+        await bulkUpdate.mutateAsync(updates);
+        setEditedRows(new Map());
+        onSuccess();
+      } catch (error) {
+        console.error("Bulk update error:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
+  };
+
+  const handleClearChanges = () => {
+    setEditedRows(new Map());
   };
 
   return (
@@ -658,15 +1162,41 @@ function BulkEditor({ properties }: { properties: Property[] }) {
             data-testid="filter-state"
           />
         </div>
-        <Button 
-          onClick={handleSaveAll} 
-          disabled={editedRows.size === 0 || bulkUpdate.isPending}
-          data-testid="button-save-bulk"
-        >
-          <Save className="h-4 w-4 mr-2" />
-          Save Changes ({editedRows.size})
-        </Button>
+        <div className="flex gap-2">
+          {editedRows.size > 0 && (
+            <Button variant="outline" onClick={handleClearChanges}>
+              <X className="h-4 w-4 mr-2" />
+              Clear Changes
+            </Button>
+          )}
+          <Button 
+            onClick={handleSaveAll} 
+            disabled={editedRows.size === 0 || isSubmitting}
+            data-testid="button-save-bulk"
+          >
+            {isSubmitting ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes ({editedRows.size})
+              </>
+            )}
+          </Button>
+        </div>
       </div>
+
+      {editedRows.size > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <span className="text-sm text-amber-800">
+            You have {editedRows.size} unsaved {editedRows.size === 1 ? 'change' : 'changes'}. Click "Save Changes" to apply them.
+          </span>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl border shadow-sm overflow-x-auto">
         <table className="w-full min-w-[1000px]">
@@ -685,27 +1215,28 @@ function BulkEditor({ properties }: { properties: Property[] }) {
           <tbody className="divide-y">
             {filteredProperties.map((property) => {
               const edited = editedRows.get(property.id) || {};
+              const hasEdits = editedRows.has(property.id);
               return (
-                <tr key={property.id} className={editedRows.has(property.id) ? "bg-amber-50" : "hover:bg-gray-50"}>
+                <tr key={property.id} className={hasEdits ? "bg-amber-50" : "hover:bg-gray-50"}>
                   <td className="px-3 py-2">
                     <Input 
                       value={(edited.address ?? property.address) as string}
                       onChange={(e) => handleCellChange(property.id, "address", e.target.value)}
-                      className="h-8 text-sm"
+                      className={`h-8 text-sm ${hasEdits && edited.address !== undefined ? 'border-amber-400' : ''}`}
                     />
                   </td>
                   <td className="px-3 py-2">
                     <Input 
                       value={(edited.city ?? property.city) as string}
                       onChange={(e) => handleCellChange(property.id, "city", e.target.value)}
-                      className="h-8 text-sm w-24"
+                      className={`h-8 text-sm w-24 ${hasEdits && edited.city !== undefined ? 'border-amber-400' : ''}`}
                     />
                   </td>
                   <td className="px-3 py-2">
                     <Input 
                       value={(edited.state ?? property.state) as string}
                       onChange={(e) => handleCellChange(property.id, "state", e.target.value)}
-                      className="h-8 text-sm w-16"
+                      className={`h-8 text-sm w-16 ${hasEdits && edited.state !== undefined ? 'border-amber-400' : ''}`}
                     />
                   </td>
                   <td className="px-3 py-2">
@@ -713,7 +1244,7 @@ function BulkEditor({ properties }: { properties: Property[] }) {
                       value={(edited.status ?? property.status) as string}
                       onValueChange={(v) => handleCellChange(property.id, "status", v)}
                     >
-                      <SelectTrigger className="h-8 text-sm w-32">
+                      <SelectTrigger className={`h-8 text-sm w-32 ${hasEdits && edited.status !== undefined ? 'border-amber-400' : ''}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -728,7 +1259,7 @@ function BulkEditor({ properties }: { properties: Property[] }) {
                       type="number"
                       value={(edited.purchasePrice ?? property.purchasePrice) as number}
                       onChange={(e) => handleCellChange(property.id, "purchasePrice", parseInt(e.target.value))}
-                      className="h-8 text-sm w-28"
+                      className={`h-8 text-sm w-28 ${hasEdits && edited.purchasePrice !== undefined ? 'border-amber-400' : ''}`}
                     />
                   </td>
                   <td className="px-3 py-2">
@@ -736,7 +1267,7 @@ function BulkEditor({ properties }: { properties: Property[] }) {
                       type="number"
                       value={(edited.estimatedEquity ?? property.estimatedEquity) as number}
                       onChange={(e) => handleCellChange(property.id, "estimatedEquity", parseInt(e.target.value))}
-                      className="h-8 text-sm w-28"
+                      className={`h-8 text-sm w-28 ${hasEdits && edited.estimatedEquity !== undefined ? 'border-amber-400' : ''}`}
                     />
                   </td>
                   <td className="px-3 py-2">
@@ -744,7 +1275,7 @@ function BulkEditor({ properties }: { properties: Property[] }) {
                       type="number"
                       value={(edited.bpoValue ?? property.bpoValue) as number}
                       onChange={(e) => handleCellChange(property.id, "bpoValue", parseInt(e.target.value))}
-                      className="h-8 text-sm w-28"
+                      className={`h-8 text-sm w-28 ${hasEdits && edited.bpoValue !== undefined ? 'border-amber-400' : ''}`}
                     />
                   </td>
                   <td className="px-3 py-2">
@@ -752,7 +1283,7 @@ function BulkEditor({ properties }: { properties: Property[] }) {
                       type="date"
                       value={(edited.closingDate ?? property.closingDate) as string}
                       onChange={(e) => handleCellChange(property.id, "closingDate", e.target.value)}
-                      className="h-8 text-sm w-36"
+                      className={`h-8 text-sm w-36 ${hasEdits && edited.closingDate !== undefined ? 'border-amber-400' : ''}`}
                     />
                   </td>
                 </tr>
@@ -762,7 +1293,9 @@ function BulkEditor({ properties }: { properties: Property[] }) {
         </table>
         {filteredProperties.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            No properties found matching the filters.
+            {properties.length === 0 
+              ? "No properties yet. Use 'Bulk Add' to add properties."
+              : "No properties found matching the filters."}
           </div>
         )}
       </div>
