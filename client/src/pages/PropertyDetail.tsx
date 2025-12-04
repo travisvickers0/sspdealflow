@@ -164,46 +164,42 @@ export default function PropertyDetail() {
                 </div>
               </div>
 
-              {/* Property Specs Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
-                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
-                    <Bed className="w-5 h-5" />
+              {/* Apple-Style Property Specs Bar */}
+              <div className="mt-2 mb-4">
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100 overflow-hidden">
+                  
+                  <div className="p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-colors group">
+                    <Bed className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={1.5} />
+                    <div className="text-center">
+                      <span className="block text-2xl font-bold text-gray-900 tracking-tight">{property.beds}</span>
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Bedrooms</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Bedrooms</p>
-                    <p className="text-lg md:text-xl font-bold text-gray-900">{property.beds}</p>
-                  </div>
-                </div>
 
-                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
-                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
-                    <Bath className="w-5 h-5" />
+                  <div className="p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-colors group">
+                    <Bath className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={1.5} />
+                    <div className="text-center">
+                      <span className="block text-2xl font-bold text-gray-900 tracking-tight">{property.baths}</span>
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Bathrooms</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Bathrooms</p>
-                    <p className="text-lg md:text-xl font-bold text-gray-900">{property.baths}</p>
-                  </div>
-                </div>
 
-                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
-                  <div className="p-2 bg-gray-50 rounded-lg text-gray-500">
-                    <Ruler className="w-5 h-5" />
+                  <div className="p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-colors group">
+                    <Ruler className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={1.5} />
+                    <div className="text-center">
+                      <span className="block text-2xl font-bold text-gray-900 tracking-tight">{property.squareFeet.toLocaleString()}</span>
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Sq. Ft.</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Sqft</p>
-                    <p className="text-lg md:text-xl font-bold text-gray-900">{property.squareFeet.toLocaleString()}</p>
-                  </div>
-                </div>
 
-                <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
-                  <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
-                    <Calendar className="w-5 h-5" />
+                  <div className="p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-colors group">
+                    <Calendar className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={1.5} />
+                    <div className="text-center">
+                      <span className="block text-2xl font-bold text-gray-900 tracking-tight">{new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Closing</span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs text-gray-400 uppercase font-bold tracking-wider">Closing</p>
-                    <p className="text-lg md:text-xl font-bold text-gray-900">{new Date(property.closingDate).toLocaleDateString()}</p>
-                  </div>
+
                 </div>
               </div>
 
