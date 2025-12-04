@@ -47,9 +47,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
               </div>
               <div className="text-right">
                 <div className="font-bold text-lg">
-                  ${(property.purchase_price + property.rehab_budget).toLocaleString()}
+                  ${property.purchase_price.toLocaleString()}
                 </div>
-                <div className="text-xs text-muted-foreground">Total Project</div>
+                <div className="text-xs text-muted-foreground">Purchase Price</div>
               </div>
             </div>
 
