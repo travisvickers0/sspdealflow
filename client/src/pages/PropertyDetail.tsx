@@ -374,19 +374,19 @@ export default function PropertyDetail() {
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="space-y-3 pt-4">
+                    <div className="flex flex-col gap-4 pt-6">
                       {property.status === 'needs_funding' ? (
                         <Link href={`/invest/${property.id}`}>
-                          <Button className="w-full h-12 text-base font-semibold" data-testid="button-invest">
+                          <Button className="w-full h-14 text-lg font-semibold" data-testid="button-invest">
                             Invest Now
                           </Button>
                         </Link>
                       ) : (
-                        <Button className="w-full h-12 text-base font-semibold" disabled>
+                        <Button className="w-full h-14 text-lg font-semibold" disabled>
                           {property.status === 'committed' ? 'Funding Secured' : 'Fully Funded'}
                         </Button>
                       )}
-                      <Button variant="outline" className="w-full">
+                      <Button variant="outline" className="w-full h-12 text-base font-medium">
                         Request More Info
                       </Button>
                     </div>
