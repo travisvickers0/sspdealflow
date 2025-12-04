@@ -1,7 +1,7 @@
 import { Property } from "@/lib/mockData";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Clock, TrendingUp } from "lucide-react";
+import { ArrowRight, Clock, TrendingUp, Bed, Bath, Ruler } from "lucide-react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 
@@ -69,17 +69,19 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </div>
 
             {/* Beds, Baths, Sqft - With Icons */}
-            <div className="flex justify-around text-xs font-medium text-gray-700 py-2 border-b border-gray-100">
-              <div className="flex items-center gap-1">
-                <span>🛏️</span>
+            <div className="flex items-center justify-between text-xs font-medium text-gray-700 py-3 border-b border-gray-100">
+              <div className="flex items-center gap-2 flex-1">
+                <Bed className="h-4 w-4 text-gray-600" />
                 <span>{property.beds} bd</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span>🚿</span>
+              <div className="h-4 w-px bg-gray-300" />
+              <div className="flex items-center gap-2 flex-1 justify-center">
+                <Bath className="h-4 w-4 text-gray-600" />
                 <span>{property.baths} ba</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span>📐</span>
+              <div className="h-4 w-px bg-gray-300" />
+              <div className="flex items-center gap-2 flex-1 justify-end">
+                <Ruler className="h-4 w-4 text-gray-600" />
                 <span>{property.sqft.toLocaleString()} sf</span>
               </div>
             </div>
