@@ -166,21 +166,34 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/upload/photo - Upload photo
-  app.post("/api/admin/upload/photo", upload.single("photo"), async (req: Request, res: Response) => {
+  app.post("/api/admin/upload/photo", (req: Request, res: Response, next: NextFunction) => {
+    upload.any()(req, res, (err) => {
+      if (err) {
+        console.error("Multer error:", err);
+        if (err instanceof multer.MulterError) {
+          return res.status(400).json({ error: err.message, code: err.code });
+        }
+        return res.status(500).json({ error: err.message || "Upload failed" });
+      }
+      next();
+    });
+  }, async (req: Request, res: Response) => {
     try {
-      if (!req.file) {
+      const files = req.files as Express.Multer.File[];
+      if (!files || files.length === 0) {
         return res.status(400).json({ error: "No file uploaded" });
       }
       
-      const url = `/uploads/photos/${req.file.filename}`;
+      const file = files[0];
+      const url = `/uploads/photos/${file.filename}`;
       
       await storage.createActivityLog({
         action: "upload",
         resourceType: "photo",
-        details: { filename: req.file.filename, url },
+        details: { filename: file.filename, url },
       });
       
-      res.json({ url, filename: req.file.filename });
+      res.json({ url, filename: file.filename });
     } catch (error) {
       console.error("Error uploading photo:", error);
       res.status(500).json({ error: "Failed to upload photo" });
@@ -188,25 +201,38 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/upload/document - Upload document
-  app.post("/api/admin/upload/document", upload.single("document"), async (req: Request, res: Response) => {
+  app.post("/api/admin/upload/document", (req: Request, res: Response, next: NextFunction) => {
+    upload.any()(req, res, (err) => {
+      if (err) {
+        console.error("Multer error:", err);
+        if (err instanceof multer.MulterError) {
+          return res.status(400).json({ error: err.message, code: err.code });
+        }
+        return res.status(500).json({ error: err.message || "Upload failed" });
+      }
+      next();
+    });
+  }, async (req: Request, res: Response) => {
     try {
-      if (!req.file) {
+      const files = req.files as Express.Multer.File[];
+      if (!files || files.length === 0) {
         return res.status(400).json({ error: "No file uploaded" });
       }
       
-      const url = `/uploads/documents/${req.file.filename}`;
+      const file = files[0];
+      const url = `/uploads/documents/${file.filename}`;
       
       await storage.createActivityLog({
         action: "upload",
         resourceType: "document",
-        details: { filename: req.file.filename, originalName: req.file.originalname, url },
+        details: { filename: file.filename, originalName: file.originalname, url },
       });
       
       res.json({ 
         url, 
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        size: req.file.size 
+        filename: file.filename,
+        originalName: file.originalname,
+        size: file.size 
       });
     } catch (error) {
       console.error("Error uploading document:", error);
@@ -216,7 +242,7 @@ export async function registerRoutes(
 
   // POST /api/admin/upload/photos - Upload multiple photos
   app.post("/api/admin/upload/photos", (req: Request, res: Response, next: NextFunction) => {
-    upload.array("photos", 10)(req, res, (err) => {
+    upload.any()(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
         if (err instanceof multer.MulterError) {
