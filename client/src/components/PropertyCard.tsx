@@ -25,7 +25,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             />
             
             {/* Dark gradient overlay at bottom */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
             
             {/* Status Badge - Top Left */}
             <div className="absolute top-2 left-2 z-10">
@@ -45,7 +45,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
             {/* Floating Address - Bottom Left */}
             <div className="absolute bottom-0 left-0 right-0 p-3 text-white z-10">
-              <h3 className="font-semibold text-sm leading-tight">
+              <h3 className="font-bold text-base leading-tight">
                 {property.address}
               </h3>
               <p className="text-xs opacity-90">
@@ -62,8 +62,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 <div className="font-bold text-gray-900 text-sm">${property.purchase_price.toLocaleString()}</div>
               </div>
               <div className="text-right text-xs">
-                <div className="text-primary font-medium">EST. EQUITY</div>
-                <div className="font-bold text-primary text-sm">+${property.equity_available.toLocaleString()}</div>
+                <div className="text-green-600 font-medium">EST. EQUITY</div>
+                <div className="font-bold text-green-600 text-sm">+${property.equity_available.toLocaleString()}</div>
               </div>
             </div>
 
