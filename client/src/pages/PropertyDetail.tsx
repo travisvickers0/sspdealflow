@@ -91,31 +91,6 @@ export default function PropertyDetail() {
               </div>
             </div>
 
-            {/* Comparable Sales */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Comparable Sales</h2>
-              <div className="space-y-3">
-                {property.comps.map((comp) => (
-                  <div key={comp.id} className="p-4 bg-white border border-gray-200/50 rounded-lg hover:shadow-md transition-all">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{comp.address}</h3>
-                        <div className="flex gap-4 text-sm text-muted-foreground mt-1">
-                          <span>{comp.beds} bed{comp.beds !== 1 ? 's' : ''}</span>
-                          <span>{comp.baths} bath{comp.baths !== 1 ? 's' : ''}</span>
-                          <span>{comp.sqft.toLocaleString()} sqft</span>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-lg text-gray-900">${comp.price.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground">Sold {new Date(comp.soldDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Location Map with Comps */}
             <div>
               <h2 className="text-xl font-semibold mb-4">Location & Comps Map</h2>
@@ -175,6 +150,31 @@ export default function PropertyDetail() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Comparable Sales */}
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Comparable Sales</h2>
+              <div className="space-y-3">
+                {property.comps.map((comp) => (
+                  <div key={comp.id} className="p-4 bg-white border border-gray-200/50 rounded-lg hover:shadow-md transition-all">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{comp.address}</h3>
+                        <div className="flex gap-4 text-sm text-muted-foreground mt-1">
+                          <span>{comp.beds} bed{comp.beds !== 1 ? 's' : ''}</span>
+                          <span>{comp.baths} bath{comp.baths !== 1 ? 's' : ''}</span>
+                          <span>{comp.sqft.toLocaleString()} sqft</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-lg text-gray-900">${comp.price.toLocaleString()}</div>
+                        <div className="text-xs text-muted-foreground">Sold {new Date(comp.soldDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
