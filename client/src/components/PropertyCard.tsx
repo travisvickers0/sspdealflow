@@ -24,9 +24,13 @@ export function PropertyCard({ property }: PropertyCardProps) {
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute top-3 left-3">
-              <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-xs font-semibold shadow-sm text-foreground border-none">
-                {property.status === "needs_funding" ? "Funding Open" : property.status === "committed" ? "Fully Committed" : "Funded"}
-              </Badge>
+              <div className={`px-4 py-2 rounded-full text-xs font-semibold text-white shadow-md ${
+                property.status === 'needs_funding' ? 'bg-amber-500' :
+                property.status === 'committed' ? 'bg-blue-500' :
+                'bg-green-500'
+              }`}>
+                {property.status === "needs_funding" ? "Needs Funding" : property.status === "committed" ? "Funding Committed" : "Funded"}
+              </div>
             </div>
           </div>
           
