@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { PropertyGallery } from "@/components/PropertyGallery";
 import { useRoute, Link } from "wouter";
 import { MapPin, ChevronLeft, CheckCircle2, Home as HomeIcon, Ruler, DollarSign, FileText, Share2 } from "lucide-react";
 import { useState } from "react";
@@ -37,16 +38,7 @@ export default function PropertyDetail() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Gallery */}
-            <div className="rounded-2xl overflow-hidden shadow-sm bg-muted aspect-video relative group">
-              <img 
-                src={property.images[0]} 
-                alt={property.address} 
-                className="w-full h-full object-cover"
-              />
-              <Button variant="secondary" size="sm" className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                View All Photos
-              </Button>
-            </div>
+            <PropertyGallery images={property.images} address={property.address} />
 
             {/* Header Info */}
             <div>

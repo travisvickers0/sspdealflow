@@ -3,6 +3,9 @@ import prop1Img from "@assets/generated_images/modern_white_farmhouse_exterior.p
 import prop2Img from "@assets/generated_images/bright_scandinavian_living_room.png";
 import prop3Img from "@assets/generated_images/renovated_historic_townhouse.png";
 
+// Repeat images for gallery (since we only have 4 unique images, reuse them for multiple photos)
+const galleryImages = [heroImg, prop1Img, prop2Img, prop3Img];
+
 export type PropertyStatus = "needs_funding" | "committed" | "funded" | "archived";
 
 export interface Property {
@@ -39,7 +42,7 @@ export const properties: Property[] = [
     rehab_budget: 120000,
     equity_available: 200000,
     description: "A beautiful mid-century modern renovation opportunity in the heart of East Austin. Large lot with potential for ADU.",
-    images: [prop1Img, prop2Img],
+    images: [prop1Img, prop2Img, prop3Img, heroImg],
     status: "needs_funding",
     created_at: "2023-10-01T10:00:00Z",
   },
@@ -57,7 +60,7 @@ export const properties: Property[] = [
     rehab_budget: 80000,
     equity_available: 150000,
     description: "Historic charm meets modern convenience. This property requires a light cosmetic rehab and foundation leveling.",
-    images: [prop3Img],
+    images: [prop3Img, heroImg, prop1Img],
     status: "committed",
     created_at: "2023-10-05T14:30:00Z",
   },
@@ -75,7 +78,7 @@ export const properties: Property[] = [
     rehab_budget: 150000,
     equity_available: 0,
     description: "Full gut renovation project in the hot RiNo district. Zoned for mixed use.",
-    images: [heroImg],
+    images: [heroImg, prop1Img, prop2Img],
     status: "funded",
     created_at: "2023-09-15T09:15:00Z",
   },
