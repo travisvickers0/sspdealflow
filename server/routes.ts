@@ -6,6 +6,8 @@ import { z } from "zod";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { extractBPOData } from "./services/openai";
+import { geocodeComps } from "./services/geocoding";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -45,6 +47,11 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  
+  // Test endpoint to verify routing works
+  app.get("/api/test", (req: Request, res: Response) => {
+    res.json({ message: "API routes are working" });
+  });
   
   // Serve uploaded files
   app.use("/uploads", (req, res, next) => {
@@ -334,6 +341,111 @@ export async function registerRoutes(
       }
       console.error("Error bulk updating properties:", error);
       res.status(500).json({ error: "Failed to bulk update properties" });
+    }
+  });
+
+  // POST /api/admin/process-bpo - Process BPO document and extract comps
+  app.post("/api/admin/process-bpo", (req: Request, res: Response, next: NextFunction) => {
+    upload.single("file")(req, res, (err) => {
+      if (err) {
+        console.error("Multer error in BPO upload:", err);
+        if (err instanceof multer.MulterError) {
+          return res.status(400).json({ error: err.message, code: err.code });
+        }
+        return res.status(500).json({ error: err.message || "Upload failed" });
+      }
+      next();
+    });
+  }, async (req: Request, res: Response) => {
+    try {
+      console.log("BPO processing endpoint hit - file received");
+      const file = req.file as Express.Multer.File;
+      if (!file) {
+        console.error("No file in request");
+        return res.status(400).json({ error: "No BPO file uploaded" });
+      }
+
+      if (file.mimetype !== "application/pdf") {
+        return res.status(400).json({ error: "BPO must be a PDF file" });
+      }
+
+      console.log(`Processing BPO: ${file.originalname}, size: ${file.size} bytes`);
+
+      // Use file.path if available (multer diskStorage), otherwise construct path
+      const filePath = file.path || path.join(uploadDir, "documents", file.filename);
+      console.log("BPO file path:", filePath);
+
+      // Check if file exists
+      if (!fs.existsSync(filePath)) {
+        console.error("File not found at path:", filePath);
+        return res.status(500).json({ error: "Uploaded file not found on server" });
+      }
+
+      // Extract data from BPO using OpenAI with timeout
+      console.log("Starting OpenAI extraction...");
+      let extractedData: any;
+      try {
+        extractedData = await Promise.race([
+          extractBPOData(filePath),
+          new Promise<any>((_, reject) => 
+            setTimeout(() => reject(new Error("OpenAI extraction timeout after 60 seconds")), 60000)
+          )
+        ]);
+        console.log(`Extracted ${extractedData.comps?.length || 0} comps from BPO`);
+      } catch (extractError) {
+        console.error("OpenAI extraction error:", extractError);
+        throw new Error(`Failed to extract BPO data: ${extractError instanceof Error ? extractError.message : "Unknown error"}`);
+      }
+
+      let comps = extractedData.comps || [];
+
+      // Geocode all comp addresses with timeout
+      console.log("Starting geocoding...");
+      try {
+        comps = await Promise.race([
+          geocodeComps(comps) as Promise<any[]>,
+          new Promise<any[]>((_, reject) => 
+            setTimeout(() => reject(new Error("Geocoding timeout after 30 seconds")), 30000)
+          )
+        ]);
+        console.log(`Geocoded ${comps.length} comps`);
+      } catch (geocodeError) {
+        console.error("Geocoding error:", geocodeError);
+        // Continue even if geocoding fails - comps are still valid
+        console.warn("Continuing without geocoding...");
+      }
+
+      await storage.createActivityLog({
+        action: "upload",
+        resourceType: "document",
+        details: { 
+          filename: file.filename, 
+          originalName: file.originalname, 
+          type: "bpo",
+          compsExtracted: comps.length 
+        },
+      }).catch(err => {
+        console.error("Failed to create activity log:", err);
+        // Don't fail the request if activity log fails
+      });
+
+      res.json({ 
+        comps,
+        subject: extractedData.subject,
+        repairs: extractedData.repairs || [],
+        url: `/uploads/documents/${file.filename}`,
+        filename: file.filename,
+        originalName: file.originalname,
+      });
+    } catch (error) {
+      console.error("Error processing BPO:", error);
+      // Make sure we send a response even if there's an error
+      if (!res.headersSent) {
+        res.status(500).json({ 
+          error: "Failed to process BPO", 
+          message: error instanceof Error ? error.message : "Unknown error" 
+        });
+      }
     }
   });
 

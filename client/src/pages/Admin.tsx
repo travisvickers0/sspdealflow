@@ -607,6 +607,76 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
     }
   };
 
+  const handleBPOUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      alert("Please upload a PDF file");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      console.log("Uploading BPO file:", file.name, file.type, file.size);
+
+      const response = await fetch("/api/admin/process-bpo", {
+        method: "POST",
+        body: formData,
+        // Don't set Content-Type header - let browser set it with boundary for multipart/form-data
+      });
+
+      console.log("Response status:", response.status, response.statusText);
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        let errorMessage = "Failed to process BPO";
+        
+        if (contentType && contentType.includes("application/json")) {
+          const error = await response.json();
+          errorMessage = error.message || error.error || errorMessage;
+        } else {
+          const text = await response.text();
+          console.error("Non-JSON error response:", text);
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      
+      // Add the BPO as a document
+      setFormData(prev => ({
+        ...prev,
+        documents: [...(prev.documents as any[]), { 
+          name: result.originalName || file.name, 
+          url: result.url 
+        }],
+        // Add extracted comps to the comps array
+        comps: [...(prev.comps as any[]), ...(result.comps || [])]
+      }));
+
+      alert(`BPO processed successfully! Extracted ${result.comps?.length || 0} comparable sales.`);
+    } catch (error) {
+      console.error("Error processing BPO:", error);
+      let errorMessage = "Unknown error";
+      
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        errorMessage = "Network error: Could not reach server. Please check your connection and try again.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      alert(`Error processing BPO: ${errorMessage}`);
+    } finally {
+      // Reset the file input
+      e.target.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit(formData);
@@ -813,12 +883,33 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               </button>
             </div>
           ))}
-          <Input 
-            type="file" 
-            accept=".pdf"
-            onChange={handleDocumentUpload}
-            data-testid="input-document"
-          />
+          <div className="space-y-2">
+            <Input 
+              type="file" 
+              accept=".pdf"
+              onChange={handleDocumentUpload}
+              data-testid="input-document"
+            />
+            <div className="flex items-center gap-2">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="text-xs text-gray-500">OR</span>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Upload BPO Document (Auto-extract Comps)
+              </Label>
+              <Input 
+                type="file" 
+                accept=".pdf"
+                onChange={handleBPOUpload}
+                data-testid="input-bpo"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Upload a BPO PDF to automatically extract comparable sales data
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
