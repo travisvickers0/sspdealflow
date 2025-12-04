@@ -15,6 +15,7 @@ import { Slider } from "@/components/ui/slider";
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading, error } = useProperty(params?.slug);
+  const [investorContribution, setInvestorContribution] = useState(50000);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -47,8 +48,6 @@ export default function PropertyDetail() {
   const fundingProgress = property.status === "needs_funding" ? 0 : 100;
   const totalCost = property.purchasePrice + (property.rehabBudget || 0);
   const projectedProfit = property.bpoValue - totalCost;
-
-  const [investorContribution, setInvestorContribution] = useState(50000);
   const investorShare = (investorContribution / totalCost) * projectedProfit;
 
   const galleryImages = property.galleryPhotoUrls || [];
