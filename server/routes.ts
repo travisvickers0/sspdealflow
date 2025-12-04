@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPropertySchema, updatePropertySchema } from "@shared/schema";
@@ -215,7 +215,18 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/upload/photos - Upload multiple photos
-  app.post("/api/admin/upload/photos", upload.array("photos", 10), async (req: Request, res: Response) => {
+  app.post("/api/admin/upload/photos", (req: Request, res: Response, next: NextFunction) => {
+    upload.array("photos", 10)(req, res, (err) => {
+      if (err) {
+        console.error("Multer error:", err);
+        if (err instanceof multer.MulterError) {
+          return res.status(400).json({ error: err.message, code: err.code });
+        }
+        return res.status(500).json({ error: err.message || "Upload failed" });
+      }
+      next();
+    });
+  }, async (req: Request, res: Response) => {
     try {
       const files = req.files as Express.Multer.File[];
       if (!files || files.length === 0) {
