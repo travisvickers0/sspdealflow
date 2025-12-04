@@ -186,17 +186,14 @@ export default function PropertyDetail() {
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xl">Investment Status</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${
-                      property.status === 'needs_funding' ? 'bg-amber-500' :
-                      property.status === 'committed' ? 'bg-blue-500' :
-                      'bg-green-500'
-                    }`} />
-                    <span className="text-sm font-medium text-gray-700">
-                      {property.status === 'needs_funding' ? 'Needs Funding' :
-                       property.status === 'committed' ? 'Funding Committed' :
-                       'Funded'}
-                    </span>
+                  <div className={`px-4 py-2 rounded-full text-sm font-semibold text-white ${
+                    property.status === 'needs_funding' ? 'bg-amber-500 hover:bg-amber-600' :
+                    property.status === 'committed' ? 'bg-blue-500 hover:bg-blue-600' :
+                    'bg-green-500 hover:bg-green-600'
+                  } transition-colors`}>
+                    {property.status === 'needs_funding' ? 'Needs Funding' :
+                     property.status === 'committed' ? 'Funding Committed' :
+                     'Funded'}
                   </div>
                 </div>
                 <CardDescription className="space-y-1">
