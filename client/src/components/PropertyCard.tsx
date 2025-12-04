@@ -60,11 +60,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <div className="text-xs">
                 <div className="text-muted-foreground font-medium">PURCHASE PRICE</div>
-                <div className="font-bold text-gray-900 text-sm">${property.purchase_price.toLocaleString()}</div>
+                <div className="font-bold text-gray-900 text-base">${property.purchase_price.toLocaleString()}</div>
               </div>
               <div className="text-right text-xs">
                 <div className="text-green-600 font-medium">EST. EQUITY</div>
-                <div className="font-bold text-green-600 text-sm">+${property.equity_available.toLocaleString()}</div>
+                <div className="font-bold text-green-600 text-base">+${property.equity_available.toLocaleString()}</div>
               </div>
             </div>
 
