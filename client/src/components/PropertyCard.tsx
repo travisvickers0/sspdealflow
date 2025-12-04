@@ -1,4 +1,4 @@
-import { Property } from "@/lib/mockData";
+import type { Property } from "@shared/schema";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Clock, TrendingUp, Bed, Bath, Ruler } from "lucide-react";
@@ -14,13 +14,13 @@ export function PropertyCard({ property }: PropertyCardProps) {
   const fundingProgress = property.status === "needs_funding" ? 0 : 100;
   
   return (
-    <Link href={`/property/${property.slug}`}>
+    <Link href={`/property/${property.id}`}>
       <div className="group cursor-pointer block h-full">
         <Card className="h-full overflow-hidden border-0 shadow-md hover:shadow-lg transition-all bg-white">
           {/* Image Section with Floating Address */}
           <div className="relative aspect-video overflow-hidden bg-muted">
             <img 
-              src={property.images[0]} 
+              src={property.mainPhotoUrl || "/placeholder.jpg"} 
               alt={property.address}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
@@ -60,11 +60,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <div className="text-xs">
                 <div className="text-muted-foreground font-medium">PURCHASE PRICE</div>
-                <div className="font-bold text-gray-900 text-base">${property.purchase_price.toLocaleString()}</div>
+                <div className="font-bold text-gray-900 text-base">${property.purchasePrice.toLocaleString()}</div>
               </div>
               <div className="text-right text-xs">
                 <div className="text-green-600 font-medium">EST. EQUITY</div>
-                <div className="font-bold text-green-600 text-base">+${property.equity_available.toLocaleString()}</div>
+                <div className="font-bold text-green-600 text-base">+${property.estimatedEquity.toLocaleString()}</div>
               </div>
             </div>
 
@@ -82,7 +82,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
               <div className="h-4 w-px bg-gray-300" />
               <div className="flex items-center gap-2 flex-1 justify-end">
                 <Ruler className="h-4 w-4 text-gray-600" />
-                <span>{property.sqft.toLocaleString()} sf</span>
+                <span>{property.squareFeet.toLocaleString()} sf</span>
               </div>
             </div>
 
@@ -107,11 +107,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <div className="flex justify-between text-xs pt-2">
               <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Clock className="h-3.5 w-3.5" />
-                <div className="font-medium">Closes {new Date(property.closing_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                <div className="font-medium">Closes {new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
               </div>
               <div className="flex items-center gap-1.5 text-right">
                 <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-                <div className="font-bold text-green-600">BPO: ${property.arv.toLocaleString()}</div>
+                <div className="font-bold text-green-600">BPO: ${property.bpoValue.toLocaleString()}</div>
               </div>
             </div>
           </CardContent>

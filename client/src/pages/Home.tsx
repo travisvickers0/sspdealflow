@@ -2,12 +2,13 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
-import { properties } from "@/lib/mockData";
+import { useProperties } from "@/hooks/useProperties";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
-import { ArrowRight, TrendingUp, Lock, Zap } from "lucide-react";
+import { ArrowRight, TrendingUp, Lock, Zap, Loader2 } from "lucide-react";
 
 export default function Home() {
-  const featuredProperties = properties.slice(0, 3);
+  const { data: properties, isLoading } = useProperties();
+  const featuredProperties = properties?.slice(0, 3) || [];
 
   return (
     <Layout>
@@ -100,115 +101,140 @@ export default function Home() {
 
             {/* Right Side - Stacked Property Cards */}
             <div className="hidden lg:block relative h-[700px]">
-              {/* Card 1 - Front */}
-              <div className="absolute right-0 top-0 w-96 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 z-30 animate-in fade-in slide-in-from-right-4 duration-700 delay-500">
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                  {properties[0].images[0] && (
-                    <img 
-                      src={properties[0].images[0]}
-                      alt={properties[0].address}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                  <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                    ${(properties[0].purchase_price / 1000).toFixed(0)}k
-                  </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-                <div className="p-5">
-                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{properties[0].address}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{properties[0].city}, {properties[0].state}</p>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-primary font-semibold">${(properties[0].equity_available / 1000).toFixed(0)}k Available</span>
-                    <span className="text-gray-600">20% ROI</span>
+              ) : featuredProperties.length > 0 ? (
+                <>
+                  {/* Card 1 - Front */}
+                  <div className="absolute right-0 top-0 w-96 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 z-30 animate-in fade-in slide-in-from-right-4 duration-700 delay-500">
+                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                      {featuredProperties[0]?.mainPhotoUrl && (
+                        <img 
+                          src={featuredProperties[0].mainPhotoUrl}
+                          alt={featuredProperties[0].address}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                      <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
+                        ${(featuredProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-semibold text-gray-900 mb-2 text-lg">{featuredProperties[0]?.address}</h3>
+                      <p className="text-sm text-gray-600 mb-4">{featuredProperties[0]?.city}, {featuredProperties[0]?.state}</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-primary font-semibold">${(featuredProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Available</span>
+                        <span className="text-gray-600">20% ROI</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Card 2 - Middle */}
-              <div className="absolute right-8 top-40 w-96 bg-white rounded-2xl shadow-xl overflow-hidden transform -rotate-6 z-20 animate-in fade-in slide-in-from-right-4 duration-700 delay-700">
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                  {properties[1].images[0] && (
-                    <img 
-                      src={properties[1].images[0]}
-                      alt={properties[1].address}
-                      className="w-full h-full object-cover"
-                    />
+                  {/* Card 2 - Middle */}
+                  {featuredProperties[1] && (
+                    <div className="absolute right-8 top-32 w-96 bg-white rounded-2xl shadow-xl overflow-hidden transform rotate-3 opacity-80 z-20 animate-in fade-in slide-in-from-right-4 duration-700 delay-700">
+                      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                        {featuredProperties[1]?.mainPhotoUrl && (
+                          <img 
+                            src={featuredProperties[1].mainPhotoUrl}
+                            alt={featuredProperties[1].address}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="p-5">
+                        <h3 className="font-semibold text-gray-900 mb-2">{featuredProperties[1]?.address}</h3>
+                        <p className="text-sm text-gray-600">{featuredProperties[1]?.city}, {featuredProperties[1]?.state}</p>
+                      </div>
+                    </div>
                   )}
-                  <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                    ${(properties[1].purchase_price / 1000).toFixed(0)}k
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{properties[1].address}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{properties[1].city}, {properties[1].state}</p>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-primary font-semibold">${(properties[1].equity_available / 1000).toFixed(0)}k Available</span>
-                    <span className="text-gray-600">18% ROI</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Card 3 - Back */}
-              <div className="absolute right-16 top-80 w-96 bg-white rounded-2xl shadow-lg overflow-hidden transform rotate-3 z-10 animate-in fade-in slide-in-from-right-4 duration-700 delay-1000">
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                  {properties[2].images[0] && (
-                    <img 
-                      src={properties[2].images[0]}
-                      alt={properties[2].address}
-                      className="w-full h-full object-cover"
-                    />
+                  {/* Card 3 - Back */}
+                  {featuredProperties[2] && (
+                    <div className="absolute right-16 top-64 w-96 bg-white rounded-2xl shadow-lg overflow-hidden transform -rotate-3 opacity-60 z-10 animate-in fade-in slide-in-from-right-4 duration-700 delay-1000">
+                      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                        {featuredProperties[2]?.mainPhotoUrl && (
+                          <img 
+                            src={featuredProperties[2].mainPhotoUrl}
+                            alt={featuredProperties[2].address}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="p-5">
+                        <h3 className="font-semibold text-gray-900 mb-2">{featuredProperties[2]?.address}</h3>
+                        <p className="text-sm text-gray-600">{featuredProperties[2]?.city}, {featuredProperties[2]?.state}</p>
+                      </div>
+                    </div>
                   )}
-                  <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                    ${(properties[2].purchase_price / 1000).toFixed(0)}k
-                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <p>No properties available</p>
                 </div>
-                <div className="p-5">
-                  <h3 className="font-semibold text-gray-900 mb-2 text-lg">{properties[2].address}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{properties[2].city}, {properties[2].state}</p>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-primary font-semibold">Fully Funded</span>
-                    <span className="text-gray-600">24% ROI</span>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
-
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-white to-transparent" />
       </div>
 
       {/* Featured Properties Section */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-10 gap-4">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">Featured Opportunities</h2>
-            <p className="text-sm sm:text-base text-muted-foreground">Hand-picked deals curated for maximum returns</p>
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+                Featured Opportunities
+              </h2>
+              <p className="text-gray-600 mt-2">
+                Hand-picked deals ready for investment
+              </p>
+            </div>
+            <Link href="/properties">
+              <Button variant="ghost" className="gap-2 hover:bg-gray-100">
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
-          <Link href="/properties">
-            <Button variant="outline" className="hidden md:flex rounded-full gap-2 text-sm">
-              View All
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-x-8 lg:gap-y-12 mb-8">
-          {featuredProperties.map((prop) => (
-            <PropertyCard key={prop.id} property={prop} />
-          ))}
-        </div>
 
-        <div className="flex md:hidden justify-center">
-          <Link href="/properties" className="w-full">
-            <Button className="rounded-full w-full gap-2 text-sm">
-              View All Properties
-              <ArrowRight className="h-4 w-4" />
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+              {featuredProperties.length === 0 && (
+                <div className="col-span-full text-center py-12 text-gray-500">
+                  <p>No properties available yet. Check back soon!</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-primary/5 to-amber-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
+            Ready to Start Investing?
+          </h2>
+          <p className="text-gray-600 max-w-xl mx-auto mb-8">
+            Join our community of accredited investors and access exclusive real estate opportunities.
+          </p>
+          <Link href="/properties">
+            <Button className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-8 h-12 shadow-lg">
+              Explore Properties
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
         </div>
-      </div>
+      </section>
     </Layout>
   );
 }
