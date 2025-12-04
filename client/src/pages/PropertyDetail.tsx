@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { PropertyGallery } from "@/components/PropertyGallery";
 import { useRoute, Link } from "wouter";
 import { MapPin, ChevronLeft, CheckCircle2, Home as HomeIcon, Ruler, DollarSign, FileText, Share2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -16,6 +16,10 @@ import { Slider } from "@/components/ui/slider";
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const property = properties.find((p) => p.slug === params?.slug);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [params?.slug]);
 
   if (!property) return <div>Property not found</div>;
 
