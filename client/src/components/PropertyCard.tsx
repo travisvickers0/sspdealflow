@@ -24,8 +24,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             
-            {/* Dark gradient overlay at bottom */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            {/* Light gradient overlay at bottom */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
             
             {/* Status Badge - Top Left */}
             <div className="absolute top-2 left-2 z-10">
@@ -45,10 +45,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
             {/* Floating Address - Bottom Left */}
             <div className="absolute bottom-0 left-0 right-0 p-3 text-white z-10">
-              <h3 className="font-bold text-base leading-tight">
+              <h3 className="font-bold text-base leading-tight drop-shadow-lg">
                 {property.address}
               </h3>
-              <p className="text-xs opacity-90">
+              <p className="text-xs opacity-90 drop-shadow-md">
                 {property.city}, {property.state} {property.zip}
               </p>
             </div>
