@@ -261,6 +261,50 @@ export default function PropertyDetail() {
                   </div>
                 </div>
               )}
+
+              {/* Comparable Sales */}
+              {(property.comps as any[])?.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-bold mb-4 text-gray-900">Comparable Sales</h2>
+                  <p className="text-gray-600 mb-6">Recent sales in the area that support our BPO valuation.</p>
+                  <div className="space-y-4">
+                    {(property.comps as any[]).map((comp, idx) => (
+                      <div 
+                        key={comp.id || idx}
+                        className="bg-white border border-gray-100 rounded-lg p-5 hover:shadow-md transition"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div>
+                            <h3 className="font-semibold text-gray-900">{comp.address}</h3>
+                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <Bed className="h-3.5 w-3.5" /> {comp.beds} bd
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Bath className="h-3.5 w-3.5" /> {comp.baths} ba
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Ruler className="h-3.5 w-3.5" /> {comp.sqft?.toLocaleString()} sqft
+                              </span>
+                              {comp.distance && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="h-3.5 w-3.5" /> {comp.distance}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xl font-bold text-gray-900">${comp.price?.toLocaleString()}</p>
+                            <p className="text-xs text-gray-500">
+                              Sold {new Date(comp.soldDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Sidebar - Investment Calculator */}

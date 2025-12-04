@@ -48,6 +48,8 @@ export const properties = pgTable("properties", {
   
   documents: jsonb("documents").default(sql`'[]'::jsonb`),
   
+  comps: jsonb("comps").default(sql`'[]'::jsonb`),
+  
   description: text("description"),
   
   createdAt: timestamp("created_at").defaultNow(),
@@ -106,3 +108,17 @@ export const documentSchema = z.object({
 });
 
 export type PropertyDocument = z.infer<typeof documentSchema>;
+
+// Comparable sale type for property comps
+export const compSchema = z.object({
+  id: z.string(),
+  address: z.string(),
+  price: z.number(),
+  beds: z.number(),
+  baths: z.number(),
+  sqft: z.number(),
+  soldDate: z.string(),
+  distance: z.string().optional(),
+});
+
+export type PropertyComp = z.infer<typeof compSchema>;

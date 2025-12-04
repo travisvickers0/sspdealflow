@@ -541,8 +541,41 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
     mainPhotoUrl: property?.mainPhotoUrl || "",
     galleryPhotoUrls: property?.galleryPhotoUrls || [],
     documents: property?.documents || [],
+    comps: property?.comps || [],
     description: property?.description || "",
   });
+
+  const addComp = () => {
+    setFormData(prev => ({
+      ...prev,
+      comps: [...(prev.comps as any[]), {
+        id: crypto.randomUUID(),
+        address: "",
+        price: 0,
+        beds: 0,
+        baths: 0,
+        sqft: 0,
+        soldDate: "",
+        distance: "",
+      }]
+    }));
+  };
+
+  const updateComp = (idx: number, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      comps: (prev.comps as any[]).map((comp, i) => 
+        i === idx ? { ...comp, [field]: value } : comp
+      )
+    }));
+  };
+
+  const removeComp = (idx: number) => {
+    setFormData(prev => ({
+      ...prev,
+      comps: (prev.comps as any[]).filter((_, i) => i !== idx)
+    }));
+  };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -786,6 +819,95 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
             onChange={handleDocumentUpload}
             data-testid="input-document"
           />
+        </div>
+      </div>
+
+      {/* Comparable Sales */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900">Comparable Sales</h3>
+          <Button type="button" variant="outline" size="sm" onClick={addComp}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Comp
+          </Button>
+        </div>
+        <div className="space-y-4">
+          {(formData.comps as any[]).map((comp, idx) => (
+            <div key={comp.id || idx} className="p-4 border rounded-lg bg-gray-50 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">Comp #{idx + 1}</span>
+                <button 
+                  type="button"
+                  className="text-red-500 hover:text-red-700"
+                  onClick={() => removeComp(idx)}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="col-span-2">
+                  <Label className="text-xs">Address</Label>
+                  <Input 
+                    value={comp.address || ""}
+                    onChange={(e) => updateComp(idx, "address", e.target.value)}
+                    placeholder="123 Main St"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Sale Price</Label>
+                  <Input 
+                    type="number"
+                    value={comp.price || ""}
+                    onChange={(e) => updateComp(idx, "price", parseInt(e.target.value) || 0)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Sold Date</Label>
+                  <Input 
+                    type="date"
+                    value={comp.soldDate || ""}
+                    onChange={(e) => updateComp(idx, "soldDate", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Beds</Label>
+                  <Input 
+                    type="number"
+                    value={comp.beds || ""}
+                    onChange={(e) => updateComp(idx, "beds", parseInt(e.target.value) || 0)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Baths</Label>
+                  <Input 
+                    type="number"
+                    step="0.5"
+                    value={comp.baths || ""}
+                    onChange={(e) => updateComp(idx, "baths", parseFloat(e.target.value) || 0)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Sqft</Label>
+                  <Input 
+                    type="number"
+                    value={comp.sqft || ""}
+                    onChange={(e) => updateComp(idx, "sqft", parseInt(e.target.value) || 0)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Distance</Label>
+                  <Input 
+                    value={comp.distance || ""}
+                    onChange={(e) => updateComp(idx, "distance", e.target.value)}
+                    placeholder="0.3 mi"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          {(formData.comps as any[]).length === 0 && (
+            <p className="text-sm text-gray-500 text-center py-4">No comparable sales added yet.</p>
+          )}
         </div>
       </div>
 
