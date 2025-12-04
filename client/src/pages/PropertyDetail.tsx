@@ -91,14 +91,89 @@ export default function PropertyDetail() {
               </div>
             </div>
 
-            {/* Location Map Placeholder */}
+            {/* Comparable Sales */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">Location</h2>
-              <div className="h-64 bg-muted rounded-xl flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 opacity-20" style={{backgroundImage: "radial-gradient(#000 1px, transparent 1px)", backgroundSize: "20px 20px"}}></div>
-                <div className="text-muted-foreground flex flex-col items-center">
-                  <MapPin className="h-8 w-8 mb-2 text-primary" />
-                  <span>Map View Placeholder</span>
+              <h2 className="text-xl font-semibold mb-4">Comparable Sales</h2>
+              <div className="space-y-3">
+                {property.comps.map((comp) => (
+                  <div key={comp.id} className="p-4 bg-white border border-gray-200/50 rounded-lg hover:shadow-md transition-all">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{comp.address}</h3>
+                        <div className="flex gap-4 text-sm text-muted-foreground mt-1">
+                          <span>{comp.beds} bed{comp.beds !== 1 ? 's' : ''}</span>
+                          <span>{comp.baths} bath{comp.baths !== 1 ? 's' : ''}</span>
+                          <span>{comp.sqft.toLocaleString()} sqft</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-lg text-gray-900">${comp.price.toLocaleString()}</div>
+                        <div className="text-xs text-muted-foreground">Sold {new Date(comp.soldDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Location Map with Comps */}
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Location & Comps Map</h2>
+              <div className="h-96 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex flex-col items-center justify-center relative overflow-hidden shadow-sm border border-blue-200/50">
+                {/* Map Grid Background */}
+                <div className="absolute inset-0 opacity-10" style={{backgroundImage: "radial-gradient(#0066cc 1px, transparent 1px)", backgroundSize: "40px 40px"}}></div>
+                
+                {/* Map Visualization with Property & Comps */}
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {/* Property Pin (Center) */}
+                  <div className="absolute flex flex-col items-center">
+                    <div className="w-8 h-8 bg-primary rounded-full shadow-lg flex items-center justify-center border-4 border-white animate-pulse">
+                      <MapPin className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="mt-2 px-3 py-1 bg-primary text-white text-xs font-semibold rounded-full shadow-md whitespace-nowrap">
+                      {property.address}
+                    </div>
+                  </div>
+
+                  {/* Comps Pins (Scattered around) */}
+                  <div className="absolute inset-0">
+                    {property.comps.map((comp, idx) => {
+                      const offsetX = Math.sin(idx * 1.2) * 120;
+                      const offsetY = Math.cos(idx * 1.2) * 100;
+                      return (
+                        <div
+                          key={comp.id}
+                          className="absolute flex flex-col items-center"
+                          style={{
+                            left: `calc(50% + ${offsetX}px)`,
+                            top: `calc(50% + ${offsetY}px)`,
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        >
+                          <div className="w-6 h-6 bg-gray-600 rounded-full shadow-lg flex items-center justify-center border-3 border-white">
+                            <span className="text-white text-xs font-bold">{idx + 1}</span>
+                          </div>
+                          <div className="mt-1 px-2 py-0.5 bg-gray-700 text-white text-xs rounded shadow-md whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity">
+                            {comp.address}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="absolute bottom-4 left-4 space-y-2 bg-white/90 backdrop-blur p-3 rounded-lg shadow-md text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-primary rounded-full"></div>
+                    <span className="font-semibold">Subject Property</span>
+                  </div>
+                  {property.comps.slice(0, 3).map((comp, idx) => (
+                    <div key={comp.id} className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs font-bold">{idx + 1}</div>
+                      <span>Comp</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
