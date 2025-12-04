@@ -1,0 +1,162 @@
+⭐ Replit Backend Requirements Prompt (use this directly)
+
+I need you to build a full backend + database for a real-estate investment app.
+No Supabase. Use Replit DB + Replit storage for files.
+
+I need the following:
+1. Database Structure (Replit DB)
+
+Create a properties collection.
+Each property should store all fields needed for the property cards + detail page.
+
+Property Fields
+id (string, uuid)
+status (string: "funded", "needs_funding", "committed")
+
+address (string)
+city (string)
+state (string)
+zip (string)
+
+purchase_price (number)
+estimated_equity (number)
+beds (number)
+baths (number)
+square_feet (number)
+
+closing_date (string, ISO)
+bpo_value (number)
+
+funding_progress (number 0-100)
+
+main_photo_url (string)
+gallery_photo_urls (array of strings)
+
+documents (array of objects: { name, url })
+
+created_at (ISO timestamp)
+updated_at (ISO timestamp)
+
+
+Also create:
+
+users collection (admin only for now)
+
+activity_logs collection (optional but helpful)
+
+2. Endpoints Needed
+Public Endpoints
+GET /properties
+GET /properties/:id
+
+Admin Endpoints
+POST /admin/properties            (create property)
+PUT /admin/properties/:id         (update all fields)
+DELETE /admin/properties/:id      (delete property)
+
+POST /admin/upload/photo          (upload image → returns URL)
+POST /admin/upload/document       (upload doc → returns URL)
+
+POST /admin/properties/bulk_import   (CSV or JSON)
+PUT /admin/properties/bulk_update    (batch editing)
+
+3. Admin UI Requirements
+A. Property Form (Create / Edit)
+
+Admin must be able to enter:
+
+Address
+
+Pricing + Equity
+
+Specs (beds, baths, square feet)
+
+BPO value
+
+Closing date
+
+Status
+
+Funding progress
+
+Upload main image
+
+Upload multiple gallery images
+
+Attach documents
+
+This should be built as an internal /admin route.
+
+B. Bulk Table View
+
+Create an admin screen with:
+
+A spreadsheet-like table
+
+Editable cells
+
+Sorting
+
+Filters (status, state, price range, etc.)
+
+Save all rows
+
+Upload CSV → auto creates & updates properties
+
+C. File Management
+
+Upload endpoints must:
+
+Accept image uploads
+
+Store to Replit file storage
+
+Return a publicly accessible URL
+
+Store the URL inside the property record
+
+4. Validation
+
+Backend should validate:
+
+Address required
+
+Price must be a number
+
+Beds/baths must be integers
+
+Files must be JPEG, PNG, or PDF
+
+Status must be one of the allowed values
+
+5. Frontend Integration
+
+Create a reusable hooks:
+
+useProperties() → fetch all properties
+useProperty(id) → fetch single
+useAdminProperties() → create/update/delete
+useBulkEditor() → handle batch update
+useUpload() → upload photos/documents
+
+6. Output
+
+Provide:
+
+Database schema (JSON format)
+
+All backend endpoints
+
+Example API calls
+
+Admin UI components (React + Tailwind + shadcn)
+
+Bulk editor table component
+
+File uploader component
+
+Integration example with the redesigned property cards
+
+🟩 END OF PROMPT
+
+Copy exactly above into Replit when generating conversion.
