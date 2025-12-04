@@ -76,25 +76,25 @@ export default function Home() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-              <Link href="/properties" className="w-full sm:w-auto">
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
+              <a href="/properties" className="w-full sm:w-auto">
                 <Button 
                   size="sm"
-                  className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 h-10 sm:h-12 border-0 shadow-lg hover:shadow-xl transition-all w-full text-sm sm:text-base"
+                  className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 h-10 sm:h-12 border-0 shadow-lg hover:shadow-xl transition-all w-full text-sm sm:text-base cursor-pointer"
                 >
                   Explore Properties
                   <ArrowRight className="ml-2 h-3 sm:h-4 w-3 sm:w-4" />
                 </Button>
-              </Link>
-              <Link href="/how-it-works" className="w-full sm:w-auto">
+              </a>
+              <a href="/how-it-works" className="w-full sm:w-auto">
                 <Button 
                   size="sm"
                   variant="outline" 
-                  className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-6 sm:px-8 h-10 sm:h-12 bg-white/60 backdrop-blur-sm w-full sm:w-auto text-sm sm:text-base"
+                  className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-6 sm:px-8 h-10 sm:h-12 bg-white/60 backdrop-blur-sm w-full sm:w-auto text-sm sm:text-base cursor-pointer"
                 >
                   How It Works
                 </Button>
-              </Link>
+              </a>
             </div>
             </div>
 
