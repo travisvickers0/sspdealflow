@@ -1,12 +1,16 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, real, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
+// Users table (admin only for now)
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  role: text("role").notNull().default("admin"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -16,3 +20,89 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+// Properties table
+export const properties = pgTable("properties", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  status: text("status").notNull().default("needs_funding"), // "funded", "needs_funding", "committed"
+  
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  zip: text("zip").notNull(),
+  
+  purchasePrice: integer("purchase_price").notNull(),
+  estimatedEquity: integer("estimated_equity").notNull(),
+  beds: integer("beds").notNull(),
+  baths: real("baths").notNull(),
+  squareFeet: integer("square_feet").notNull(),
+  
+  closingDate: text("closing_date").notNull(),
+  bpoValue: integer("bpo_value").notNull(),
+  rehabBudget: integer("rehab_budget").notNull().default(0),
+  
+  fundingProgress: integer("funding_progress").notNull().default(0),
+  
+  mainPhotoUrl: text("main_photo_url"),
+  galleryPhotoUrls: text("gallery_photo_urls").array().default(sql`ARRAY[]::text[]`),
+  
+  documents: jsonb("documents").default(sql`'[]'::jsonb`),
+  
+  description: text("description"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPropertySchema = createInsertSchema(properties).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updatePropertySchema = insertPropertySchema.partial();
+
+export type InsertProperty = z.infer<typeof insertPropertySchema>;
+export type UpdateProperty = z.infer<typeof updatePropertySchema>;
+export type Property = typeof properties.$inferSelect;
+
+// Activity logs table
+export const activityLogs = pgTable("activity_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  action: text("action").notNull(), // "create", "update", "delete", "upload"
+  resourceType: text("resource_type").notNull(), // "property", "document", "photo"
+  resourceId: varchar("resource_id"),
+  details: jsonb("details"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+export type ActivityLog = typeof activityLogs.$inferSelect;
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  activityLogs: many(activityLogs),
+}));
+
+export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [activityLogs.userId],
+    references: [users.id],
+  }),
+}));
+
+// Document type for property documents
+export const documentSchema = z.object({
+  name: z.string(),
+  url: z.string(),
+  type: z.string().optional(),
+  size: z.number().optional(),
+});
+
+export type PropertyDocument = z.infer<typeof documentSchema>;
