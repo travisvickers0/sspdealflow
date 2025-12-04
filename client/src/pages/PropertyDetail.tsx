@@ -1,7 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -50,8 +49,6 @@ export default function PropertyDetail() {
     );
   }
 
-  // Funding progress: 0% if needs_funding, 100% if committed or funded
-  const fundingProgress = property.status === "needs_funding" ? 0 : 100;
   
   // Business model: Investor puts up purchase price, profits split 50/50 on estimated equity
   const investorReturn = property.estimatedEquity * 0.5;
@@ -187,9 +184,52 @@ export default function PropertyDetail() {
             </div>
 
           </div>
+
+          {/* Property Specs Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className="p-2.5 bg-gray-50 rounded-lg text-gray-600">
+                <Bed className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Bedrooms</p>
+                <p className="text-xl font-bold text-gray-900">{property.beds}</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className="p-2.5 bg-gray-50 rounded-lg text-gray-600">
+                <Bath className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Bathrooms</p>
+                <p className="text-xl font-bold text-gray-900">{property.baths}</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className="p-2.5 bg-gray-50 rounded-lg text-gray-600">
+                <Ruler className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Sqft</p>
+                <p className="text-xl font-bold text-gray-900">{property.squareFeet.toLocaleString()}</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className="p-2.5 bg-blue-50 rounded-lg text-blue-600">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Est. Closing</p>
+                <p className="text-xl font-bold text-gray-900">{new Date(property.closingDate).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-12">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-12">
@@ -204,41 +244,6 @@ export default function PropertyDetail() {
                   The renovation plan includes a full cosmetic update, modernizing the kitchen and baths, 
                   and enhancing curb appeal to maximize resale value.
                 </p>
-              </div>
-
-              {/* Property Specs */}
-              <div>
-                <h2 className="text-2xl font-bold mb-6 text-gray-900">Property Details</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="bg-white border border-gray-100 rounded-lg p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Bed className="h-5 w-5 text-gray-400" />
-                      <p className="text-xs text-gray-500 uppercase font-semibold">Bedrooms</p>
-                    </div>
-                    <p className="text-3xl font-bold text-gray-900">{property.beds}</p>
-                  </div>
-                  <div className="bg-white border border-gray-100 rounded-lg p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Bath className="h-5 w-5 text-gray-400" />
-                      <p className="text-xs text-gray-500 uppercase font-semibold">Bathrooms</p>
-                    </div>
-                    <p className="text-3xl font-bold text-gray-900">{property.baths}</p>
-                  </div>
-                  <div className="bg-white border border-gray-100 rounded-lg p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Ruler className="h-5 w-5 text-gray-400" />
-                      <p className="text-xs text-gray-500 uppercase font-semibold">Square Feet</p>
-                    </div>
-                    <p className="text-3xl font-bold text-gray-900">{property.squareFeet.toLocaleString()}</p>
-                  </div>
-                  <div className="bg-white border border-gray-100 rounded-lg p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="h-5 w-5 text-gray-400" />
-                      <p className="text-xs text-gray-500 uppercase font-semibold">Closing</p>
-                    </div>
-                    <p className="text-xl font-bold text-gray-900">{new Date(property.closingDate).toLocaleDateString()}</p>
-                  </div>
-                </div>
               </div>
 
               {/* Documents */}
@@ -316,24 +321,33 @@ export default function PropertyDetail() {
                     <CardDescription>Calculate your potential returns</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Funding Progress */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Funding Progress</span>
-                        <span className="font-semibold">{fundingProgress}%</span>
-                      </div>
-                      <Progress 
-                        value={fundingProgress} 
-                        className={`h-2 ${
-                          property.status === 'needs_funding' ? '[&>div]:bg-amber-500' :
-                          property.status === 'committed' ? '[&>div]:bg-blue-500' :
-                          '[&>div]:bg-green-500'
-                        }`}
-                      />
-                      <p className="text-xs text-gray-500">
-                        {property.status === 'needs_funding' ? 'Open for investment' :
-                         property.status === 'committed' ? 'Funding secured' : 'Fully funded'}
-                      </p>
+                    {/* Availability Status */}
+                    <div className="bg-gray-50 rounded-lg p-3 flex items-center justify-between border border-gray-100">
+                      <span className="text-sm font-medium text-gray-600">Availability</span>
+                      
+                      {property.status === 'needs_funding' ? (
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                          </span>
+                          <span className="text-sm font-bold text-emerald-700">Open for Funding</span>
+                        </div>
+                      ) : property.status === 'committed' ? (
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-3 w-3">
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                          </span>
+                          <span className="text-sm font-bold text-blue-700">Funding Secured</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="relative flex h-3 w-3">
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-gray-400"></span>
+                          </span>
+                          <span className="text-sm font-bold text-gray-600">Fully Funded</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Investment Calculator */}

@@ -1,0 +1,66 @@
+. The New Layout Code
+Locate where your Financial Strip (Purchase Price, Rehab, etc.) ends, and paste this grid section immediately after it, but before the "About this Property" section.
+
+HTML
+
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 mb-10">
+  
+  <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+    <div class="p-2.5 bg-gray-50 rounded-lg text-gray-600">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Bedrooms</p>
+      <p class="text-xl font-bold text-gray-900">3</p>
+    </div>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+    <div class="p-2.5 bg-gray-50 rounded-lg text-gray-600">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Bathrooms</p>
+      <p class="text-xl font-bold text-gray-900">2</p>
+    </div>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+    <div class="p-2.5 bg-gray-50 rounded-lg text-gray-600">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Sqft</p>
+      <p class="text-xl font-bold text-gray-900">1,777</p>
+    </div>
+  </div>
+
+  <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+    <div class="p-2.5 bg-blue-50 rounded-lg text-blue-600">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Est. Closing</p>
+      <p class="text-xl font-bold text-gray-900">1/1/2026</p>
+    </div>
+  </div>
+
+</div>
+2. Bonus: Cleaner "Single Investor" Status
+In your right sidebar, replace the "0% Funding Progress" bar with this cleaner "Status Indicator." This fits your single-investor model much better.
+
+HTML
+
+<div class="bg-gray-50 rounded-lg p-3 mb-6 flex items-center justify-between border border-gray-100">
+  <span class="text-sm font-medium text-gray-600">Availability</span>
+  
+  <div class="flex items-center gap-2">
+    <span class="relative flex h-3 w-3">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+    </span>
+    <span class="text-sm font-bold text-emerald-700">Open for Funding</span>
+  </div>
+</div>
