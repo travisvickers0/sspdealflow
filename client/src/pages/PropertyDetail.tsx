@@ -184,7 +184,18 @@ export default function PropertyDetail() {
             {/* Funding Status Card */}
             <Card className="shadow-lg border-0 ring-1 ring-gray-200 sticky top-24">
               <CardHeader className="pb-4">
-                <CardTitle className="text-xl">Investment Status</CardTitle>
+                <div className="flex items-start justify-between mb-3">
+                  <CardTitle className="text-xl">Investment Status</CardTitle>
+                  <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    property.status === 'needs_funding' ? 'bg-amber-100 text-amber-800' :
+                    property.status === 'committed' ? 'bg-blue-100 text-blue-800' :
+                    'bg-green-100 text-green-800'
+                  }`}>
+                    {property.status === 'needs_funding' ? 'Needs Funding' :
+                     property.status === 'committed' ? 'Funding Committed' :
+                     'Funded'}
+                  </div>
+                </div>
                 <CardDescription className="space-y-1">
                   <div className="text-xs font-semibold text-gray-700">Closing: {new Date(property.closing_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
                   <div className="text-xs text-muted-foreground">Funding closes in 14 days</div>
