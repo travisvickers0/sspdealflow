@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Property, InsertProperty, UpdateProperty } from "@shared/schema";
 
@@ -585,49 +585,137 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
 
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-900">Photos</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Main Photo</Label>
-            <div className="mt-2 space-y-2">
-              {formData.mainPhotoUrl && (
-                <img src={formData.mainPhotoUrl} alt="Main" className="w-full h-32 object-cover rounded-lg" />
-              )}
-              <Input 
-                type="file" 
-                accept="image/*"
-                onChange={handlePhotoUpload}
-                data-testid="input-main-photo"
-              />
-            </div>
-          </div>
-          <div>
-            <Label>Gallery Photos</Label>
-            <div className="mt-2 space-y-2">
-              <div className="flex gap-2 flex-wrap">
-                {formData.galleryPhotoUrls.map((url, idx) => (
-                  <div key={idx} className="relative">
-                    <img src={url} alt={`Gallery ${idx}`} className="w-16 h-16 object-cover rounded" />
-                    <button 
-                      type="button"
-                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5"
-                      onClick={() => setFormData(prev => ({
-                        ...prev,
-                        galleryPhotoUrls: prev.galleryPhotoUrls.filter((_, i) => i !== idx)
-                      }))}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+        <p className="text-sm text-gray-500">Upload photos, then click any photo to set it as the main hero image. Use arrows to reorder.</p>
+        
+        <div className="space-y-4">
+          {/* All Photos Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {/* Main Photo First */}
+            {formData.mainPhotoUrl && (
+              <div className="relative group">
+                <div className="absolute top-1 left-1 z-10 bg-amber-500 text-white text-xs px-2 py-0.5 rounded font-medium flex items-center gap-1">
+                  <Star className="h-3 w-3" /> Hero
+                </div>
+                <img 
+                  src={formData.mainPhotoUrl} 
+                  alt="Main" 
+                  className="w-full aspect-square object-cover rounded-lg border-2 border-amber-500 shadow-md"
+                />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-1">
+                  <button
+                    type="button"
+                    className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    onClick={() => setFormData(prev => ({ ...prev, mainPhotoUrl: "" }))}
+                    title="Remove photo"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
               </div>
+            )}
+            
+            {/* Gallery Photos */}
+            {formData.galleryPhotoUrls.map((url, idx) => (
+              <div key={idx} className="relative group">
+                <img 
+                  src={url} 
+                  alt={`Gallery ${idx + 1}`} 
+                  className="w-full aspect-square object-cover rounded-lg border border-gray-200 hover:border-amber-400 cursor-pointer transition-all"
+                  onClick={() => {
+                    const oldMain = formData.mainPhotoUrl;
+                    const newGallery = formData.galleryPhotoUrls.filter((_, i) => i !== idx);
+                    if (oldMain) {
+                      newGallery.unshift(oldMain);
+                    }
+                    setFormData(prev => ({
+                      ...prev,
+                      mainPhotoUrl: url,
+                      galleryPhotoUrls: newGallery
+                    }));
+                  }}
+                  title="Click to set as hero image"
+                />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-1">
+                  <button
+                    type="button"
+                    className="p-1.5 bg-amber-500 text-white rounded-full hover:bg-amber-600"
+                    onClick={() => {
+                      const oldMain = formData.mainPhotoUrl;
+                      const newGallery = formData.galleryPhotoUrls.filter((_, i) => i !== idx);
+                      if (oldMain) {
+                        newGallery.unshift(oldMain);
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        mainPhotoUrl: url,
+                        galleryPhotoUrls: newGallery
+                      }));
+                    }}
+                    title="Set as hero"
+                  >
+                    <Star className="h-3 w-3" />
+                  </button>
+                  {idx > 0 && (
+                    <button
+                      type="button"
+                      className="p-1.5 bg-white text-gray-700 rounded-full hover:bg-gray-100"
+                      onClick={() => {
+                        const newGallery = [...formData.galleryPhotoUrls];
+                        [newGallery[idx - 1], newGallery[idx]] = [newGallery[idx], newGallery[idx - 1]];
+                        setFormData(prev => ({ ...prev, galleryPhotoUrls: newGallery }));
+                      }}
+                      title="Move left"
+                    >
+                      <ChevronLeft className="h-3 w-3" />
+                    </button>
+                  )}
+                  {idx < formData.galleryPhotoUrls.length - 1 && (
+                    <button
+                      type="button"
+                      className="p-1.5 bg-white text-gray-700 rounded-full hover:bg-gray-100"
+                      onClick={() => {
+                        const newGallery = [...formData.galleryPhotoUrls];
+                        [newGallery[idx], newGallery[idx + 1]] = [newGallery[idx + 1], newGallery[idx]];
+                        setFormData(prev => ({ ...prev, galleryPhotoUrls: newGallery }));
+                      }}
+                      title="Move right"
+                    >
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    onClick={() => setFormData(prev => ({
+                      ...prev,
+                      galleryPhotoUrls: prev.galleryPhotoUrls.filter((_, i) => i !== idx)
+                    }))}
+                    title="Remove photo"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Upload Button */}
+          <div className="flex items-center gap-4">
+            <Label className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors">
+              <Upload className="h-4 w-4" />
+              <span>Add Photos</span>
               <Input 
                 type="file" 
                 accept="image/*"
                 multiple
+                className="hidden"
                 onChange={handleGalleryUpload}
                 data-testid="input-gallery-photos"
               />
-            </div>
+            </Label>
+            <span className="text-sm text-gray-500">
+              {(formData.mainPhotoUrl ? 1 : 0) + formData.galleryPhotoUrls.length} photo(s) uploaded
+            </span>
           </div>
         </div>
       </div>
