@@ -15,11 +15,17 @@ import { Slider } from "@/components/ui/slider";
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading, error } = useProperty(params?.slug);
-  const [investorContribution, setInvestorContribution] = useState(50000);
+  const [investorContribution, setInvestorContribution] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [params?.slug]);
+
+  useEffect(() => {
+    if (property) {
+      setInvestorContribution(property.purchasePrice);
+    }
+  }, [property]);
 
   if (isLoading) {
     return (
@@ -46,9 +52,10 @@ export default function PropertyDetail() {
 
   // Funding progress: 0% if needs_funding, 100% if committed or funded
   const fundingProgress = property.status === "needs_funding" ? 0 : 100;
-  const totalCost = property.purchasePrice + (property.rehabBudget || 0);
-  const projectedProfit = property.bpoValue - totalCost;
-  const investorShare = (investorContribution / totalCost) * projectedProfit;
+  
+  // Business model: Investor puts up purchase price, profits split 50/50 on estimated equity
+  const investorReturn = property.estimatedEquity * 0.5;
+  const returnPercentage = investorContribution > 0 ? (investorReturn / investorContribution) * 100 : 0;
 
   const galleryImages = property.galleryPhotoUrls || [];
   const allImages = property.mainPhotoUrl ? [property.mainPhotoUrl, ...galleryImages] : galleryImages;
@@ -287,42 +294,37 @@ export default function PropertyDetail() {
 
                     {/* Investment Calculator */}
                     <div className="space-y-4 pt-4 border-t">
-                      <div>
-                        <Label className="text-sm font-medium">Your Investment Amount</Label>
-                        <div className="mt-2">
-                          <Input
-                            type="number"
-                            value={investorContribution}
-                            onChange={(e) => setInvestorContribution(Number(e.target.value))}
-                            className="text-lg font-semibold"
-                            min={10000}
-                            step={5000}
-                          />
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-sm font-medium">Investment Required</Label>
+                          <span className="text-xs text-gray-500">(Full Purchase Price)</span>
                         </div>
-                        <Slider
-                          value={[investorContribution]}
-                          onValueChange={([val]) => setInvestorContribution(val)}
-                          min={10000}
-                          max={property.estimatedEquity}
-                          step={5000}
-                          className="mt-3"
-                        />
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
-                          <span>$10,000</span>
-                          <span>${property.estimatedEquity.toLocaleString()}</span>
+                        <div className="text-2xl font-bold text-gray-900">
+                          ${property.purchasePrice.toLocaleString()}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 pt-3 border-t border-dashed">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Estimated Equity</span>
+                          <span className="font-medium">${property.estimatedEquity.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Profit Split</span>
+                          <span className="font-medium">50/50</span>
                         </div>
                       </div>
 
                       <div className="bg-green-50 rounded-lg p-4 border border-green-100">
                         <div className="flex items-center gap-2 mb-2">
                           <TrendingUp className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium text-green-800">Projected Return</span>
+                          <span className="text-sm font-medium text-green-800">Your Estimated Return</span>
                         </div>
                         <p className="text-3xl font-bold text-green-600">
-                          ${Math.max(0, investorShare).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                          ${investorReturn.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </p>
                         <p className="text-xs text-green-700 mt-1">
-                          Based on {((investorContribution / totalCost) * 100).toFixed(1)}% equity stake
+                          {returnPercentage.toFixed(1)}% return on investment
                         </p>
                       </div>
                     </div>
