@@ -1,0 +1,114 @@
+1. The Design Strategy: "The Omni-Bar"
+Instead of separate inputs, we will build a single floating control bar.
+
+Consolidated: Search, Status Filter, and Sort Order live in one container.
+
+Sticky: It should stick to the top of the scrollable area (under the stats) so investors can filter without scrolling back up.
+
+Visuals: White background, rounded corners (rounded-full or rounded-xl), slight shadow, and internal vertical dividers.
+
+2. The Stats Row (Simplification)
+Your current stats cards are huge. In a split-view layout, vertical space is precious. We should shrink these into a "Slim Stats Ribbon" that sits above the toolbar.
+
+3. The Code Implementation
+Here is the React code for a new component called FilterToolbar. It combines search, filtering, and view toggles into one premium bar.
+
+JavaScript
+
+import React from 'react';
+
+const FilterToolbar = () => {
+  return (
+    <div className="w-full bg-white/90 backdrop-blur-sm sticky top-0 z-30 pb-4 pt-2 px-6 border-b border-gray-100">
+      
+      {/* 1. SLIM STATS ROW (Optional - allows quick view without taking up huge space) */}
+      <div className="flex gap-6 mb-4 text-sm text-gray-500 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+          <span><strong>16</strong> Available</span>
+        </div>
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <span className="w-2 h-2 rounded-full bg-green-500"></span>
+          <span><strong>$1.2M</strong> Est. Equity</span>
+        </div>
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+          <span><strong>11</strong> Need Funding</span>
+        </div>
+      </div>
+
+      {/* 2. THE OMNI-BAR */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+        
+        {/* Left: The Unified Search Pill */}
+        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-full px-2 py-1 shadow-sm w-full md:w-auto">
+          
+          {/* Search Input */}
+          <div className="flex items-center px-3 border-r border-gray-300">
+            <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input 
+              type="text" 
+              placeholder="City, Zip, or Address" 
+              className="bg-transparent border-none focus:ring-0 text-sm text-gray-700 w-40 placeholder-gray-400"
+            />
+          </div>
+
+          {/* Status Dropdown */}
+          <div className="hidden md:flex items-center px-4 border-r border-gray-300 relative group cursor-pointer">
+             <span className="text-xs text-gray-500 font-bold uppercase mr-2">Status</span>
+             <span className="text-sm font-medium text-gray-800">Any</span>
+             <svg className="w-4 h-4 ml-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+
+          {/* Search Button (The Black Circle) */}
+          <button className="bg-gray-900 hover:bg-black text-white rounded-full p-2 ml-2 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+        </div>
+
+        {/* Right: Sort & View Options */}
+        <div className="flex items-center gap-3">
+          
+          {/* Sort Dropdown (Simple) */}
+          <select className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+            <option>Newest First</option>
+            <option>Highest Equity</option>
+            <option>Lowest Price</option>
+          </select>
+
+          {/* View Toggle (Grid/List) - Only visible on Mobile if using Split View on Desktop */}
+          <div className="flex bg-gray-100 rounded-lg p-1">
+             <button className="p-2 bg-white rounded-md shadow-sm text-gray-800">
+               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+             </button>
+             <button className="p-2 text-gray-500 hover:text-gray-800">
+               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-1.447-.894L15 7m0 13V7"></path></svg>
+             </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default FilterToolbar;
+4. Replit Prompt
+Use this prompt to get Replit to install this specific look. It instructs the AI to replace your current scattered inputs with this cohesive bar.
+
+Copy/Paste this into Replit:
+
+I want to upgrade the marketplace search and filter area to look more premium, similar to Airbnb or the "Rento" example.
+
+Please replace the current search input and stats row with a new FilterToolbar component.
+
+Design Requirements:
+
+The Omni-Bar: Create a cohesive "pill-shaped" container that groups the Search Input, Status Filter, and Search Button together. It should have a light gray border and rounded corners.
+
+Slim Stats: Instead of the 4 large cards, move the stats (Total Properties, Total Equity, etc.) into a slim, single-line horizontal list just above the search bar. Use small colored dots (legend style) to distinguish them.
+
+Sticky Positioning: The toolbar must use sticky top-0 and backdrop-blur so it stays visible when the user scrolls down the list of properties.
+
+Layout: On Desktop, justify the Search Bar to the left and the Sort Dropdown to the right.
