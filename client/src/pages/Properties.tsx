@@ -176,10 +176,17 @@ export default function Properties() {
 
       {/* Content Area - with bottom safe area for iOS home bar */}
       <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-8 min-h-[600px] pb-24 lg:pb-8">
-        {/* Dashboard Stats - Compact on mobile */}
+        {/* Dashboard Stats - Compact on mobile - Interactive */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
+          <button 
+            onClick={() => setStatusFilter("all")}
+            className={`rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer ${
+              statusFilter === "all" 
+                ? "bg-primary/10 border-2 border-primary" 
+                : "bg-white border border-gray-200 hover:bg-muted/50"
+            }`}
+          >
+            <div className="flex items-center justify-between text-left">
               <div>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium">Total Properties</p>
                 <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">{stats.total}</p>
@@ -188,7 +195,7 @@ export default function Properties() {
                 <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
             </div>
-          </div>
+          </button>
 
           <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -202,8 +209,15 @@ export default function Properties() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
+          <button 
+            onClick={() => setStatusFilter("open")}
+            className={`rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer ${
+              statusFilter === "open" 
+                ? "bg-primary/10 border-2 border-primary" 
+                : "bg-white border border-gray-200 hover:bg-muted/50"
+            }`}
+          >
+            <div className="flex items-center justify-between text-left">
               <div>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium">Needs Funding</p>
                 <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">{stats.needsFunding}</p>
@@ -212,10 +226,17 @@ export default function Properties() {
                 <Home className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600" />
               </div>
             </div>
-          </div>
+          </button>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
+          <button 
+            onClick={() => setStatusFilter("funded")}
+            className={`rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer ${
+              statusFilter === "funded" 
+                ? "bg-primary/10 border-2 border-primary" 
+                : "bg-white border border-gray-200 hover:bg-muted/50"
+            }`}
+          >
+            <div className="flex items-center justify-between text-left">
               <div>
                 <p className="text-xs sm:text-sm text-muted-foreground font-medium">Funded Deals</p>
                 <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">{stats.fundedDeals}</p>
@@ -224,7 +245,7 @@ export default function Properties() {
                 <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" />
               </div>
             </div>
-          </div>
+          </button>
         </div>
 
         <div className="flex items-center justify-between mb-6">
