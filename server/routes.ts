@@ -67,6 +67,78 @@ export async function registerRoutes(
   // PUBLIC ENDPOINTS
   // ============================================
 
+  // GET /api/maps/static - Generate static map URL for property with comps
+  app.get("/api/maps/static/:propertyId", async (req: Request, res: Response) => {
+    try {
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        return res.status(404).json({ error: "Maps API key not configured" });
+      }
+      
+      // Try by ID first, then by slug
+      let property = await storage.getProperty(req.params.propertyId);
+      if (!property) {
+        property = await storage.getPropertyBySlug(req.params.propertyId);
+      }
+      if (!property) {
+        return res.status(404).json({ error: "Property not found" });
+      }
+      
+      const comps = property.comps as any[] || [];
+      
+      // Build markers for static map
+      const markers: string[] = [];
+      
+      // Subject property marker (red)
+      const subjectLocation = `${property.address}, ${property.city}, ${property.state} ${property.zip}`;
+      markers.push(`color:red|label:S|${encodeURIComponent(subjectLocation)}`);
+      
+      // Comp markers (numbered)
+      comps.forEach((comp, idx) => {
+        if (comp.lat && comp.lng) {
+          markers.push(`color:0x475569|label:${idx + 1}|${comp.lat},${comp.lng}`);
+        } else if (comp.address) {
+          markers.push(`color:0x475569|label:${idx + 1}|${encodeURIComponent(comp.address)}`);
+        }
+      });
+      
+      // Build static map URL with dark style
+      const baseUrl = "https://maps.googleapis.com/maps/api/staticmap";
+      const params = new URLSearchParams({
+        size: "800x400",
+        scale: "2",
+        maptype: "roadmap",
+        style: "element:geometry|color:0x242f3e",
+        key: apiKey,
+      });
+      
+      // Add dark theme styles
+      const styles = [
+        "element:geometry|color:0x242f3e",
+        "element:labels.text.stroke|color:0x242f3e",
+        "element:labels.text.fill|color:0x746855",
+        "feature:administrative.locality|element:labels.text.fill|color:0xd59563",
+        "feature:road|element:geometry|color:0x38414e",
+        "feature:road|element:geometry.stroke|color:0x212a37",
+        "feature:road|element:labels.text.fill|color:0x9ca5b3",
+        "feature:water|element:geometry|color:0x17263c",
+      ];
+      
+      let url = `${baseUrl}?${params.toString()}`;
+      styles.forEach(style => {
+        url += `&style=${encodeURIComponent(style)}`;
+      });
+      markers.forEach(marker => {
+        url += `&markers=${marker}`;
+      });
+      
+      res.json({ mapUrl: url });
+    } catch (error) {
+      console.error("Error generating map:", error);
+      res.status(500).json({ error: "Failed to generate map" });
+    }
+  });
+
   // GET /api/properties - Get all properties
   app.get("/api/properties", async (req: Request, res: Response) => {
     try {
@@ -78,10 +150,17 @@ export async function registerRoutes(
     }
   });
 
-  // GET /api/properties/:id - Get single property
+  // GET /api/properties/:id - Get single property (by ID or slug)
   app.get("/api/properties/:id", async (req: Request, res: Response) => {
     try {
-      const property = await storage.getProperty(req.params.id);
+      // Try by ID first
+      let property = await storage.getProperty(req.params.id);
+      
+      // If not found by ID, try by slug
+      if (!property) {
+        property = await storage.getPropertyBySlug(req.params.id);
+      }
+      
       if (!property) {
         return res.status(404).json({ error: "Property not found" });
       }

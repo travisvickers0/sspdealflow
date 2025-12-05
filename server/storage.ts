@@ -16,6 +16,7 @@ export interface IStorage {
   // Properties
   getAllProperties(): Promise<Property[]>;
   getProperty(id: string): Promise<Property | undefined>;
+  getPropertyBySlug(slug: string): Promise<Property | undefined>;
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: string, property: UpdateProperty): Promise<Property | undefined>;
   deleteProperty(id: string): Promise<boolean>;
@@ -52,6 +53,17 @@ export class DatabaseStorage implements IStorage {
   async getProperty(id: string): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
     return property || undefined;
+  }
+
+  async getPropertyBySlug(slug: string): Promise<Property | undefined> {
+    const allProperties = await this.getAllProperties();
+    return allProperties.find(p => {
+      const propSlug = `${p.address}-${p.city}-${p.state}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      return propSlug === slug;
+    });
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {

@@ -12,6 +12,8 @@ export default function PropertyDetail() {
   const { data: property, isLoading, error } = useProperty(params?.slug);
   const [selectedImage, setSelectedImage] = useState(0);
   const [investAmount, setInvestAmount] = useState(50000);
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  const [mapLoading, setMapLoading] = useState(false);
 
   // Calculate images array early for keyboard navigation
   const galleryImages = property?.galleryPhotoUrls || [];
@@ -26,6 +28,22 @@ export default function PropertyDetail() {
       setInvestAmount(property.purchasePrice);
     }
   }, [property]);
+
+  // Fetch static map URL when property loads
+  useEffect(() => {
+    if (property?.id && (property.comps as any[])?.length > 0) {
+      setMapLoading(true);
+      fetch(`/api/maps/static/${property.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.mapUrl) {
+            setMapUrl(data.mapUrl);
+          }
+        })
+        .catch(err => console.error("Failed to load map:", err))
+        .finally(() => setMapLoading(false));
+    }
+  }, [property?.id]);
 
   // Keyboard navigation - must be before any conditional returns
   useEffect(() => {
@@ -255,77 +273,48 @@ export default function PropertyDetail() {
                   
                   {/* Map Container */}
                   <div className="relative rounded-xl overflow-hidden bg-slate-800 h-80">
-                    {/* Dark themed map background with grid */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800">
-                      {/* Grid lines for map effect */}
-                      <div className="absolute inset-0 opacity-10">
-                        <svg width="100%" height="100%">
-                          <defs>
-                            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5"/>
-                            </pattern>
-                          </defs>
-                          <rect width="100%" height="100%" fill="url(#grid)" />
+                    {mapLoading ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
+                        <Loader2 className="h-8 w-8 animate-spin text-white" />
+                      </div>
+                    ) : mapUrl ? (
+                      <img 
+                        src={mapUrl} 
+                        alt="Property location map with comps"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800">
+                        <div className="absolute inset-0 opacity-10">
+                          <svg width="100%" height="100%">
+                            <defs>
+                              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5"/>
+                              </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+                          </svg>
+                        </div>
+                        <svg className="absolute inset-0 w-full h-full opacity-20">
+                          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="white" strokeWidth="3"/>
+                          <line x1="50%" y1="0" x2="50%" y2="100%" stroke="white" strokeWidth="2"/>
                         </svg>
-                      </div>
-                      
-                      {/* Street/road lines for realism */}
-                      <svg className="absolute inset-0 w-full h-full opacity-20">
-                        <line x1="0" y1="50%" x2="100%" y2="50%" stroke="white" strokeWidth="3"/>
-                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="white" strokeWidth="2"/>
-                        <line x1="20%" y1="0" x2="30%" y2="100%" stroke="white" strokeWidth="1"/>
-                        <line x1="70%" y1="0" x2="80%" y2="100%" stroke="white" strokeWidth="1"/>
-                      </svg>
-                    </div>
-                    
-                    {/* Subject Property Marker */}
-                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-full z-20">
-                      <div className="flex flex-col items-center">
-                        {/* Address Label */}
-                        <div className="bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg mb-1 whitespace-nowrap">
-                          {property.address}
-                        </div>
-                        {/* Pin */}
-                        <div className="relative">
-                          <div className="w-8 h-8 bg-red-500 rounded-full border-4 border-white shadow-xl flex items-center justify-center">
-                            <HomeIcon className="w-4 h-4 text-white" />
-                          </div>
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-white/50 text-sm">Map unavailable</span>
                         </div>
                       </div>
-                    </div>
+                    )}
                     
-                    {/* Comp Markers - positioned around subject */}
-                    {(property.comps as any[]).map((comp, idx) => {
-                      const positions = [
-                        { left: '30%', top: '35%' },
-                        { left: '70%', top: '60%' },
-                        { left: '25%', top: '70%' },
-                      ];
-                      const pos = positions[idx % positions.length];
-                      return (
-                        <div 
-                          key={comp.id || idx}
-                          className="absolute z-10 transform -translate-x-1/2 -translate-y-1/2"
-                          style={{ left: pos.left, top: pos.top }}
-                        >
-                          <div className="w-8 h-8 bg-slate-600 rounded-full border-3 border-white shadow-lg flex items-center justify-center text-white font-bold text-sm">
-                            {idx + 1}
-                          </div>
-                        </div>
-                      );
-                    })}
-                    
-                    {/* Map Legend */}
-                    <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                    {/* Map Legend - overlay on top of map */}
+                    <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg z-10">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow"></div>
+                          <div className="w-5 h-5 bg-red-500 rounded-sm flex items-center justify-center text-white text-[10px] font-bold">S</div>
                           <span className="text-xs font-medium text-gray-700">Subject Property</span>
                         </div>
                         {(property.comps as any[]).slice(0, 3).map((_, idx) => (
                           <div key={idx} className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-slate-600 rounded-full border border-white shadow flex items-center justify-center text-white text-[8px] font-bold">
+                            <div className="w-5 h-5 bg-slate-600 rounded-sm flex items-center justify-center text-white text-[10px] font-bold">
                               {idx + 1}
                             </div>
                             <span className="text-xs text-gray-600">Comp</span>
