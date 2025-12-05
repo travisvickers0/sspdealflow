@@ -45,6 +45,14 @@ export default function Properties() {
             return b.purchasePrice - a.purchasePrice;
           case "equity":
             return b.estimatedEquity - a.estimatedEquity;
+          case "closing_soonest":
+            const dateA = a.closingDate ? new Date(a.closingDate).getTime() : Infinity;
+            const dateB = b.closingDate ? new Date(b.closingDate).getTime() : Infinity;
+            return dateA - dateB;
+          case "closing_latest":
+            const lateDateA = a.closingDate ? new Date(a.closingDate).getTime() : 0;
+            const lateDateB = b.closingDate ? new Date(b.closingDate).getTime() : 0;
+            return lateDateB - lateDateA;
           case "newest":
           default:
             return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
@@ -118,6 +126,8 @@ export default function Properties() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="closing_soonest">Closing: Soonest</SelectItem>
+                <SelectItem value="closing_latest">Closing: Latest</SelectItem>
                 <SelectItem value="price_asc">Price: Low to High</SelectItem>
                 <SelectItem value="price_desc">Price: High to Low</SelectItem>
                 <SelectItem value="equity">Equity Available</SelectItem>
