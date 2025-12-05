@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { PropertyCard, PropertyCardSkeleton } from "@/components/PropertyCard";
+import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -73,12 +73,8 @@ export default function Properties() {
   if (isLoading) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 sm:px-6 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <PropertyCardSkeleton key={i} />
-            ))}
-          </div>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </Layout>
     );
@@ -153,16 +149,16 @@ export default function Properties() {
       </div>
 
       {/* Content Area */}
-      <div className="container mx-auto px-4 sm:px-6 py-6 min-h-[600px]">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-xl font-semibold tracking-tight text-foreground">Available Properties</h2>
+      <div className="container mx-auto px-4 sm:px-8 py-8 min-h-[600px]">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold tracking-tight text-foreground">Available Properties</h2>
           <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-            {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'}
+            {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} available
           </span>
         </div>
         
         {viewMode === "list" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 animate-in fade-in duration-500">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 animate-in fade-in duration-500">
             {filteredProperties.map((prop) => (
                 <PropertyCard key={prop.id} property={prop} />
             ))}
