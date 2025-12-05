@@ -10,7 +10,15 @@ import { useState } from "react";
 export default function Home() {
   const { data: properties, isLoading } = useProperties();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const featuredProperties = properties?.slice(0, 3) || [];
+  
+  // Filter for properties that need funding
+  const needsFundingProperties = properties?.filter(p => p.status === 'needs_funding') || [];
+  
+  // Hero stack shows first 3 needs_funding properties
+  const heroStackProperties = needsFundingProperties.slice(0, 3);
+  
+  // Featured Opportunities shows next 3 different needs_funding properties
+  const featuredProperties = needsFundingProperties.slice(3, 6);
   
   // Calculate total equity from all properties
   const totalEquity = properties?.reduce((sum, p) => sum + (p.estimatedEquity || 0), 0) || 0;
@@ -115,16 +123,16 @@ export default function Home() {
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : featuredProperties.length > 0 ? (
+              ) : heroStackProperties.length > 0 ? (
                 <div className="relative h-[280px] mx-auto max-w-[320px]">
                   {/* Card 3 - Back */}
-                  {featuredProperties[2] && (
+                  {heroStackProperties[2] && (
                     <div className="absolute left-4 top-8 w-[280px] bg-white rounded-xl shadow-md overflow-hidden transform -rotate-3 opacity-50 z-10">
                       <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {featuredProperties[2]?.mainPhotoUrl && (
+                        {heroStackProperties[2]?.mainPhotoUrl && (
                           <img 
-                            src={featuredProperties[2].mainPhotoUrl}
-                            alt={featuredProperties[2].address}
+                            src={heroStackProperties[2].mainPhotoUrl}
+                            alt={heroStackProperties[2].address}
                             className="w-full h-full object-cover"
                           />
                         )}
@@ -133,13 +141,13 @@ export default function Home() {
                   )}
                   
                   {/* Card 2 - Middle */}
-                  {featuredProperties[1] && (
+                  {heroStackProperties[1] && (
                     <div className="absolute left-2 top-4 w-[280px] bg-white rounded-xl shadow-lg overflow-hidden transform rotate-2 opacity-70 z-20">
                       <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {featuredProperties[1]?.mainPhotoUrl && (
+                        {heroStackProperties[1]?.mainPhotoUrl && (
                           <img 
-                            src={featuredProperties[1].mainPhotoUrl}
-                            alt={featuredProperties[1].address}
+                            src={heroStackProperties[1].mainPhotoUrl}
+                            alt={heroStackProperties[1].address}
                             className="w-full h-full object-cover"
                           />
                         )}
@@ -148,26 +156,26 @@ export default function Home() {
                   )}
                   
                   {/* Card 1 - Front */}
-                  <a href={`/properties/${featuredProperties[0]?.id}`} className="block">
+                  <a href={`/properties/${heroStackProperties[0]?.id}`} className="block">
                     <div className="absolute left-0 top-0 w-[280px] bg-white rounded-xl shadow-2xl overflow-hidden z-30">
                       <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {featuredProperties[0]?.mainPhotoUrl && (
+                        {heroStackProperties[0]?.mainPhotoUrl && (
                           <img 
-                            src={featuredProperties[0].mainPhotoUrl}
-                            alt={featuredProperties[0].address}
+                            src={heroStackProperties[0].mainPhotoUrl}
+                            alt={heroStackProperties[0].address}
                             className="w-full h-full object-cover"
                           />
                         )}
                         <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold">
-                          ${(featuredProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                          ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
                         </div>
                       </div>
                       <div className="p-4">
-                        <h3 className="font-semibold text-gray-900 mb-1 text-sm">{featuredProperties[0]?.address}</h3>
-                        <p className="text-xs text-gray-600 mb-2">{featuredProperties[0]?.city}, {featuredProperties[0]?.state}</p>
+                        <h3 className="font-semibold text-gray-900 mb-1 text-sm">{heroStackProperties[0]?.address}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
                         <div className="flex justify-between text-xs">
-                          <span className="text-primary font-semibold">${(featuredProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
-                          <span className="text-gray-600">{(featuredProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
+                          <span className="text-primary font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                          <span className="text-gray-600">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
                         </div>
                       </div>
                     </div>
@@ -182,10 +190,10 @@ export default function Home() {
                 <div className="flex items-center justify-center h-full">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : featuredProperties.length > 0 ? (
+              ) : heroStackProperties.length > 0 ? (
                 <>
                   {/* Card 3 - Back (renders first so it's behind) */}
-                  {featuredProperties[2] && (
+                  {heroStackProperties[2] && (
                     <div 
                       className={`absolute right-16 top-48 w-[420px] bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 cursor-pointer ${
                         hoveredCard === 2 ? 'z-50 scale-105 opacity-100 rotate-0' : 'z-10 -rotate-3 opacity-60'
@@ -194,26 +202,26 @@ export default function Home() {
                       onMouseLeave={() => setHoveredCard(null)}
                     >
                       <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {featuredProperties[2]?.mainPhotoUrl && (
+                        {heroStackProperties[2]?.mainPhotoUrl && (
                           <img 
-                            src={featuredProperties[2].mainPhotoUrl}
-                            alt={featuredProperties[2].address}
+                            src={heroStackProperties[2].mainPhotoUrl}
+                            alt={heroStackProperties[2].address}
                             className="w-full h-full object-cover"
                           />
                         )}
                         <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                          ${(featuredProperties[2]?.purchasePrice / 1000).toFixed(0)}k
+                          ${(heroStackProperties[2]?.purchasePrice / 1000).toFixed(0)}k
                         </div>
                       </div>
                       <div className="p-5">
-                        <h3 className="font-semibold text-gray-900 mb-2">{featuredProperties[2]?.address}</h3>
-                        <p className="text-sm text-gray-600">{featuredProperties[2]?.city}, {featuredProperties[2]?.state}</p>
+                        <h3 className="font-semibold text-gray-900 mb-2">{heroStackProperties[2]?.address}</h3>
+                        <p className="text-sm text-gray-600">{heroStackProperties[2]?.city}, {heroStackProperties[2]?.state}</p>
                       </div>
                     </div>
                   )}
 
                   {/* Card 2 - Middle */}
-                  {featuredProperties[1] && (
+                  {heroStackProperties[1] && (
                     <div 
                       className={`absolute right-8 top-24 w-[420px] bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 cursor-pointer ${
                         hoveredCard === 1 ? 'z-50 scale-105 opacity-100 rotate-0' : 'z-20 rotate-3 opacity-80'
@@ -222,20 +230,20 @@ export default function Home() {
                       onMouseLeave={() => setHoveredCard(null)}
                     >
                       <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {featuredProperties[1]?.mainPhotoUrl && (
+                        {heroStackProperties[1]?.mainPhotoUrl && (
                           <img 
-                            src={featuredProperties[1].mainPhotoUrl}
-                            alt={featuredProperties[1].address}
+                            src={heroStackProperties[1].mainPhotoUrl}
+                            alt={heroStackProperties[1].address}
                             className="w-full h-full object-cover"
                           />
                         )}
                         <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                          ${(featuredProperties[1]?.purchasePrice / 1000).toFixed(0)}k
+                          ${(heroStackProperties[1]?.purchasePrice / 1000).toFixed(0)}k
                         </div>
                       </div>
                       <div className="p-5">
-                        <h3 className="font-semibold text-gray-900 mb-2">{featuredProperties[1]?.address}</h3>
-                        <p className="text-sm text-gray-600">{featuredProperties[1]?.city}, {featuredProperties[1]?.state}</p>
+                        <h3 className="font-semibold text-gray-900 mb-2">{heroStackProperties[1]?.address}</h3>
+                        <p className="text-sm text-gray-600">{heroStackProperties[1]?.city}, {heroStackProperties[1]?.state}</p>
                       </div>
                     </div>
                   )}
@@ -249,23 +257,23 @@ export default function Home() {
                     onMouseLeave={() => setHoveredCard(null)}
                   >
                     <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                      {featuredProperties[0]?.mainPhotoUrl && (
+                      {heroStackProperties[0]?.mainPhotoUrl && (
                         <img 
-                          src={featuredProperties[0].mainPhotoUrl}
-                          alt={featuredProperties[0].address}
+                          src={heroStackProperties[0].mainPhotoUrl}
+                          alt={heroStackProperties[0].address}
                           className="w-full h-full object-cover"
                         />
                       )}
                       <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                        ${(featuredProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                        ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
                       </div>
                     </div>
                     <div className="p-5">
-                      <h3 className="font-semibold text-gray-900 mb-2 text-lg">{featuredProperties[0]?.address}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{featuredProperties[0]?.city}, {featuredProperties[0]?.state}</p>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-lg">{heroStackProperties[0]?.address}</h3>
+                      <p className="text-sm text-gray-600 mb-4">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
                       <div className="flex justify-between text-sm">
-                        <span className="text-primary font-semibold">${(featuredProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
-                        <span className="text-gray-600">{(featuredProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
+                        <span className="text-primary font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span className="text-gray-600">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
                       </div>
                     </div>
                   </div>
