@@ -109,7 +109,74 @@ export default function Home() {
             </div>
             </div>
 
-            {/* Right Side - Stacked Property Cards */}
+            {/* Mobile Card Stack */}
+            <div className="lg:hidden relative mt-8">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : featuredProperties.length > 0 ? (
+                <div className="relative h-[280px] mx-auto max-w-[320px]">
+                  {/* Card 3 - Back */}
+                  {featuredProperties[2] && (
+                    <div className="absolute left-4 top-8 w-[280px] bg-white rounded-xl shadow-md overflow-hidden transform -rotate-3 opacity-50 z-10">
+                      <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                        {featuredProperties[2]?.mainPhotoUrl && (
+                          <img 
+                            src={featuredProperties[2].mainPhotoUrl}
+                            alt={featuredProperties[2].address}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Card 2 - Middle */}
+                  {featuredProperties[1] && (
+                    <div className="absolute left-2 top-4 w-[280px] bg-white rounded-xl shadow-lg overflow-hidden transform rotate-2 opacity-70 z-20">
+                      <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                        {featuredProperties[1]?.mainPhotoUrl && (
+                          <img 
+                            src={featuredProperties[1].mainPhotoUrl}
+                            alt={featuredProperties[1].address}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Card 1 - Front */}
+                  <a href={`/properties/${featuredProperties[0]?.id}`} className="block">
+                    <div className="absolute left-0 top-0 w-[280px] bg-white rounded-xl shadow-2xl overflow-hidden z-30">
+                      <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                        {featuredProperties[0]?.mainPhotoUrl && (
+                          <img 
+                            src={featuredProperties[0].mainPhotoUrl}
+                            alt={featuredProperties[0].address}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                        <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                          ${(featuredProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-900 mb-1 text-sm">{featuredProperties[0]?.address}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{featuredProperties[0]?.city}, {featuredProperties[0]?.state}</p>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-primary font-semibold">${(featuredProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                          <span className="text-gray-600">{(featuredProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Desktop Stacked Property Cards */}
             <div className="hidden lg:block relative h-[600px]">
               {isLoading ? (
                 <div className="flex items-center justify-center h-full">
