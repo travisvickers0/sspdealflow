@@ -54,7 +54,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           />
           
           {/* Status Badge */}
-          <div className={`absolute top-3 left-3 ${status.bg} text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm tracking-wide`}>
+          <div className={`absolute top-3 left-3 ${status.bg} text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full shadow-sm tracking-wide`}>
             {status.label}
           </div>
 
@@ -140,7 +140,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
               </svg>
               <span>Closes {closeDate}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-primary font-bold bg-primary/10 px-2 py-1 rounded">
+            <div className="flex items-center gap-1.5 text-green-600 font-bold bg-green-50 px-2 py-1 rounded">
               {/* Chart Icon */}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
