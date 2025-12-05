@@ -1,12 +1,13 @@
 const pdfParseLib = require('pdf-parse');
-const pdfParse = pdfParseLib.PDFParse || pdfParseLib.default || pdfParseLib;
+const { PDFParse } = pdfParseLib;
 
 async function parsePDF(dataBuffer) {
-  const data = await pdfParse(dataBuffer);
+  const parser = new PDFParse({ data: dataBuffer });
+  const result = await parser.getText();
   return {
-    text: data.text,
-    numpages: data.numpages,
-    info: data.info
+    text: result.text || '',
+    numpages: result.pages?.length || 0,
+    info: result.info || {}
   };
 }
 
