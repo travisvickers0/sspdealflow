@@ -89,11 +89,39 @@ export default function Properties() {
 
   return (
     <Layout>
+      {/* Mobile Floating View Toggle - Fixed at bottom for thumb access */}
+      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pb-[env(safe-area-inset-bottom)]">
+        <ToggleGroup 
+          type="single" 
+          value={viewMode} 
+          onValueChange={(val) => val && setViewMode(val as "list" | "map")} 
+          className="bg-white/95 backdrop-blur-lg p-1.5 rounded-full border shadow-xl"
+        >
+          <ToggleGroupItem 
+            value="list" 
+            size="sm" 
+            className="rounded-full px-4 h-10 data-[state=on]:bg-primary data-[state=on]:text-white data-[state=on]:shadow-sm transition-all cursor-pointer active:scale-95" 
+            data-testid="toggle-list-mobile"
+          >
+            <List className="h-4 w-4 mr-2" /> List
+          </ToggleGroupItem>
+          <ToggleGroupItem 
+            value="map" 
+            size="sm" 
+            className="rounded-full px-4 h-10 data-[state=on]:bg-primary data-[state=on]:text-white data-[state=on]:shadow-sm transition-all cursor-pointer active:scale-95" 
+            data-testid="toggle-map-mobile"
+          >
+            <MapIcon className="h-4 w-4 mr-2" /> Map
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+
       {/* Filters Bar */}
-      <div className="sticky top-16 z-40 w-full bg-background/80 backdrop-blur-xl border-b py-4 shadow-sm transition-all">
-        <div className="container mx-auto px-4 sm:px-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex w-full md:w-auto items-center gap-2 bg-muted/50 hover:bg-muted/80 rounded-full px-4 py-2 border transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 focus-within:bg-background">
-            <Search className="h-4 w-4 text-muted-foreground" />
+      <div className="sticky top-16 z-40 w-full bg-background/80 backdrop-blur-xl border-b py-3 sm:py-4 shadow-sm transition-all overflow-x-hidden">
+        <div className="container mx-auto px-4 sm:px-8 flex flex-col gap-3 sm:flex-row sm:gap-4 items-stretch sm:items-center justify-between">
+          {/* Search Input - Full width on mobile */}
+          <div className="flex w-full sm:w-auto items-center gap-2 bg-muted/50 hover:bg-muted/80 rounded-full px-4 py-2.5 sm:py-2 border transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 focus-within:bg-background">
+            <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <input 
               type="text" 
               placeholder="City, State, or Zip" 
@@ -106,7 +134,7 @@ export default function Properties() {
                 <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-4 w-4 p-0 hover:bg-transparent text-muted-foreground hover:text-foreground"
+                    className="h-5 w-5 p-0 hover:bg-transparent text-muted-foreground hover:text-foreground cursor-pointer active:scale-95"
                     onClick={() => setSearchQuery("")}
                 >
                     <span className="sr-only">Clear</span>
@@ -115,9 +143,10 @@ export default function Properties() {
             )}
           </div>
           
-          <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar items-center">
+          {/* Filters Row - Horizontal scroll on mobile */}
+          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 no-scrollbar items-center">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px] rounded-full border-gray-200 bg-background shadow-sm h-10 text-xs font-medium hover:bg-muted/50 transition-colors" data-testid="filter-status">
+              <SelectTrigger className="w-[120px] sm:w-[140px] rounded-full border-gray-200 bg-background shadow-sm h-10 text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer" data-testid="filter-status">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -128,7 +157,7 @@ export default function Properties() {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[150px] rounded-full border-gray-200 bg-background shadow-sm h-10 text-xs font-medium hover:bg-muted/50 transition-colors" data-testid="filter-sort">
+              <SelectTrigger className="w-[130px] sm:w-[150px] rounded-full border-gray-200 bg-background shadow-sm h-10 text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer" data-testid="filter-sort">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -141,68 +170,70 @@ export default function Properties() {
               </SelectContent>
             </Select>
 
-            <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
-            
-            <ToggleGroup type="single" value={viewMode} onValueChange={(val) => val && setViewMode(val as "list" | "map")} className="bg-muted/50 p-1 rounded-full border">
-                <ToggleGroupItem value="list" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all" data-testid="toggle-list">
-                    <List className="h-4 w-4 mr-2" /> List
-                </ToggleGroupItem>
-                <ToggleGroupItem value="map" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all" data-testid="toggle-map">
-                    <MapIcon className="h-4 w-4 mr-2" /> Map
-                </ToggleGroupItem>
-            </ToggleGroup>
+            {/* Desktop-only view toggle - hidden on mobile */}
+            <div className="hidden lg:flex items-center">
+              <div className="h-6 w-px bg-border mx-2" />
+              <ToggleGroup type="single" value={viewMode} onValueChange={(val) => val && setViewMode(val as "list" | "map")} className="bg-muted/50 p-1 rounded-full border">
+                  <ToggleGroupItem value="list" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-list">
+                      <List className="h-4 w-4 mr-2" /> List
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="map" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-map">
+                      <MapIcon className="h-4 w-4 mr-2" /> Map
+                  </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="container mx-auto px-4 sm:px-8 py-8 min-h-[600px]">
-        {/* Dashboard Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+      {/* Content Area - with bottom safe area for iOS home bar */}
+      <div className="container mx-auto px-4 sm:px-8 py-6 sm:py-8 min-h-[600px] pb-24 lg:pb-8">
+        {/* Dashboard Stats - Compact on mobile */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Total Properties</p>
-                <p className="text-3xl font-bold text-foreground mt-2">{stats.total}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium">Total Properties</p>
+                <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">{stats.total}</p>
               </div>
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <Building2 className="h-6 w-6 text-blue-600" />
+              <div className="bg-primary/10 p-2 sm:p-3 rounded-lg">
+                <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Total Spread</p>
-                <p className="text-3xl font-bold text-foreground mt-2">${(stats.totalSpread / 1000000).toFixed(1)}M</p>
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium">Total Equity</p>
+                <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">${(stats.totalSpread / 1000000).toFixed(1)}M</p>
               </div>
-              <div className="bg-green-100 p-3 rounded-lg">
-                <DollarSign className="h-6 w-6 text-green-600" />
+              <div className="bg-green-100 p-2 sm:p-3 rounded-lg">
+                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Needs Funding</p>
-                <p className="text-3xl font-bold text-foreground mt-2">{stats.needsFunding}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium">Needs Funding</p>
+                <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">{stats.needsFunding}</p>
               </div>
-              <div className="bg-amber-100 p-3 rounded-lg">
-                <Home className="h-6 w-6 text-amber-600" />
+              <div className="bg-amber-100 p-2 sm:p-3 rounded-lg">
+                <Home className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground font-medium">Funded Deals</p>
-                <p className="text-3xl font-bold text-foreground mt-2">{stats.fundedDeals}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground font-medium">Funded Deals</p>
+                <p className="text-xl sm:text-3xl font-bold text-foreground mt-1 sm:mt-2">{stats.fundedDeals}</p>
               </div>
-              <div className="bg-emerald-100 p-3 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-emerald-600" />
+              <div className="bg-emerald-100 p-2 sm:p-3 rounded-lg">
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" />
               </div>
             </div>
           </div>
