@@ -3,7 +3,7 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Map as MapIcon, List, Loader2 } from "lucide-react";
+import { Search, Map as MapIcon, List, Loader2, Building2, DollarSign, TrendingUp, Home } from "lucide-react";
 import mapBg from "@assets/generated_images/a_light,_clean,_minimalist_street_map_background_in_the_style_of_apple_maps_or_google_maps..png";
 import { useState, useMemo, useEffect } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -59,6 +59,17 @@ export default function Properties() {
         }
       });
   }, [properties, searchQuery, statusFilter, sortBy]);
+
+  const stats = useMemo(() => {
+    if (!properties) return { total: 0, totalSpread: 0, needsFunding: 0, fundedDeals: 0 };
+    
+    const total = properties.length;
+    const totalSpread = properties.reduce((sum, p) => sum + (p.estimatedEquity || 0), 0);
+    const needsFunding = properties.filter(p => p.status === "needs_funding").length;
+    const fundedDeals = properties.filter(p => p.status === "funded" || p.status === "committed").length;
+    
+    return { total, totalSpread, needsFunding, fundedDeals };
+  }, [properties]);
 
   const getPinPosition = (prop: Property) => {
     if (!properties || properties.length === 0) return { top: "50%", left: "50%" };
@@ -150,6 +161,57 @@ export default function Properties() {
 
       {/* Content Area */}
       <div className="container mx-auto px-4 sm:px-8 py-8 min-h-[600px]">
+        {/* Dashboard Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Total Properties</p>
+                <p className="text-3xl font-bold text-foreground mt-2">{stats.total}</p>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-lg">
+                <Building2 className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Total Spread</p>
+                <p className="text-3xl font-bold text-foreground mt-2">${(stats.totalSpread / 1000000).toFixed(1)}M</p>
+              </div>
+              <div className="bg-green-100 p-3 rounded-lg">
+                <DollarSign className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Needs Funding</p>
+                <p className="text-3xl font-bold text-foreground mt-2">{stats.needsFunding}</p>
+              </div>
+              <div className="bg-amber-100 p-3 rounded-lg">
+                <Home className="h-6 w-6 text-amber-600" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground font-medium">Funded Deals</p>
+                <p className="text-3xl font-bold text-foreground mt-2">{stats.fundedDeals}</p>
+              </div>
+              <div className="bg-emerald-100 p-3 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-emerald-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold tracking-tight text-foreground">Available Properties</h2>
           <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
