@@ -90,33 +90,6 @@ export default function Properties() {
 
   return (
     <Layout>
-      {/* Mobile Floating View Toggle - Fixed at bottom for thumb access */}
-      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pb-[env(safe-area-inset-bottom)]">
-        <ToggleGroup 
-          type="single" 
-          value={viewMode} 
-          onValueChange={(val) => val && setViewMode(val as "list" | "map")} 
-          className="bg-white/95 backdrop-blur-lg p-1.5 rounded-full border shadow-xl"
-        >
-          <ToggleGroupItem 
-            value="list" 
-            size="sm" 
-            className="rounded-full px-4 h-10 data-[state=on]:bg-primary data-[state=on]:text-white data-[state=on]:shadow-sm transition-all cursor-pointer active:scale-95" 
-            data-testid="toggle-list-mobile"
-          >
-            <List className="h-4 w-4 mr-2" /> List
-          </ToggleGroupItem>
-          <ToggleGroupItem 
-            value="map" 
-            size="sm" 
-            className="rounded-full px-4 h-10 data-[state=on]:bg-primary data-[state=on]:text-white data-[state=on]:shadow-sm transition-all cursor-pointer active:scale-95" 
-            data-testid="toggle-map-mobile"
-          >
-            <MapIcon className="h-4 w-4 mr-2" /> Map
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-
       {/* Filters Bar */}
       <div className="w-full bg-background border-b py-3 sm:py-4 shadow-sm transition-all overflow-x-hidden">
         <div className="container mx-auto px-4 sm:px-8 flex flex-col gap-3 sm:flex-row sm:gap-4 items-stretch sm:items-center justify-between">
@@ -170,6 +143,18 @@ export default function Properties() {
                 <SelectItem value="equity">Equity Available</SelectItem>
               </SelectContent>
             </Select>
+
+            {/* Mobile-only view toggle - right of sort dropdown */}
+            <div className="lg:hidden flex items-center">
+              <ToggleGroup type="single" value={viewMode} onValueChange={(val) => val && setViewMode(val as "list" | "map")} className="bg-muted/50 p-1 rounded-full border">
+                  <ToggleGroupItem value="list" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-list-mobile">
+                      <List className="h-4 w-4 mr-2" /> List
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="map" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-map-mobile">
+                      <MapIcon className="h-4 w-4 mr-2" /> Map
+                  </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
 
             {/* Desktop-only view toggle - hidden on mobile */}
             <div className="hidden lg:flex items-center">
