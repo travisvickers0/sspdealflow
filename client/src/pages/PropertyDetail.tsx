@@ -5,14 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRoute, Link } from "wouter";
 import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Slider } from "@/components/ui/slider";
 import { CompsMap } from "@/components/CompsMap";
 
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading, error } = useProperty(params?.slug);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [investAmount, setInvestAmount] = useState(50000);
 
   // Calculate images array early for keyboard navigation
   const galleryImages = property?.galleryPhotoUrls || [];
@@ -21,12 +19,6 @@ export default function PropertyDetail() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [params?.slug]);
-
-  useEffect(() => {
-    if (property) {
-      setInvestAmount(property.purchasePrice);
-    }
-  }, [property]);
 
   // Keyboard navigation - must be before any conditional returns
   useEffect(() => {
@@ -65,10 +57,12 @@ export default function PropertyDetail() {
     );
   }
 
-  // Calculate profit share based on investment amount
-  const investmentRatio = property?.purchasePrice > 0 ? investAmount / property.purchasePrice : 0;
-  const investorReturn = (property?.estimatedEquity || 0) * investmentRatio;
-  const returnPercentage = investAmount > 0 ? (investorReturn / investAmount) * 100 : 0;
+  // Calculate 50/50 profit split - investor funds full purchase, splits equity 50/50
+  const totalEquity = property?.estimatedEquity || 0;
+  const investorProfitShare = totalEquity * 0.5; // 50% of equity goes to investor
+  const sspProfitShare = totalEquity * 0.5; // 50% of equity goes to SSP
+  const investorTotalReturn = (property?.purchasePrice || 0) + investorProfitShare;
+  const returnPercentage = property?.purchasePrice > 0 ? (investorProfitShare / property.purchasePrice) * 100 : 0;
 
   const handlePreviousImage = () => {
     setSelectedImage((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
@@ -471,50 +465,89 @@ export default function PropertyDetail() {
                 </CardContent>
               </Card>
 
-              {/* Profit Calculator Card */}
+              {/* Profit Calculator Card - 50/50 Split */}
               <Card className="shadow-lg border-0">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">Profit Calculator</CardTitle>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    Profit Calculator
+                    <span className="text-xs font-normal bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">50/50 Split</span>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-3 block">Your Investment</label>
-                    <div className="mb-4">
-                      <Slider 
-                        value={[investAmount]}
-                        onValueChange={(value) => setInvestAmount(value[0])}
-                        min={10000}
-                        max={property.purchasePrice}
-                        step={5000}
-                        className="mb-3"
-                      />
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">$10,000</span>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-gray-900">
-                            ${investAmount.toLocaleString()}
-                          </div>
-                        </div>
-                        <span className="text-xs text-gray-500">${property.purchasePrice.toLocaleString()}</span>
+                <CardContent className="space-y-5">
+                  {/* Your Investment */}
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Your Investment</span>
+                        <p className="text-xs text-gray-500 mt-0.5">Full purchase price</p>
+                      </div>
+                      <span className="text-2xl font-bold text-gray-900">
+                        ${(property.purchasePrice || 0).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Total Equity */}
+                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm font-semibold text-gray-700">Total Projected Equity</span>
+                      <span className="text-xl font-bold text-blue-600">
+                        ${totalEquity.toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-xs text-blue-700/80">ARV minus purchase price and rehab costs</p>
+                  </div>
+
+                  {/* 50/50 Split Visualization */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profit Split</p>
+                    
+                    {/* Visual Split Bar */}
+                    <div className="h-4 rounded-full overflow-hidden flex">
+                      <div className="w-1/2 bg-green-500 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-white">YOU 50%</span>
+                      </div>
+                      <div className="w-1/2 bg-gray-400 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-white">SSP 50%</span>
+                      </div>
+                    </div>
+
+                    {/* Split Details */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
+                        <p className="text-xs text-gray-600 mb-1">Your Share</p>
+                        <p className="text-lg font-bold text-green-600">${investorProfitShare.toLocaleString()}</p>
+                      </div>
+                      <div className="p-3 bg-gray-100 rounded-lg border border-gray-200 text-center">
+                        <p className="text-xs text-gray-600 mb-1">SSP Share</p>
+                        <p className="text-lg font-bold text-gray-600">${sspProfitShare.toLocaleString()}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-100 space-y-4">
-                    <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm font-medium text-gray-700">Projected Profit Share</span>
-                        <span className="text-2xl font-bold text-green-600">
-                          ${investorReturn.toLocaleString()}
-                        </span>
+                  {/* Total Return */}
+                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <span className="text-sm font-semibold text-gray-700">Your Total Return</span>
+                        <p className="text-xs text-gray-500 mt-0.5">Investment + profit share</p>
                       </div>
-                      <div className="flex justify-between items-center mt-3 pt-3 border-t border-green-200">
-                        <span className="text-xs font-medium text-gray-600">Estimated ROI</span>
-                        <span className="text-lg font-bold text-green-700">
-                          ~{returnPercentage.toFixed(1)}%
-                        </span>
-                      </div>
+                      <span className="text-2xl font-bold text-green-600">
+                        ${investorTotalReturn.toLocaleString()}
+                      </span>
                     </div>
+                    <div className="flex justify-between items-center pt-3 border-t border-green-200">
+                      <span className="text-xs font-medium text-gray-600">Estimated ROI</span>
+                      <span className="text-lg font-bold text-green-700">
+                        +{returnPercentage.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* How It Works Note */}
+                  <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                    <p className="font-semibold text-gray-700 mb-1">How it works:</p>
+                    <p>You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus 50% of the profit.</p>
                   </div>
                 </CardContent>
               </Card>
