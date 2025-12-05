@@ -149,10 +149,10 @@ export default function Properties() {
             {/* Mobile-only view toggle - far right */}
             <div className="lg:hidden flex items-center">
               <ToggleGroup type="single" value={viewMode} onValueChange={(val) => val && setViewMode(val as "list" | "map")} className="bg-muted/50 p-0.5 rounded-full border">
-                  <ToggleGroupItem value="list" size="sm" className="rounded-full px-2 h-8 text-[11px] data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-list-mobile">
+                  <ToggleGroupItem value="list" size="sm" className="rounded-full px-2 h-8 text-[11px] data-[state=on]:bg-primary data-[state=on]:text-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-list-mobile">
                       <List className="h-3.5 w-3.5 mr-1" />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="map" size="sm" className="rounded-full px-2 h-8 text-[11px] data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-map-mobile">
+                  <ToggleGroupItem value="map" size="sm" className="rounded-full px-2 h-8 text-[11px] data-[state=on]:bg-primary data-[state=on]:text-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-map-mobile">
                       <MapIcon className="h-3.5 w-3.5 mr-1" />
                   </ToggleGroupItem>
               </ToggleGroup>
