@@ -104,7 +104,7 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
             },
             comps: {
               type: "array",
-              description: "Extract ONLY properties from the 'Recent Sales' table section (typically 2-4 properties). Ignore other comparable sections.",
+              description: "Extract ONLY from the 'Recent Sales' table (NOT 'Active Listings'). The table has columns: Subject, Comp 1, Comp 2, Comp 3. Extract Comp 1, Comp 2, and Comp 3 data only - ignore the Subject column and ignore any Active Listings page.",
               items: {
                 type: "object",
                 properties: {
@@ -164,14 +164,14 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
             "IMPORTANT:\n" +
             "1. For As-Is Price: Extract the 'As-Is Price' or 'As Is Value' from the TOP RIGHT of the FIRST PAGE. This is ALWAYS prominently displayed and labeled clearly. This is the current value of the property without repairs.\n" +
             "2. For ARV: Extract the estimated ARV (After Repair Value) also from the TOP RIGHT of the FIRST PAGE, displayed near the As-Is Price.\n" +
-            "3. For comps: Extract ONLY properties from the 'Recent Sales' table section (usually 2-4 properties). Ignore other comparable sections.\n" +
+            "3. For comps: The BPO contains an 'Active Listings' page and a 'Recent Sales' page. ONLY extract from the 'Recent Sales' table. This table has columns: Subject (the house being valued), Comp 1, Comp 2, Comp 3. Extract ONLY Comp 1, Comp 2, and Comp 3 - do NOT extract the Subject column or anything from Active Listings.\n" +
             "4. For repairs: Look for a table section titled 'Estimated Repairs', 'Repair Estimate', 'Scope of Repairs', or similar at the back of the document.\n\n" +
             "Key instructions:\n" +
             "- Extract numeric values WITHOUT $ symbols or commas (e.g., '250000' not '$250,000')\n" +
             "- The As-Is Price and ARV are typically in the top right corner of page 1\n" +
             "- For distances, extract numeric miles (e.g., 0.5 for '0.5 mi')\n" +
             "- Parse dates in ISO format (YYYY-MM-DD)\n" +
-            "- Include sold price, list price if no sold price for comps",
+            "- Use the SOLD price from Recent Sales comps (not list price)",
         },
         {
           role: "user",
