@@ -248,46 +248,119 @@ export default function PropertyDetail() {
                 </CardContent>
               </Card>
 
-              {/* Comparable Sales */}
+              {/* Location & Comps Map */}
               {(property.comps as any[])?.length > 0 && (
-                <Card className="border-0 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-xl">Comparable Sales</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold text-gray-900">Location & Comps Map</h2>
+                  
+                  {/* Map Container */}
+                  <div className="relative rounded-xl overflow-hidden bg-slate-800 h-80">
+                    {/* Dark themed map background with grid */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800">
+                      {/* Grid lines for map effect */}
+                      <div className="absolute inset-0 opacity-10">
+                        <svg width="100%" height="100%">
+                          <defs>
+                            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5"/>
+                            </pattern>
+                          </defs>
+                          <rect width="100%" height="100%" fill="url(#grid)" />
+                        </svg>
+                      </div>
+                      
+                      {/* Street/road lines for realism */}
+                      <svg className="absolute inset-0 w-full h-full opacity-20">
+                        <line x1="0" y1="50%" x2="100%" y2="50%" stroke="white" strokeWidth="3"/>
+                        <line x1="50%" y1="0" x2="50%" y2="100%" stroke="white" strokeWidth="2"/>
+                        <line x1="20%" y1="0" x2="30%" y2="100%" stroke="white" strokeWidth="1"/>
+                        <line x1="70%" y1="0" x2="80%" y2="100%" stroke="white" strokeWidth="1"/>
+                      </svg>
+                    </div>
+                    
+                    {/* Subject Property Marker */}
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-full z-20">
+                      <div className="flex flex-col items-center">
+                        {/* Address Label */}
+                        <div className="bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-lg mb-1 whitespace-nowrap">
+                          {property.address}
+                        </div>
+                        {/* Pin */}
+                        <div className="relative">
+                          <div className="w-8 h-8 bg-red-500 rounded-full border-4 border-white shadow-xl flex items-center justify-center">
+                            <HomeIcon className="w-4 h-4 text-white" />
+                          </div>
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Comp Markers - positioned around subject */}
+                    {(property.comps as any[]).map((comp, idx) => {
+                      const positions = [
+                        { left: '30%', top: '35%' },
+                        { left: '70%', top: '60%' },
+                        { left: '25%', top: '70%' },
+                      ];
+                      const pos = positions[idx % positions.length];
+                      return (
+                        <div 
+                          key={comp.id || idx}
+                          className="absolute z-10 transform -translate-x-1/2 -translate-y-1/2"
+                          style={{ left: pos.left, top: pos.top }}
+                        >
+                          <div className="w-8 h-8 bg-slate-600 rounded-full border-3 border-white shadow-lg flex items-center justify-center text-white font-bold text-sm">
+                            {idx + 1}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Map Legend */}
+                    <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow"></div>
+                          <span className="text-xs font-medium text-gray-700">Subject Property</span>
+                        </div>
+                        {(property.comps as any[]).slice(0, 3).map((_, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-slate-600 rounded-full border border-white shadow flex items-center justify-center text-white text-[8px] font-bold">
+                              {idx + 1}
+                            </div>
+                            <span className="text-xs text-gray-600">Comp</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comparable Sales List */}
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Comparable Sales</h3>
+                    <div className="divide-y divide-gray-100">
                       {(property.comps as any[]).map((comp, idx) => (
                         <div 
                           key={comp.id || idx}
-                          className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-gray-200 hover:bg-gray-50/50 transition-colors"
+                          className="py-4 flex items-start justify-between"
                         >
                           <div className="flex-1">
-                            <p className="font-semibold text-gray-900 mb-1">{comp.address}</p>
-                            <div className="flex items-center gap-3 text-xs text-gray-500">
-                              <span>{comp.beds} beds</span>
-                              <span>·</span>
-                              <span>{comp.baths} baths</span>
-                              <span>·</span>
-                              <span>{comp.sqft?.toLocaleString()} sqft</span>
-                              {comp.distance && (
-                                <>
-                                  <span>·</span>
-                                  <span>{comp.distance} mi away</span>
-                                </>
-                              )}
-                            </div>
+                            <p className="font-semibold text-gray-900">{comp.address?.split(',')[0]}</p>
+                            <p className="text-sm text-gray-500 mt-0.5">
+                              {comp.beds} beds · {comp.baths} baths · {comp.sqft?.toLocaleString()} sqft
+                            </p>
                           </div>
                           <div className="text-right ml-4">
-                            <p className="font-bold text-lg text-gray-900">${comp.price?.toLocaleString()}</p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              Sold {new Date(comp.soldDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            <p className="font-bold text-gray-900">${comp.price?.toLocaleString()}</p>
+                            <p className="text-sm text-gray-500 mt-0.5">
+                              Sold {new Date(comp.soldDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                             </p>
                           </div>
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
             </div>
 
