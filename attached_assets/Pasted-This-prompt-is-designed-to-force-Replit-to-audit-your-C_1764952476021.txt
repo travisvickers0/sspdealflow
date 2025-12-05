@@ -1,0 +1,40 @@
+This prompt is designed to force Replit to audit your CSS/Tailwind classes specifically for the constraints of modern iOS devices (Dynamic Island, Home Bar, high-DPI screens).
+
+Copy and paste this entire block into your Replit Agent chat.
+
+The "Mobile Optimization" Prompt for Replit
+I need to perform a comprehensive mobile optimization audit and refactor for the entire application, specifically targeting the form factor of the iPhone 16/17 Pro Max.
+
+Please review Marketplace.tsx, PropertyCard.tsx, and Navbar.tsx and apply the following responsive design rules:
+
+1. iOS Safe Area & Viewport Handling:
+
+Ensure the main container accounts for the "Notch/Dynamic Island" and the bottom "Home Swipe Bar."
+
+Add pb-safe (or pb-[env(safe-area-inset-bottom)]) to the bottom of the main scroll container so the last property card isn't cut off behind the home bar.
+
+Ensure the top Navbar doesn't overlap with the status bar.
+
+2. Mobile Layout Strategy (Stacking):
+
+Marketplace Split-View: On mobile (< lg breakpoints), completely hide the "Right Panel" (Map). The "Left Panel" (List) must take up w-full.
+
+Toolbar/Omni-bar: On mobile, the search bar and filter chips must stack vertically or scroll horizontally. Do not let them squash the input fields.
+
+Floating Map Toggle: Ensure the "Map/List" toggle button is fixed at the bottom-center of the screen (fixed bottom-8 left-1/2 -translate-x-1/2 z-50) on mobile, so users can switch views easily with their thumb.
+
+3. Property Card Adjustments:
+
+On mobile, the PropertyCard image height should be reduced (e.g., h-48 instead of h-56) to allow more vertical content to fit on the screen.
+
+Increase the "View Details" button hit area. Ensure it is at least 44px tall for touch accessibility.
+
+Ensure font sizes for Price and ARV do not shrink below text-lg on mobile; they must remain readable.
+
+4. Touch Optimization:
+
+Add cursor-pointer and active:scale-95 to buttons to give tactile feedback on touch.
+
+Ensure no elements cause "Horizontal Scroll Drift" (the page wobbling left/right). Set overflow-x-hidden on the main page wrapper.
+
+Action Plan: Please rewrite the responsive classes for the Marketplace container and the Navbar to ensure a perfect, native-app-like feel on a large mobile screen.

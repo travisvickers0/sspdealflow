@@ -46,7 +46,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
       >
         
         {/* 1. IMAGE SECTION with OVERLAYS */}
-        <div className="relative h-56 w-full group">
+        <div className="relative h-48 sm:h-56 w-full group">
           <img 
             src={property.mainPhotoUrl || "/placeholder.jpg"} 
             alt={property.address} 
@@ -140,7 +140,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
               </svg>
               <span>Closes {closeDate}</span>
             </div>
-            <div className="flex items-center gap-1.5 text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded">
+            <div className="flex items-center gap-1.5 text-primary font-bold bg-primary/10 px-2 py-1 rounded">
               {/* Chart Icon */}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
@@ -151,10 +151,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
           {/* 3. ACTION BUTTON */}
           <div className="mt-auto pt-2">
-            <div className={`group/btn w-full font-bold py-3.5 rounded-lg flex justify-center items-center gap-2 transition-all ${
+            <div className={`group/btn w-full font-bold py-4 min-h-[44px] rounded-lg flex justify-center items-center gap-2 transition-all cursor-pointer active:scale-95 ${
               property.status === 'funded' 
                 ? 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-300'
-                : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-blue-200 shadow-md hover:shadow-lg'
+                : 'bg-primary hover:bg-primary/90 active:bg-primary/80 text-white shadow-primary/20 shadow-md hover:shadow-lg'
             }`}>
               {property.status === 'funded' ? 'View Case Study' : 'View Details'}
               {/* Chevron Right */}
