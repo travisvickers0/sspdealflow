@@ -151,14 +151,13 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
           {/* 3. ACTION BUTTON */}
           <div className="mt-auto pt-2">
-            <div className={`group/btn w-full font-bold py-4 min-h-[44px] rounded-lg flex justify-center items-center gap-2 transition-all cursor-pointer active:scale-95 ${
+            <div className={`group/btn w-full font-semibold text-sm py-2.5 rounded-md flex justify-center items-center gap-1.5 transition-all cursor-pointer active:scale-95 ${
               property.status === 'funded' 
                 ? 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-300'
-                : 'bg-primary hover:bg-primary/90 active:bg-primary/80 text-white shadow-primary/20 shadow-md hover:shadow-lg'
+                : 'bg-primary hover:bg-primary/90 active:bg-primary/80 text-white'
             }`}>
               {property.status === 'funded' ? 'View Case Study' : 'View Details'}
-              {/* Chevron Right */}
-              <svg className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </div>
