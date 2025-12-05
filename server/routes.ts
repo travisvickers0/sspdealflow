@@ -67,6 +67,16 @@ export async function registerRoutes(
   // PUBLIC ENDPOINTS
   // ============================================
 
+  // GET /api/config/maps-key - Get Google Maps API key for interactive maps
+  app.get("/api/config/maps-key", (req: Request, res: Response) => {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (apiKey) {
+      res.json({ apiKey });
+    } else {
+      res.status(404).json({ error: "Maps API key not configured" });
+    }
+  });
+
   // GET /api/maps/static - Generate static map URL for property with comps
   app.get("/api/maps/static/:propertyId", async (req: Request, res: Response) => {
     try {
