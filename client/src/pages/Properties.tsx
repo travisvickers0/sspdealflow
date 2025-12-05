@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Map as MapIcon, List, Loader2 } from "lucide-react";
 import mapBg from "@assets/generated_images/a_light,_clean,_minimalist_street_map_background_in_the_style_of_apple_maps_or_google_maps..png";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { Property } from "@shared/schema";
@@ -16,6 +16,10 @@ export default function Properties() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("newest");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const filteredProperties = useMemo(() => {
     if (!properties) return [];
