@@ -653,20 +653,35 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
 
       const result = await response.json();
       
-      // Add the BPO as a document
-      setFormData(prev => ({
-        ...prev,
-        documents: [...(prev.documents as any[]), { 
-          name: result.originalName || file.name, 
-          url: result.url 
-        }],
-        // Add extracted comps to the comps array
-        comps: [...(prev.comps as any[]), ...(result.comps || [])]
-      }));
+      // Add the BPO as a document and update form with extracted data
+      setFormData(prev => {
+        const updates: any = {
+          ...prev,
+          documents: [...(prev.documents as any[]), { 
+            name: result.originalName || file.name, 
+            url: result.url 
+          }],
+          // Add extracted comps to the comps array
+          comps: [...(prev.comps as any[]), ...(result.comps || [])]
+        };
+        
+        // Auto-populate BPO Value from As-Is Price if extracted
+        if (result.subject?.asIsValue && result.subject.asIsValue > 0) {
+          updates.bpoValue = result.subject.asIsValue;
+        }
+        
+        return updates;
+      });
+
+      // Build success message
+      let successMessage = `Extracted ${result.comps?.length || 0} comparable sales.`;
+      if (result.subject?.asIsValue) {
+        successMessage += ` As-Is Price: $${result.subject.asIsValue.toLocaleString()} (auto-filled in BPO Value).`;
+      }
 
       toast({
         title: "BPO Processed Successfully",
-        description: `Extracted ${result.comps?.length || 0} comparable sales.`,
+        description: successMessage,
       });
     } catch (error) {
       console.error("Error processing BPO:", error);

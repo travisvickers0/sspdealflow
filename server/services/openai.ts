@@ -97,8 +97,8 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
                 baths: { type: "number" },
                 sqft: { type: "number" },
                 yearBuilt: { type: "number" },
-                asIsValue: { type: "number" },
-                arv: { type: "number", description: "After Repair Value - typically in top right of first page" },
+                asIsValue: { type: "number", description: "As-Is Price/Value - prominently displayed in top right of first page, labeled 'As-Is Price' or 'As Is Value'" },
+                arv: { type: "number", description: "After Repair Value (ARV) - typically shown near the As-Is Price in top right of first page" },
               },
               required: ["address"],
             },
@@ -162,12 +162,13 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
           role: "system",
           content: "You are an expert BPO parser. Extract subject property details, ONLY the 'Recent Sales' table, and the 'Estimated Repairs' table from the BPO report.\n\n" +
             "IMPORTANT:\n" +
-            "1. For ARV: Extract the estimated ARV (After Repair Value) from the TOP RIGHT of the FIRST PAGE. This is usually displayed prominently as 'Estimated ARV', 'ARV', 'Final BPO Value', or similar.\n" +
-            "2. For comps: Extract ONLY properties from the 'Recent Sales' table section (usually 2-4 properties). Ignore other comparable sections.\n" +
-            "3. For repairs: Look for a table section titled 'Estimated Repairs', 'Repair Estimate', 'Scope of Repairs', or similar at the back of the document.\n\n" +
+            "1. For As-Is Price: Extract the 'As-Is Price' or 'As Is Value' from the TOP RIGHT of the FIRST PAGE. This is ALWAYS prominently displayed and labeled clearly. This is the current value of the property without repairs.\n" +
+            "2. For ARV: Extract the estimated ARV (After Repair Value) also from the TOP RIGHT of the FIRST PAGE, displayed near the As-Is Price.\n" +
+            "3. For comps: Extract ONLY properties from the 'Recent Sales' table section (usually 2-4 properties). Ignore other comparable sections.\n" +
+            "4. For repairs: Look for a table section titled 'Estimated Repairs', 'Repair Estimate', 'Scope of Repairs', or similar at the back of the document.\n\n" +
             "Key instructions:\n" +
             "- Extract numeric values WITHOUT $ symbols or commas (e.g., '250000' not '$250,000')\n" +
-            "- The ARV is typically in the top right corner of page 1\n" +
+            "- The As-Is Price and ARV are typically in the top right corner of page 1\n" +
             "- For distances, extract numeric miles (e.g., 0.5 for '0.5 mi')\n" +
             "- Parse dates in ISO format (YYYY-MM-DD)\n" +
             "- Include sold price, list price if no sold price for comps",
