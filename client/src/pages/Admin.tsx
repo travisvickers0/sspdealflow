@@ -523,6 +523,7 @@ interface PropertyFormProps {
 }
 
 function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos, uploadDocument }: PropertyFormProps) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     address: property?.address || "",
     city: property?.city || "",
@@ -612,7 +613,11 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
     if (!file) return;
 
     if (file.type !== "application/pdf") {
-      alert("Please upload a PDF file");
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload a PDF file",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -659,7 +664,10 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
         comps: [...(prev.comps as any[]), ...(result.comps || [])]
       }));
 
-      alert(`BPO processed successfully! Extracted ${result.comps?.length || 0} comparable sales.`);
+      toast({
+        title: "BPO Processed Successfully",
+        description: `Extracted ${result.comps?.length || 0} comparable sales.`,
+      });
     } catch (error) {
       console.error("Error processing BPO:", error);
       let errorMessage = "Unknown error";
@@ -670,7 +678,11 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
         errorMessage = error.message;
       }
       
-      alert(`Error processing BPO: ${errorMessage}`);
+      toast({
+        title: "Error Processing BPO",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       // Reset the file input
       e.target.value = "";
