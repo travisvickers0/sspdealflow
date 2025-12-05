@@ -5,9 +5,11 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
 import { ArrowRight, TrendingUp, Lock, Zap, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export default function Home() {
   const { data: properties, isLoading } = useProperties();
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const featuredProperties = properties?.slice(0, 3) || [];
 
   return (
@@ -107,67 +109,125 @@ export default function Home() {
                 </div>
               ) : featuredProperties.length > 0 ? (
                 <>
-                  {/* Card 1 - Front */}
-                  <div className="absolute right-0 top-0 w-96 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300 z-30 animate-in fade-in slide-in-from-right-4 duration-700 delay-500">
-                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                      {featuredProperties[0]?.mainPhotoUrl && (
+                  {/* Card 3 - Back (renders first so it's behind) */}
+                  {featuredProperties[2] && (
+                    <div 
+                      className={`absolute right-16 top-64 w-96 bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 cursor-pointer border border-gray-100 ${
+                        hoveredCard === 2 ? 'z-50 scale-105 opacity-100 rotate-0' : 'z-10 -rotate-3 opacity-70'
+                      }`}
+                      onMouseEnter={() => setHoveredCard(2)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                    >
+                      <div className="relative h-40">
                         <img 
-                          src={featuredProperties[0].mainPhotoUrl}
-                          alt={featuredProperties[0].address}
+                          src={featuredProperties[2].mainPhotoUrl || "/placeholder.jpg"}
+                          alt={featuredProperties[2].address}
                           className="w-full h-full object-cover"
                         />
-                      )}
-                      <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                        ${(featuredProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                        <div className="absolute top-3 left-3 bg-blue-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm tracking-wide">
+                          {featuredProperties[2].status === 'needs_funding' ? 'Needs Funding' : featuredProperties[2].status === 'committed' ? 'Funding Committed' : 'Funded'}
+                        </div>
+                        <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-8">
+                          <h3 className="text-white text-base font-bold leading-tight drop-shadow-md">{featuredProperties[2].address}</h3>
+                          <p className="text-white/80 text-xs">{featuredProperties[2].city}, {featuredProperties[2].state}</p>
+                        </div>
+                      </div>
+                      <div className="p-3 bg-white">
+                        <div className="flex justify-between text-xs text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold text-gray-900">${(featuredProperties[2].purchasePrice / 1000).toFixed(0)}k</span>
+                            <span>Price</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-green-600 font-bold">
+                            <span>${(featuredProperties[2].estimatedEquity / 1000).toFixed(0)}k</span>
+                            <span>Equity</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="p-5">
-                      <h3 className="font-semibold text-gray-900 mb-2 text-lg">{featuredProperties[0]?.address}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{featuredProperties[0]?.city}, {featuredProperties[0]?.state}</p>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-primary font-semibold">${(featuredProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Available</span>
-                        <span className="text-gray-600">20% ROI</span>
-                      </div>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Card 2 - Middle */}
                   {featuredProperties[1] && (
-                    <div className="absolute right-8 top-32 w-96 bg-white rounded-2xl shadow-xl overflow-hidden transform rotate-3 opacity-80 z-20 animate-in fade-in slide-in-from-right-4 duration-700 delay-700">
-                      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {featuredProperties[1]?.mainPhotoUrl && (
-                          <img 
-                            src={featuredProperties[1].mainPhotoUrl}
-                            alt={featuredProperties[1].address}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
+                    <div 
+                      className={`absolute right-8 top-32 w-96 bg-white rounded-xl shadow-xl overflow-hidden transform transition-all duration-300 cursor-pointer border border-gray-100 ${
+                        hoveredCard === 1 ? 'z-50 scale-105 opacity-100 rotate-0' : hoveredCard === 2 ? 'z-20 rotate-3 opacity-80' : 'z-20 rotate-3 opacity-80'
+                      }`}
+                      onMouseEnter={() => setHoveredCard(1)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                    >
+                      <div className="relative h-40">
+                        <img 
+                          src={featuredProperties[1].mainPhotoUrl || "/placeholder.jpg"}
+                          alt={featuredProperties[1].address}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 left-3 bg-blue-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm tracking-wide">
+                          {featuredProperties[1].status === 'needs_funding' ? 'Needs Funding' : featuredProperties[1].status === 'committed' ? 'Funding Committed' : 'Funded'}
+                        </div>
+                        <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-8">
+                          <h3 className="text-white text-base font-bold leading-tight drop-shadow-md">{featuredProperties[1].address}</h3>
+                          <p className="text-white/80 text-xs">{featuredProperties[1].city}, {featuredProperties[1].state}</p>
+                        </div>
                       </div>
-                      <div className="p-5">
-                        <h3 className="font-semibold text-gray-900 mb-2">{featuredProperties[1]?.address}</h3>
-                        <p className="text-sm text-gray-600">{featuredProperties[1]?.city}, {featuredProperties[1]?.state}</p>
+                      <div className="p-3 bg-white">
+                        <div className="flex justify-between text-xs text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold text-gray-900">${(featuredProperties[1].purchasePrice / 1000).toFixed(0)}k</span>
+                            <span>Price</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-green-600 font-bold">
+                            <span>${(featuredProperties[1].estimatedEquity / 1000).toFixed(0)}k</span>
+                            <span>Equity</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Card 3 - Back */}
-                  {featuredProperties[2] && (
-                    <div className="absolute right-16 top-64 w-96 bg-white rounded-2xl shadow-lg overflow-hidden transform -rotate-3 opacity-60 z-10 animate-in fade-in slide-in-from-right-4 duration-700 delay-1000">
-                      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {featuredProperties[2]?.mainPhotoUrl && (
-                          <img 
-                            src={featuredProperties[2].mainPhotoUrl}
-                            alt={featuredProperties[2].address}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
+                  {/* Card 1 - Front */}
+                  <div 
+                    className={`absolute right-0 top-0 w-96 bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 cursor-pointer border border-gray-100 ${
+                      hoveredCard === 0 ? 'z-50 scale-105' : hoveredCard !== null ? 'z-30 opacity-90' : 'z-30'
+                    }`}
+                    onMouseEnter={() => setHoveredCard(0)}
+                    onMouseLeave={() => setHoveredCard(null)}
+                  >
+                    <div className="relative h-44">
+                      <img 
+                        src={featuredProperties[0].mainPhotoUrl || "/placeholder.jpg"}
+                        alt={featuredProperties[0].address}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-3 left-3 bg-blue-600 text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm tracking-wide">
+                        {featuredProperties[0].status === 'needs_funding' ? 'Needs Funding' : featuredProperties[0].status === 'committed' ? 'Funding Committed' : 'Funded'}
                       </div>
-                      <div className="p-5">
-                        <h3 className="font-semibold text-gray-900 mb-2">{featuredProperties[2]?.address}</h3>
-                        <p className="text-sm text-gray-600">{featuredProperties[2]?.city}, {featuredProperties[2]?.state}</p>
+                      <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-10">
+                        <h3 className="text-white text-lg font-bold leading-tight drop-shadow-md">{featuredProperties[0].address}</h3>
+                        <p className="text-white/80 text-sm">{featuredProperties[0].city}, {featuredProperties[0].state}</p>
                       </div>
                     </div>
-                  )}
+                    <div className="p-4 bg-white">
+                      <div className="flex justify-between text-sm text-gray-600 mb-3">
+                        <div className="flex items-center gap-1">
+                          <span className="font-semibold text-gray-900">${(featuredProperties[0].purchasePrice / 1000).toFixed(0)}k</span>
+                          <span>Price</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-green-600 font-bold">
+                          <span>${(featuredProperties[0].estimatedEquity / 1000).toFixed(0)}k</span>
+                          <span>Equity</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span>{(featuredProperties[0].squareFeet || 0).toLocaleString()}</span>
+                          <span>sf</span>
+                        </div>
+                      </div>
+                      <div className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg flex justify-center items-center gap-2 text-sm">
+                        View Details
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-500">
