@@ -28,6 +28,7 @@ export default function Properties() {
         const matchesSearch = 
           p.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
           p.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
           p.zip.includes(searchQuery);
         
         const matchesStatus = statusFilter === "all" || 
@@ -119,15 +120,15 @@ export default function Properties() {
       {/* Filters Bar */}
       <div className="w-full bg-background border-b py-3 sm:py-4 shadow-sm transition-all overflow-x-hidden">
         <div className="container mx-auto px-4 sm:px-8 flex flex-col gap-3 sm:flex-row sm:gap-4 items-stretch sm:items-center justify-between">
-          {/* Search Input - Full width on mobile */}
-          <div className="flex w-full sm:w-auto items-center gap-2 bg-muted/50 hover:bg-muted/80 rounded-full px-4 py-2.5 sm:py-2 border transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 focus-within:bg-background">
+          {/* Search Input - Expanded width */}
+          <div className="flex flex-1 max-w-md items-center gap-2 bg-muted/50 hover:bg-muted/80 rounded-full px-4 py-2.5 sm:py-2 border transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 focus-within:bg-background">
             <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <input 
               type="text" 
-              placeholder="City, State, or Zip" 
+              placeholder="Address, City, State or Zip" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent border-none focus:outline-none text-sm w-full sm:w-64 placeholder:text-muted-foreground/70"
+              className="bg-transparent border-none focus:outline-none text-sm w-full placeholder:text-muted-foreground/70"
               data-testid="input-search"
             />
             {searchQuery && (
@@ -143,8 +144,8 @@ export default function Properties() {
             )}
           </div>
           
-          {/* Filters Row - Horizontal scroll on mobile */}
-          <div className="flex gap-2 sm:gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 no-scrollbar items-center">
+          {/* Filters Row */}
+          <div className="flex gap-2 sm:gap-3 flex-shrink-0 overflow-x-auto pb-1 sm:pb-0 no-scrollbar items-center">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[120px] sm:w-[140px] rounded-full border-gray-200 bg-background shadow-sm h-10 text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer" data-testid="filter-status">
                 <SelectValue placeholder="Status" />
