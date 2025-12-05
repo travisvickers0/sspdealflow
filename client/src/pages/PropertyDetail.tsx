@@ -295,10 +295,11 @@ export default function PropertyDetail() {
             </div>
 
             {/* Right Column - Sidebar */}
-            <div className="space-y-6">
+            <div className="lg:col-span-1">
+              <div className="sticky top-6 space-y-6">
               
               {/* Investment Status Card */}
-              <Card className="shadow-lg border-0 sticky top-6">
+              <Card className="shadow-lg border-0">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg">Investment Status</CardTitle>
                 </CardHeader>
@@ -573,6 +574,7 @@ export default function PropertyDetail() {
                   )}
                 </CardContent>
               </Card>
+              </div>
             </div>
           </div>
         </div>
