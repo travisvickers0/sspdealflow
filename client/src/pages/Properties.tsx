@@ -118,33 +118,35 @@ export default function Properties() {
           </div>
           
           {/* Filters Row */}
-          <div className="flex gap-1.5 sm:gap-3 flex-shrink-0 items-center">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[85px] sm:w-[140px] rounded-full border-gray-200 bg-background shadow-sm h-9 sm:h-10 text-[11px] sm:text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer px-2 sm:px-3" data-testid="filter-status">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="open">Funding Open</SelectItem>
-                <SelectItem value="funded">Funded</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex gap-1.5 sm:gap-3 flex-shrink-0 items-center justify-between w-full">
+            <div className="flex gap-1.5 sm:gap-3 items-center">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[85px] sm:w-[140px] rounded-full border-gray-200 bg-background shadow-sm h-9 sm:h-10 text-[11px] sm:text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer px-2 sm:px-3" data-testid="filter-status">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="open">Funding Open</SelectItem>
+                  <SelectItem value="funded">Funded</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[90px] sm:w-[150px] rounded-full border-gray-200 bg-background shadow-sm h-9 sm:h-10 text-[11px] sm:text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer px-2 sm:px-3" data-testid="filter-sort">
-                <SelectValue placeholder="Sort" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="closing_soonest">Closing: Soonest</SelectItem>
-                <SelectItem value="closing_latest">Closing: Latest</SelectItem>
-                <SelectItem value="price_asc">Price: Low to High</SelectItem>
-                <SelectItem value="price_desc">Price: High to Low</SelectItem>
-                <SelectItem value="equity">Equity Available</SelectItem>
-              </SelectContent>
-            </Select>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[90px] sm:w-[150px] rounded-full border-gray-200 bg-background shadow-sm h-9 sm:h-10 text-[11px] sm:text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer px-2 sm:px-3" data-testid="filter-sort">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="closing_soonest">Closing: Soonest</SelectItem>
+                  <SelectItem value="closing_latest">Closing: Latest</SelectItem>
+                  <SelectItem value="price_asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price_desc">Price: High to Low</SelectItem>
+                  <SelectItem value="equity">Equity Available</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            {/* Mobile-only view toggle - right of sort dropdown */}
+            {/* Mobile-only view toggle - far right */}
             <div className="lg:hidden flex items-center">
               <ToggleGroup type="single" value={viewMode} onValueChange={(val) => val && setViewMode(val as "list" | "map")} className="bg-muted/50 p-0.5 rounded-full border">
                   <ToggleGroupItem value="list" size="sm" className="rounded-full px-2 h-8 text-[11px] data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-list-mobile">
