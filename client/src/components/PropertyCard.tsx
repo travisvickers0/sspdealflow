@@ -1,5 +1,5 @@
 import type { Property } from "@shared/schema";
-import { ArrowRight, Calendar, Heart, TrendingUp } from "lucide-react";
+import { Heart, Bed, Bath, Square } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 
@@ -9,6 +9,7 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -18,127 +19,145 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
   const statusConfig = {
     needs_funding: {
-      label: "Needs Funding",
-      color: "text-emerald-700",
-      bg: "bg-white/90"
+      label: "Ready",
+      bg: "bg-emerald-500",
+      text: "text-white"
     },
     committed: {
-      label: "Funding Committed",
-      color: "text-blue-700",
-      bg: "bg-white/90"
+      label: "Pending",
+      bg: "bg-amber-500",
+      text: "text-white"
     },
     funded: {
       label: "Funded",
-      color: "text-gray-700",
-      bg: "bg-white/90"
+      bg: "bg-gray-500",
+      text: "text-white"
     }
   };
 
   const status = statusConfig[property.status as keyof typeof statusConfig] || statusConfig.needs_funding;
 
+  const formatCompactPrice = (price: number) => {
+    if (price >= 1000000) {
+      return `$${(price / 1000000).toFixed(1)}M`;
+    }
+    return `$${Math.round(price / 1000)}k`;
+  };
+
   return (
     <Link href={`/property/${property.id}`}>
-      <div className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:border-primary/20 relative">
-        {/* Color accent bar on hover */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-primary to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
-        {/* Image Section */}
-        <div className="relative aspect-[4/3] overflow-hidden">
-          {/* Gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0" />
+      <div 
+        className="group bg-white rounded-xl overflow-hidden cursor-pointer flex flex-col transition-all duration-400 ease-out hover:-translate-y-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.12)]"
+        data-testid={`card-property-${property.id}`}
+      >
+        {/* Image Section - 16:9 ratio */}
+        <div className="relative aspect-video overflow-hidden">
+          {/* Skeleton loader */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+          )}
+          
+          {/* Bottom gradient overlay for text visibility */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-[1]" />
           
           <img 
             src={property.mainPhotoUrl || "/placeholder.jpg"} 
             alt={property.address}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            onLoad={() => setImageLoaded(true)}
+            className={`w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
           
-          {/* Status Badge - Top Left with enhanced styling */}
+          {/* Status Pill - Top Left */}
           <div className="absolute top-3 left-3 z-10">
-            <span className={`px-3 py-1.5 rounded-lg text-xs font-bold ${status.bg} backdrop-blur-sm ${status.color} shadow-lg border border-white/50 group-hover:scale-105 transition-transform duration-300`}>
+            <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${status.bg} ${status.text} shadow-sm`}>
               {status.label}
             </span>
           </div>
 
-          {/* Heart Button - Top Right with enhanced hover */}
+          {/* Heart Button - Top Right */}
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-3 right-3 p-2 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-sm transition-all duration-300 z-10 hover:scale-110 hover:rotate-12"
+            className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-red-500 backdrop-blur-sm transition-all duration-200 z-10 shadow-sm hover:shadow-md hover:scale-105"
             aria-label="Save property"
+            data-testid={`button-favorite-${property.id}`}
           >
-            <Heart className={`w-4 h-4 transition-all ${isFavorite ? 'fill-red-500 text-red-500 scale-110' : ''}`} />
+            <Heart className={`w-4 h-4 transition-all ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
           </button>
+
+          {/* Price overlay on image - bottom left */}
+          <div className="absolute bottom-3 left-3 z-10">
+            <span className="text-white text-xl font-bold drop-shadow-lg">
+              ${(property.purchasePrice || 0).toLocaleString()}
+            </span>
+          </div>
+
+          {/* Equity badge - bottom right */}
+          <div className="absolute bottom-3 right-3 z-10">
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500 text-white shadow-sm">
+              +${(property.estimatedEquity || 0).toLocaleString()}
+            </span>
+          </div>
         </div>
 
-        {/* Content Section */}
-        <div className="p-5 flex-1 flex flex-col">
-          {/* Address */}
-          <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-primary transition-colors">
-              {property.address}
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              {property.city}, {property.state} {property.zip}
+        {/* Content Section - Compact */}
+        <div className="p-4">
+          {/* Address - Primary */}
+          <h3 className="text-[15px] font-semibold text-gray-900 leading-snug mb-0.5 truncate group-hover:text-gray-700 transition-colors">
+            {property.address}
+          </h3>
+          
+          {/* City/State - Secondary */}
+          <p className="text-[13px] text-gray-500 mb-3">
+            {property.city}, {property.state}
+          </p>
+
+          {/* Micro Icon Row */}
+          <div className="flex items-center gap-4 text-[13px] text-gray-600 mb-3">
+            <span className="flex items-center gap-1">
+              <Bed className="w-3.5 h-3.5 text-gray-400" />
+              {property.beds}
+            </span>
+            <span className="flex items-center gap-1">
+              <Bath className="w-3.5 h-3.5 text-gray-400" />
+              {property.baths}
+            </span>
+            <span className="flex items-center gap-1">
+              <Square className="w-3.5 h-3.5 text-gray-400" />
+              {(property.squareFeet || 0).toLocaleString()} sqft
+            </span>
+          </div>
+
+          {/* Muted Financial Row - Apple Wallet style */}
+          <div className="pt-3 border-t border-gray-100">
+            <p className="text-[12px] text-gray-400">
+              Purchase: {formatCompactPrice(property.purchasePrice || 0)} · Value: {formatCompactPrice(property.bpoValue || 0)}
             </p>
-          </div>
-
-          {/* Specs with Dot Separators - Enhanced */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-5 font-medium relative">
-            <span className="group-hover:text-gray-900 transition-colors">{property.beds} Beds</span>
-            <span className="text-gray-300">•</span>
-            <span className="group-hover:text-gray-900 transition-colors">{property.baths} Baths</span>
-            <span className="text-gray-300">•</span>
-            <span className="group-hover:text-gray-900 transition-colors">{(property.squareFeet || 0).toLocaleString()} sqft</span>
-          </div>
-
-          {/* Price & Equity - Enhanced with color accents */}
-          <div className="flex items-end justify-between pt-5 border-t border-gray-100 mt-auto bg-gradient-to-br from-emerald-50/30 via-gray-50/50 to-transparent -mx-5 px-5 pb-1 relative overflow-hidden">
-            {/* Decorative accent */}
-            <div className="absolute right-0 top-0 w-20 h-20 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors" />
-            
-            <div className="flex-1 relative z-10">
-              <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1.5 group-hover:text-gray-700 transition-colors">Purchase Price</p>
-              <p className="text-2xl font-bold text-gray-900 group-hover:text-gray-950 transition-colors">
-                ${(property.purchasePrice || 0).toLocaleString()}
-              </p>
-            </div>
-
-            <div className="text-right flex-1 pl-4 relative z-10">
-              <p className="text-xs text-emerald-600 uppercase font-semibold tracking-wider mb-1.5 group-hover:text-emerald-700 transition-colors">Est. Equity</p>
-              <p className="text-2xl font-extrabold text-emerald-600 group-hover:text-emerald-700 group-hover:scale-105 transition-all duration-300 inline-block">
-                +${(property.estimatedEquity || 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-
-          {/* Closing Date & BPO Price - Redesigned */}
-          <div className="mt-5 pt-4 border-t border-gray-100 relative z-10">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Closing Date */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">Closing</span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900 group-hover:text-gray-950 transition-colors">
-                  {property.closingDate ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
-                </span>
-              </div>
-              
-              {/* BPO Value */}
-              <div className="flex flex-col gap-1.5 items-end">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">BPO Value</span>
-                  <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-                </div>
-                <span className="text-sm font-bold text-emerald-600 group-hover:text-emerald-700 transition-colors">
-                  ${(property.bpoValue || 0).toLocaleString()}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </Link>
+  );
+}
+
+export function PropertyCardSkeleton() {
+  return (
+    <div className="bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+      {/* Image skeleton */}
+      <div className="aspect-video bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+      
+      {/* Content skeleton */}
+      <div className="p-4 space-y-3">
+        <div className="h-4 bg-gray-200 rounded-full w-3/4 animate-pulse" />
+        <div className="h-3 bg-gray-100 rounded-full w-1/2 animate-pulse" />
+        <div className="flex gap-4 pt-2">
+          <div className="h-3 bg-gray-100 rounded-full w-12 animate-pulse" />
+          <div className="h-3 bg-gray-100 rounded-full w-12 animate-pulse" />
+          <div className="h-3 bg-gray-100 rounded-full w-16 animate-pulse" />
+        </div>
+        <div className="pt-3 border-t border-gray-100">
+          <div className="h-3 bg-gray-100 rounded-full w-2/3 animate-pulse" />
+        </div>
+      </div>
+    </div>
   );
 }
