@@ -1,144 +1,158 @@
 import type { Property } from "@shared/schema";
-import { ArrowRight, Calendar, Heart, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
-import { useState } from "react";
 
 interface PropertyCardProps {
   property: Property;
 }
 
+const formatMoney = (amount: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
 export function PropertyCard({ property }: PropertyCardProps) {
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsFavorite(!isFavorite);
-  };
-
   const statusConfig = {
     needs_funding: {
       label: "Needs Funding",
-      color: "text-emerald-700",
-      bg: "bg-white/90"
+      bg: "bg-emerald-500"
     },
     committed: {
       label: "Funding Committed",
-      color: "text-blue-700",
-      bg: "bg-white/90"
+      bg: "bg-yellow-500"
     },
     funded: {
       label: "Funded",
-      color: "text-gray-700",
-      bg: "bg-white/90"
+      bg: "bg-blue-500"
+    },
+    archived: {
+      label: "Archived",
+      bg: "bg-gray-500"
     }
   };
 
   const status = statusConfig[property.status as keyof typeof statusConfig] || statusConfig.needs_funding;
+  const closeDate = property.closingDate 
+    ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : 'TBD';
 
   return (
     <Link href={`/property/${property.id}`}>
-      <div className="group bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col hover:border-primary/20 relative">
-        {/* Color accent bar on hover */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-primary to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div 
+        className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col w-full font-sans border border-gray-100 cursor-pointer h-full"
+        data-testid={`card-property-${property.id}`}
+      >
         
-        {/* Image Section */}
-        <div className="relative aspect-[4/3] overflow-hidden">
-          {/* Gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0" />
-          
+        {/* 1. IMAGE SECTION with OVERLAYS */}
+        <div className="relative h-56 w-full group">
           <img 
             src={property.mainPhotoUrl || "/placeholder.jpg"} 
-            alt={property.address}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            alt={property.address} 
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
           />
           
-          {/* Status Badge - Top Left with enhanced styling */}
-          <div className="absolute top-3 left-3 z-10">
-            <span className={`px-3 py-1.5 rounded-lg text-xs font-bold ${status.bg} backdrop-blur-sm ${status.color} shadow-lg border border-white/50 group-hover:scale-105 transition-transform duration-300`}>
-              {status.label}
-            </span>
+          {/* Status Badge */}
+          <div className={`absolute top-3 left-3 ${status.bg} text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm tracking-wide`}>
+            {status.label}
           </div>
 
-          {/* Heart Button - Top Right with enhanced hover */}
-          <button
-            onClick={handleFavoriteClick}
-            className="absolute top-3 right-3 p-2 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-sm transition-all duration-300 z-10 hover:scale-110 hover:rotate-12"
-            aria-label="Save property"
-          >
-            <Heart className={`w-4 h-4 transition-all ${isFavorite ? 'fill-red-500 text-red-500 scale-110' : ''}`} />
-          </button>
-        </div>
-
-        {/* Content Section */}
-        <div className="p-5 flex-1 flex flex-col">
-          {/* Address */}
-          <div className="mb-4">
-            <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-primary transition-colors">
+          {/* Gradient Scrim for Address Readability */}
+          <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-16">
+            <h3 className="text-white text-xl font-bold leading-tight drop-shadow-md">
               {property.address}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-gray-200 text-sm drop-shadow-sm opacity-90">
               {property.city}, {property.state} {property.zip}
             </p>
           </div>
+        </div>
 
-          {/* Specs with Dot Separators - Enhanced */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-5 font-medium relative">
-            <span className="group-hover:text-gray-900 transition-colors">{property.beds} Beds</span>
-            <span className="text-gray-300">•</span>
-            <span className="group-hover:text-gray-900 transition-colors">{property.baths} Baths</span>
-            <span className="text-gray-300">•</span>
-            <span className="group-hover:text-gray-900 transition-colors">{(property.squareFeet || 0).toLocaleString()} sqft</span>
+        {/* 2. CARD BODY */}
+        <div className="p-4 flex flex-col gap-5 flex-1">
+
+          {/* Financials Row */}
+          <div className="flex justify-between items-end border-b border-gray-100 pb-3">
+            <div>
+              <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">
+                Purchase Price
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatMoney(property.purchasePrice || 0)}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] text-green-600 uppercase font-bold tracking-wider mb-0.5">
+                Est. Equity
+              </p>
+              <p className="text-2xl font-bold text-green-600">
+                +{formatMoney(property.estimatedEquity || 0)}
+              </p>
+            </div>
           </div>
 
-          {/* Price & Equity - Enhanced with color accents */}
-          <div className="flex items-end justify-between pt-5 border-t border-gray-100 mt-auto bg-gradient-to-br from-emerald-50/30 via-gray-50/50 to-transparent -mx-5 px-5 pb-1 relative overflow-hidden">
-            {/* Decorative accent */}
-            <div className="absolute right-0 top-0 w-20 h-20 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors" />
+          {/* Stats Row with Inline SVG Icons */}
+          <div className="flex items-center justify-start text-gray-500 text-sm font-medium">
             
-            <div className="flex-1 relative z-10">
-              <p className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-1.5 group-hover:text-gray-700 transition-colors">Purchase Price</p>
-              <p className="text-2xl font-bold text-gray-900 group-hover:text-gray-950 transition-colors">
-                ${(property.purchasePrice || 0).toLocaleString()}
-              </p>
+            {/* Bed */}
+            <div className="flex items-center gap-2 pr-4 border-r border-gray-200">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <span>{property.beds} bd</span>
             </div>
 
-            <div className="text-right flex-1 pl-4 relative z-10">
-              <p className="text-xs text-emerald-600 uppercase font-semibold tracking-wider mb-1.5 group-hover:text-emerald-700 transition-colors">Est. Equity</p>
-              <p className="text-2xl font-extrabold text-emerald-600 group-hover:text-emerald-700 group-hover:scale-105 transition-all duration-300 inline-block">
-                +${(property.estimatedEquity || 0).toLocaleString()}
-              </p>
+            {/* Bath */}
+            <div className="flex items-center gap-2 px-4 border-r border-gray-200">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <span>{property.baths} ba</span>
+            </div>
+
+            {/* Sqft */}
+            <div className="flex items-center gap-2 pl-4">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+              </svg>
+              <span>{(property.squareFeet || 0).toLocaleString()} sf</span>
             </div>
           </div>
 
-          {/* Closing Date & BPO Price - Redesigned */}
-          <div className="mt-5 pt-4 border-t border-gray-100 relative z-10">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Closing Date */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">Closing</span>
-                </div>
-                <span className="text-sm font-semibold text-gray-900 group-hover:text-gray-950 transition-colors">
-                  {property.closingDate ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
-                </span>
-              </div>
-              
-              {/* BPO Value */}
-              <div className="flex flex-col gap-1.5 items-end">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-gray-400 uppercase font-semibold tracking-wider">BPO Value</span>
-                  <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-                </div>
-                <span className="text-sm font-bold text-emerald-600 group-hover:text-emerald-700 transition-colors">
-                  ${(property.bpoValue || 0).toLocaleString()}
-                </span>
-              </div>
+          {/* Info/Dates Row */}
+          <div className="flex justify-between items-center text-xs mt-1">
+            <div className="flex items-center gap-1.5 text-gray-400 font-medium">
+              {/* Clock Icon */}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>Closes {closeDate}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded">
+              {/* Chart Icon */}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+              <span>BPO: {formatMoney(property.bpoValue || 0)}</span>
             </div>
           </div>
+
+          {/* 3. ACTION BUTTON */}
+          <div className="mt-auto pt-2">
+            <div className="group/btn w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 rounded-lg flex justify-center items-center gap-2 transition-all shadow-blue-200 shadow-md hover:shadow-lg">
+              View Details 
+              {/* Chevron Right */}
+              <svg className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </div>
+          </div>
+
         </div>
       </div>
     </Link>
   );
 }
+
+export default PropertyCard;
