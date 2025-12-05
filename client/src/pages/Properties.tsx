@@ -118,9 +118,9 @@ export default function Properties() {
           </div>
           
           {/* Filters Row */}
-          <div className="flex gap-2 sm:gap-3 flex-shrink-0 overflow-x-auto pb-1 sm:pb-0 no-scrollbar items-center">
+          <div className="flex gap-1.5 sm:gap-3 flex-shrink-0 items-center">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[120px] sm:w-[140px] rounded-full border-gray-200 bg-background shadow-sm h-10 text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer" data-testid="filter-status">
+              <SelectTrigger className="w-[85px] sm:w-[140px] rounded-full border-gray-200 bg-background shadow-sm h-9 sm:h-10 text-[11px] sm:text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer px-2 sm:px-3" data-testid="filter-status">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -131,8 +131,8 @@ export default function Properties() {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[130px] sm:w-[150px] rounded-full border-gray-200 bg-background shadow-sm h-10 text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer" data-testid="filter-sort">
-                <SelectValue placeholder="Sort by" />
+              <SelectTrigger className="w-[90px] sm:w-[150px] rounded-full border-gray-200 bg-background shadow-sm h-9 sm:h-10 text-[11px] sm:text-xs font-medium hover:bg-muted/50 transition-colors flex-shrink-0 cursor-pointer px-2 sm:px-3" data-testid="filter-sort">
+                <SelectValue placeholder="Sort" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="newest">Newest</SelectItem>
@@ -146,12 +146,12 @@ export default function Properties() {
 
             {/* Mobile-only view toggle - right of sort dropdown */}
             <div className="lg:hidden flex items-center">
-              <ToggleGroup type="single" value={viewMode} onValueChange={(val) => val && setViewMode(val as "list" | "map")} className="bg-muted/50 p-1 rounded-full border">
-                  <ToggleGroupItem value="list" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-list-mobile">
-                      <List className="h-4 w-4 mr-2" /> List
+              <ToggleGroup type="single" value={viewMode} onValueChange={(val) => val && setViewMode(val as "list" | "map")} className="bg-muted/50 p-0.5 rounded-full border">
+                  <ToggleGroupItem value="list" size="sm" className="rounded-full px-2 h-8 text-[11px] data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-list-mobile">
+                      <List className="h-3.5 w-3.5 mr-1" />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="map" size="sm" className="rounded-full px-3 h-8 data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-map-mobile">
-                      <MapIcon className="h-4 w-4 mr-2" /> Map
+                  <ToggleGroupItem value="map" size="sm" className="rounded-full px-2 h-8 text-[11px] data-[state=on]:bg-white data-[state=on]:shadow-sm transition-all cursor-pointer" data-testid="toggle-map-mobile">
+                      <MapIcon className="h-3.5 w-3.5 mr-1" />
                   </ToggleGroupItem>
               </ToggleGroup>
             </div>
