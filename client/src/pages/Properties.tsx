@@ -37,6 +37,13 @@ export default function Properties() {
         return matchesSearch && matchesStatus;
       })
       .sort((a, b) => {
+        // Status priority: needs_funding > committed > funded
+        const statusOrder = { needs_funding: 0, committed: 1, funded: 2, archived: 3 };
+        const statusDiff = (statusOrder[a.status as keyof typeof statusOrder] ?? 99) - (statusOrder[b.status as keyof typeof statusOrder] ?? 99);
+        
+        if (statusDiff !== 0) return statusDiff;
+        
+        // Secondary sort by selected sortBy option
         switch (sortBy) {
           case "price_asc":
             return a.purchasePrice - b.purchasePrice;
