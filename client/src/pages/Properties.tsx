@@ -247,7 +247,7 @@ export default function Properties() {
         </div>
         
         {viewMode === "list" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 animate-in fade-in duration-500">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10 animate-in fade-in duration-500">
             {filteredProperties.map((prop) => (
                 <PropertyCard key={prop.id} property={prop} />
             ))}
