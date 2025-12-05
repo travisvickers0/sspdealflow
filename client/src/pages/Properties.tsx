@@ -182,7 +182,7 @@ export default function Properties() {
             onClick={() => setStatusFilter("all")}
             className={`rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer ${
               statusFilter === "all" 
-                ? "bg-primary/10 border-2 border-primary" 
+                ? "bg-white border border-primary/30" 
                 : "bg-white border border-gray-200 hover:bg-muted/50"
             }`}
           >
@@ -213,7 +213,7 @@ export default function Properties() {
             onClick={() => setStatusFilter("open")}
             className={`rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer ${
               statusFilter === "open" 
-                ? "bg-primary/10 border-2 border-primary" 
+                ? "bg-white border border-primary/30" 
                 : "bg-white border border-gray-200 hover:bg-muted/50"
             }`}
           >
@@ -232,7 +232,7 @@ export default function Properties() {
             onClick={() => setStatusFilter("funded")}
             className={`rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer ${
               statusFilter === "funded" 
-                ? "bg-primary/10 border-2 border-primary" 
+                ? "bg-white border border-primary/30" 
                 : "bg-white border border-gray-200 hover:bg-muted/50"
             }`}
           >
