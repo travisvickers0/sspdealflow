@@ -195,12 +195,12 @@ const MapContent = memo(function MapContent({
             </div>
             <span className="text-xs font-medium text-gray-700">Subject Property</span>
           </div>
-          {comps.slice(0, 3).map((_, idx) => (
+          {comps.slice(0, 3).map((comp, idx) => (
             <div key={idx} className="flex items-center gap-2">
               <div className="w-5 h-5 bg-slate-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white shadow">
                 {idx + 1}
               </div>
-              <span className="text-xs text-gray-600">Comp</span>
+              <span className="text-xs text-gray-600">{comp.address?.split(",")[0] || `Comp ${idx + 1}`}</span>
             </div>
           ))}
         </div>
