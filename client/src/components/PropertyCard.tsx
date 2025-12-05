@@ -50,13 +50,24 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <img 
             src={property.mainPhotoUrl || "/placeholder.jpg"} 
             alt={property.address} 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${property.status === 'funded' ? 'grayscale opacity-75' : ''}`}
           />
           
           {/* Status Badge */}
           <div className={`absolute top-3 left-3 ${status.bg} text-white text-[10px] uppercase font-bold px-2 py-1 rounded shadow-sm tracking-wide`}>
             {status.label}
           </div>
+
+          {/* FUNDED Stamp Overlay */}
+          {property.status === 'funded' && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+              <div className="border-4 border-green-600 text-green-600 px-6 py-3 rounded-lg -rotate-12 bg-white/10 backdrop-blur-sm shadow-xl">
+                <span className="text-3xl font-black uppercase tracking-widest">
+                  FUNDED
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Gradient Scrim for Address Readability */}
           <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-16">
@@ -140,8 +151,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
           {/* 3. ACTION BUTTON */}
           <div className="mt-auto pt-2">
-            <div className="group/btn w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 rounded-lg flex justify-center items-center gap-2 transition-all shadow-blue-200 shadow-md hover:shadow-lg">
-              View Details 
+            <div className={`group/btn w-full font-bold py-3.5 rounded-lg flex justify-center items-center gap-2 transition-all ${
+              property.status === 'funded' 
+                ? 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-300'
+                : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-blue-200 shadow-md hover:shadow-lg'
+            }`}>
+              {property.status === 'funded' ? 'View Case Study' : 'View Details'}
               {/* Chevron Right */}
               <svg className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
