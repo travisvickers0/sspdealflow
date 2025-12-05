@@ -1,0 +1,121 @@
+<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col w-full max-w-sm font-sans">
+
+
+
+  <div class="relative h-56 w-full group">
+
+    <img src="https://placehold.co/600x400" alt="Property" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+
+    
+
+    <div class="absolute top-3 left-3 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-md shadow-sm">
+
+      Funding Committed
+
+    </div>
+
+
+
+    <div class="absolute bottom-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-16">
+
+      <h3 class="text-white text-xl font-bold leading-tight drop-shadow-md">133 Worchester Cir</h3>
+
+      <p class="text-gray-200 text-sm drop-shadow-sm">Perry, GA 31069</p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="p-4 flex flex-col gap-5">
+
+
+
+    <div class="flex justify-between items-end border-b border-gray-100 pb-2">
+
+      <div>
+
+        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-0.5">Purchase Price</p>
+
+        <p class="text-2xl font-bold text-gray-900">$165,000</p>
+
+      </div>
+
+      <div class="text-right">
+
+        <p class="text-[10px] text-green-600 uppercase font-bold tracking-wider mb-0.5">Est. Equity</p>
+
+        <p class="text-2xl font-bold text-green-600">+$90,000</p>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="flex items-center text-gray-500 text-sm font-medium">
+
+      <div class="flex items-center gap-2 pr-4 border-r border-gray-200">
+
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+
+        <span>3 bd</span>
+
+      </div>
+
+      <div class="flex items-center gap-2 px-4 border-r border-gray-200">
+
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+
+        <span>2 ba</span>
+
+      </div>
+
+      <div class="flex items-center gap-2 pl-4">
+
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+
+        <span>1,608 sf</span>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="flex justify-between items-center text-xs mt-1">
+
+      <div class="flex items-center gap-1.5 text-gray-400 font-medium">
+
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+
+        <span>Closes Dec 21, 2025</span>
+
+      </div>
+
+      <div class="flex items-center gap-1.5 text-blue-600 font-bold bg-blue-50 px-2 py-1 rounded">
+
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+
+        <span>BPO: $255,000</span>
+
+      </div>
+
+    </div>
+
+
+
+    <button class="group w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3.5 rounded-lg flex justify-center items-center gap-2 transition-all shadow-blue-200 shadow-lg mt-1">
+
+      View Details 
+
+      <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+
+    </button>
+
+
+
+  </div>
+
+</div>
