@@ -117,7 +117,7 @@ export default function Properties() {
       </div>
 
       {/* Filters Bar */}
-      <div className="sticky top-16 z-40 w-full bg-background/80 backdrop-blur-xl border-b py-3 sm:py-4 shadow-sm transition-all overflow-x-hidden">
+      <div className="w-full bg-background border-b py-3 sm:py-4 shadow-sm transition-all overflow-x-hidden">
         <div className="container mx-auto px-4 sm:px-8 flex flex-col gap-3 sm:flex-row sm:gap-4 items-stretch sm:items-center justify-between">
           {/* Search Input - Full width on mobile */}
           <div className="flex w-full sm:w-auto items-center gap-2 bg-muted/50 hover:bg-muted/80 rounded-full px-4 py-2.5 sm:py-2 border transition-all focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 focus-within:bg-background">
