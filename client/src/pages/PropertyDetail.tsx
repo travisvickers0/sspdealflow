@@ -107,7 +107,7 @@ export default function PropertyDetail() {
                       </span>
                     </div>
                     
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-2" data-testid="text-property-address">
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-2 whitespace-nowrap overflow-hidden text-ellipsis" data-testid="text-property-address">
                       {property.address}
                     </h1>
                     
