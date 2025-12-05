@@ -1,4 +1,5 @@
-const pdfParse = require('pdf-parse');
+const pdfParseLib = require('pdf-parse');
+const pdfParse = pdfParseLib.PDFParse || pdfParseLib.default || pdfParseLib;
 
 async function parsePDF(dataBuffer) {
   const data = await pdfParse(dataBuffer);
