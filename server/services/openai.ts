@@ -3,10 +3,14 @@ import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 import { createRequire } from "module";
+import { fileURLToPath } from "url";
 
-// Use require for pdf-parse which doesn't have ESM exports
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
+
+// Load the CommonJS PDF parser wrapper
+const { parsePDF } = require(path.join(__dirname, "../utils/pdfParser.cjs"));
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "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",
@@ -53,7 +57,7 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
     console.log(`PDF file size: ${dataBuffer.length} bytes`);
     
     console.log("Parsing PDF...");
-    const pdfData = await pdfParse(dataBuffer);
+    const pdfData = await parsePDF(dataBuffer);
     const pdfText = pdfData.text || "";
     console.log(`PDF text extracted: ${pdfText.length} characters`);
 
