@@ -4,14 +4,13 @@ import { useProperties } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Map as MapIcon, List, Loader2, Building2, DollarSign, TrendingUp, Home } from "lucide-react";
-import mapBg from "@assets/generated_images/a_light,_clean,_minimalist_street_map_background_in_the_style_of_apple_maps_or_google_maps..png";
 import { useState, useMemo, useEffect } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { Property } from "@shared/schema";
+import { MarketplaceMap } from "@/components/MarketplaceMap";
 
 export default function Properties() {
-  const { data: properties, isLoading, error } = useProperties();
+  const { data: properties, isLoading, error } = useProperties({ refetchInterval: 10000 });
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -70,16 +69,6 @@ export default function Properties() {
     
     return { total, totalSpread, needsFunding, fundedDeals };
   }, [properties]);
-
-  const getPinPosition = (prop: Property) => {
-    if (!properties || properties.length === 0) return { top: "50%", left: "50%" };
-    
-    const idx = properties.findIndex(p => p.id === prop.id);
-    const top = 20 + (idx * 15) % 60;
-    const left = 20 + (idx * 20) % 60;
-
-    return { top: `${top}%`, left: `${left}%` };
-  };
 
   if (isLoading) {
     return (
@@ -251,49 +240,8 @@ export default function Properties() {
             )}
             </div>
         ) : (
-            <div className="h-[600px] w-full rounded-2xl overflow-hidden border shadow-lg relative bg-[#F4F4F4] animate-in fade-in zoom-in-95 duration-300">
-                {/* Mock Map Background */}
-                <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-90"
-                    style={{ backgroundImage: `url(${mapBg})` }}
-                />
-                
-                {/* Map Pins */}
-                {filteredProperties.map((prop) => {
-                    const pos = getPinPosition(prop);
-                    return (
-                        <Popover key={prop.id}>
-                            <PopoverTrigger asChild>
-                                <button
-                                    className="absolute transform -translate-x-1/2 -translate-y-full group"
-                                    style={{ top: pos.top, left: pos.left }}
-                                >
-                                    <div className="relative">
-                                        <div className="bg-primary text-primary-foreground font-bold text-xs px-3 py-1.5 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center gap-1 whitespace-nowrap z-10">
-                                            ${(prop.purchasePrice / 1000)}k
-                                        </div>
-                                        <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-primary absolute left-1/2 -translate-x-1/2 -bottom-2"></div>
-                                        <div className="w-8 h-2 bg-black/20 blur-sm rounded-full absolute left-1/2 -translate-x-1/2 -bottom-3 z-0"></div>
-                                    </div>
-                                </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80 p-0 border-none shadow-xl bg-transparent" sideOffset={10}>
-                                <div className="bg-background rounded-xl overflow-hidden shadow-2xl border">
-                                    <PropertyCard property={prop} />
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    );
-                })}
-
-                <div className="absolute bottom-6 right-6 flex flex-col gap-2">
-                    <Button variant="secondary" size="icon" className="rounded-full shadow-md bg-white hover:bg-gray-50">
-                        <span className="text-xl font-bold text-gray-600">+</span>
-                    </Button>
-                    <Button variant="secondary" size="icon" className="rounded-full shadow-md bg-white hover:bg-gray-50">
-                        <span className="text-xl font-bold text-gray-600">−</span>
-                    </Button>
-                </div>
+            <div className="h-[600px] w-full rounded-2xl overflow-hidden border shadow-lg animate-in fade-in zoom-in-95 duration-300">
+                <MarketplaceMap properties={filteredProperties} />
             </div>
         )}
       </div>

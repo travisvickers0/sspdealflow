@@ -433,6 +433,66 @@ export async function registerRoutes(
     }
   });
 
+  // POST /api/admin/properties/geocode-all - Geocode all properties that don't have lat/lng
+  app.post("/api/admin/properties/geocode-all", async (req: Request, res: Response) => {
+    try {
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      if (!apiKey) {
+        return res.status(400).json({ error: "Google Maps API key not configured" });
+      }
+
+      const properties = await storage.getAllProperties();
+      const { geocodeAddress } = await import("./services/geocoding");
+      
+      const geocodedCount = { success: 0, failed: 0 };
+      const updates = [];
+
+      for (const prop of properties) {
+        // Skip if already has coordinates
+        if (prop.lat && prop.lng) {
+          continue;
+        }
+
+        const fullAddress = `${prop.address}, ${prop.city}, ${prop.state} ${prop.zip}`;
+        const result = await geocodeAddress(fullAddress);
+        
+        if (result) {
+          updates.push({
+            id: prop.id,
+            data: { lat: result.lat, lng: result.lng }
+          });
+          geocodedCount.success++;
+        } else {
+          geocodedCount.failed++;
+        }
+
+        // Small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Batch update all geocoded properties
+      if (updates.length > 0) {
+        await storage.bulkUpdateProperties(updates);
+      }
+
+      await storage.createActivityLog({
+        action: "update",
+        resourceType: "property",
+        details: { action: "geocode-all", ...geocodedCount },
+      });
+
+      res.json({ 
+        message: "Geocoding completed",
+        geocoded: geocodedCount.success,
+        failed: geocodedCount.failed,
+        alreadyHadCoords: properties.length - geocodedCount.success - geocodedCount.failed
+      });
+    } catch (error) {
+      console.error("Error geocoding properties:", error);
+      res.status(500).json({ error: "Failed to geocode properties" });
+    }
+  });
+
   // POST /api/admin/process-bpo - Process BPO document and extract comps
   app.post("/api/admin/process-bpo", (req: Request, res: Response, next: NextFunction) => {
     upload.single("file")(req, res, (err) => {

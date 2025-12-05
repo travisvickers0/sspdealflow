@@ -6,7 +6,11 @@ interface GeocodeResult {
 
 export async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
   try {
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY || "AIzaSyCSt8VJl2vozHkHQHnYDa4C6WjNVi2f98E";
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.error("GOOGLE_MAPS_API_KEY environment variable is not set");
+      return null;
+    }
     const encodedAddress = encodeURIComponent(address);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}&key=${apiKey}`;
 

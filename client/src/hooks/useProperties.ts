@@ -3,8 +3,8 @@ import type { Property, InsertProperty, UpdateProperty } from "@shared/schema";
 
 const API_BASE = "/api";
 
-// Fetch all properties
-export function useProperties() {
+// Fetch all properties with optional auto-refresh
+export function useProperties(options?: { refetchInterval?: number }) {
   return useQuery<Property[]>({
     queryKey: ["properties"],
     queryFn: async () => {
@@ -14,6 +14,7 @@ export function useProperties() {
       }
       return response.json();
     },
+    refetchInterval: options?.refetchInterval,
   });
 }
 

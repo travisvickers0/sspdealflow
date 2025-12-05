@@ -30,6 +30,8 @@ export const properties = pgTable("properties", {
   city: text("city").notNull(),
   state: text("state").notNull(),
   zip: text("zip").notNull(),
+  lat: real("lat"),
+  lng: real("lng"),
   
   purchasePrice: integer("purchase_price").notNull(),
   estimatedEquity: integer("estimated_equity").notNull(),
