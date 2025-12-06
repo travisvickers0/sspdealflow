@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -10,6 +10,25 @@ import HowItWorks from "@/pages/HowItWorks";
 import PropertyDetail from "@/pages/PropertyDetail";
 import Invest from "@/pages/Invest";
 import Admin from "@/pages/Admin";
+import { useAuth } from "@/hooks/useAuth";
+
+function AdminRoute() {
+  const { isAdmin, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+  
+  if (!isAdmin) {
+    return <Redirect to="/" />;
+  }
+  
+  return <Admin />;
+}
 
 function Router() {
   return (
@@ -19,7 +38,7 @@ function Router() {
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/property/:slug" component={PropertyDetail} />
       <Route path="/invest/:propertyId" component={Invest} />
-      <Route path="/admin" component={Admin} />
+      <Route path="/admin" component={AdminRoute} />
       <Route component={NotFound} />
     </Switch>
   );

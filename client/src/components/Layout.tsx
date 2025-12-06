@@ -2,10 +2,12 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { LayoutGrid, ShieldCheck, Home, LogOut, Menu } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, isAdmin, isLoading } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground overflow-x-hidden">
@@ -22,18 +24,39 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <Link href="/properties" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/properties" ? "text-foreground" : "text-muted-foreground"}`}>
                 Marketplace
               </Link>
-              <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"}`}>
-                Admin
-              </Link>
+              {isAdmin && (
+                <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"}`}>
+                  Admin
+                </Link>
+              )}
             </nav>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
-            <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer">
-              Log in
-            </Button>
-            <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform">
-              Sign up
-            </Button>
+            {!isLoading && (
+              isAuthenticated ? (
+                <>
+                  {user?.profileImageUrl && (
+                    <img 
+                      src={user.profileImageUrl} 
+                      alt="Profile" 
+                      className="w-8 h-8 rounded-full object-cover hidden sm:block"
+                    />
+                  )}
+                  <a href="/api/logout">
+                    <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer gap-2">
+                      <LogOut className="h-4 w-4" />
+                      Log out
+                    </Button>
+                  </a>
+                </>
+              ) : (
+                <a href="/api/login">
+                  <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform">
+                    Sign in
+                  </Button>
+                </a>
+              )
+            )}
             {/* Mobile menu button */}
             <Button 
               variant="ghost" 
@@ -57,17 +80,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
               >
                 Marketplace
               </Link>
-              <Link 
-                href="/admin" 
-                onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
-              >
-                Admin
-              </Link>
+              {isAdmin && (
+                <Link 
+                  href="/admin" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
+                >
+                  Admin
+                </Link>
+              )}
               <div className="border-t my-2" />
-              <Button variant="outline" className="w-full justify-center cursor-pointer active:scale-95">
-                Log in
-              </Button>
+              {isAuthenticated ? (
+                <a href="/api/logout" className="w-full">
+                  <Button variant="outline" className="w-full justify-center cursor-pointer active:scale-95 gap-2">
+                    <LogOut className="h-4 w-4" />
+                    Log out
+                  </Button>
+                </a>
+              ) : (
+                <a href="/api/login" className="w-full">
+                  <Button className="w-full justify-center cursor-pointer active:scale-95">
+                    Sign in
+                  </Button>
+                </a>
+              )}
             </nav>
           </div>
         )}

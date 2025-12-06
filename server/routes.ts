@@ -8,6 +8,7 @@ import path from "path";
 import fs from "fs";
 import { extractBPOData } from "./services/openai";
 import { geocodeComps } from "./services/geocoding";
+import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -47,6 +48,21 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  
+  // Setup Replit Auth
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
   
   // Test endpoint to verify routing works
   app.get("/api/test", (req: Request, res: Response) => {
@@ -182,11 +198,11 @@ export async function registerRoutes(
   });
 
   // ============================================
-  // ADMIN ENDPOINTS
+  // ADMIN ENDPOINTS (Protected by isAdmin middleware)
   // ============================================
 
   // POST /api/admin/properties - Create property
-  app.post("/api/admin/properties", async (req: Request, res: Response) => {
+  app.post("/api/admin/properties", isAdmin, async (req: Request, res: Response) => {
     try {
       const validatedData = insertPropertySchema.parse(req.body);
       const property = await storage.createProperty(validatedData);
@@ -209,7 +225,7 @@ export async function registerRoutes(
   });
 
   // PUT /api/admin/properties/:id - Update property
-  app.put("/api/admin/properties/:id", async (req: Request, res: Response) => {
+  app.put("/api/admin/properties/:id", isAdmin, async (req: Request, res: Response) => {
     try {
       const validatedData = updatePropertySchema.parse(req.body);
       const property = await storage.updateProperty(req.params.id, validatedData);
@@ -236,7 +252,7 @@ export async function registerRoutes(
   });
 
   // DELETE /api/admin/properties/:id - Delete property
-  app.delete("/api/admin/properties/:id", async (req: Request, res: Response) => {
+  app.delete("/api/admin/properties/:id", isAdmin, async (req: Request, res: Response) => {
     try {
       const property = await storage.getProperty(req.params.id);
       if (!property) {
@@ -262,7 +278,7 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/upload/photo - Upload photo
-  app.post("/api/admin/upload/photo", (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/admin/upload/photo", isAdmin, (req: Request, res: Response, next: NextFunction) => {
     upload.any()(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
@@ -297,7 +313,7 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/upload/document - Upload document
-  app.post("/api/admin/upload/document", (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/admin/upload/document", isAdmin, (req: Request, res: Response, next: NextFunction) => {
     upload.any()(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
@@ -337,7 +353,7 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/upload/photos - Upload multiple photos
-  app.post("/api/admin/upload/photos", (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/admin/upload/photos", isAdmin, (req: Request, res: Response, next: NextFunction) => {
     upload.any()(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
@@ -374,7 +390,7 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/properties/bulk_import - Bulk import properties
-  app.post("/api/admin/properties/bulk_import", async (req: Request, res: Response) => {
+  app.post("/api/admin/properties/bulk_import", isAdmin, async (req: Request, res: Response) => {
     try {
       const { properties: propertyList } = req.body;
       
@@ -402,7 +418,7 @@ export async function registerRoutes(
   });
 
   // PUT /api/admin/properties/bulk_update - Bulk update properties
-  app.put("/api/admin/properties/bulk_update", async (req: Request, res: Response) => {
+  app.put("/api/admin/properties/bulk_update", isAdmin, async (req: Request, res: Response) => {
     try {
       const { updates } = req.body;
       
@@ -434,7 +450,7 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/properties/geocode-all - Geocode all properties that don't have lat/lng
-  app.post("/api/admin/properties/geocode-all", async (req: Request, res: Response) => {
+  app.post("/api/admin/properties/geocode-all", isAdmin, async (req: Request, res: Response) => {
     try {
       const apiKey = process.env.GOOGLE_MAPS_API_KEY;
       if (!apiKey) {
@@ -494,7 +510,7 @@ export async function registerRoutes(
   });
 
   // POST /api/admin/process-bpo - Process BPO document and extract comps
-  app.post("/api/admin/process-bpo", (req: Request, res: Response, next: NextFunction) => {
+  app.post("/api/admin/process-bpo", isAdmin, (req: Request, res: Response, next: NextFunction) => {
     upload.single("file")(req, res, (err) => {
       if (err) {
         console.error("Multer error in BPO upload:", err);
@@ -599,7 +615,7 @@ export async function registerRoutes(
   });
 
   // GET /api/admin/activity-logs - Get activity logs
-  app.get("/api/admin/activity-logs", async (req: Request, res: Response) => {
+  app.get("/api/admin/activity-logs", isAdmin, async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 50;
       const logs = await storage.getActivityLogs(limit);
