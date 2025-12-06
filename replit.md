@@ -74,7 +74,8 @@ Preferred communication style: Simple, everyday language.
 - Database migrations in `./migrations` directory managed by drizzle-kit
 
 **Database Schema**
-- `users` table: Admin-only authentication (username, hashed password, role)
+- `sessions` table: Session storage for Replit Auth (sid, sess, expire)
+- `users` table: User profiles from Replit Auth (id, email, firstName, lastName, profileImageUrl)
 - `properties` table: Core property data including address, financials, images, status, coordinates
 - `activityLogs` table: Audit trail for property and commitment actions
 - Property status workflow: needs_funding → committed → funded → archived
@@ -94,15 +95,23 @@ Preferred communication style: Simple, everyday language.
 ### Authentication and Authorization
 
 **Current Implementation**
-- Admin-only system with no public user authentication currently implemented
-- User table exists with password field for future authentication
-- No session management or JWT implementation in current codebase
-- Protected admin routes rely on frontend routing without backend enforcement
+- Replit Auth via OpenID Connect for user authentication
+- Users can log in with Google, GitHub, Apple, or email/password through Replit's OIDC provider
+- Session management via express-session with PostgreSQL storage (connect-pg-simple)
+- Admin-only access enforced on all /api/admin/* endpoints via isAdmin middleware
+- Admin email: travisvickers0@gmail.com (hardcoded in server/replitAuth.ts)
 
-**Design for Future Enhancement**
-- Schema supports role-based access (admin role field in users table)
-- Foundation for implementing passport.js or similar authentication middleware
-- Session storage could be added using connect-pg-simple or memorystore
+**Authentication Flow**
+- `/api/login` - Initiates Replit Auth login flow
+- `/api/callback` - Handles OAuth callback and creates session
+- `/api/logout` - Ends session and logs out from Replit
+- `/api/auth/user` - Returns authenticated user's profile (protected)
+
+**Frontend Auth**
+- useAuth hook (client/src/hooks/useAuth.ts) provides isAuthenticated, isAdmin, and user state
+- Admin link in navigation hidden for non-admin users
+- /admin route redirects non-admins to home page
+- Sign in/out buttons displayed conditionally based on auth state
 
 ### External Dependencies
 
