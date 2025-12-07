@@ -1,0 +1,258 @@
+You are building a React 18 plus TypeScript single page inside a real estate investment app called “SSP Deal Flow.”
+
+Goal
+Create a new page component called `HowItWorksPage` that visually matches the style of the new SSP Deal Flow homepage and marketplace pages. Think Apple and Airbnb style. Clean, bright, soft gradients, white cards with rounded corners, subtle shadows, bold typography, and strong hierarchy.
+
+Use
+• React 18
+• TypeScript
+• Tailwind CSS
+• shadcn ui components for buttons and cards where it makes sense
+• Replit Database if any data persistence is needed
+Do NOT use Supabase.
+
+Global layout and styling
+• The page should live at route `/how-it-works` or be exported as `HowItWorksPage` so it can be plugged into routing.
+• Reuse the same global layout shell as the rest of the app: header with logo, navigation, and login button, plus the same footer that appears on other pages.
+• Set the max width of the main content to `max-w-6xl` or `max-w-7xl` and center it with `mx-auto` and responsive padding `px-4 sm:px-6 lg:px-8`.
+• Section vertical spacing: about `py-16` to `py-20` between sections.
+• Typography: reuse the same font stack as the rest of the app. Page should use large H1 and H2 headings similar to the homepage.
+• Primary brand color is a warm coral red similar to `#F0444F`. Use this for primary buttons and key accents.
+• Secondary accent is a positive green tone for equity and returns.
+• Background pattern: use soft beige or blush gradient sections similar to the homepage hero and CTA, plus light grey separators like `bg-slate-50`.
+
+Break the page into clear sections. Each section should be built as its own React component inside the same file or separate components folder. Use descriptive names such as `HeroSection`, `StepsSection`, `ComparisonSection`, and so on.
+
+The sections are:
+
+1. Hero Section
+   Component name: `HeroSection`
+
+   Layout
+   • Background: soft warm gradient that matches the homepage hero. You can use a div with `bg-gradient-to-b from-rose-50 via-amber-50 to-white`.
+   • Two column layout on desktop: text on the left, visual on the right. On mobile, stack vertically with text first.
+   • Left side content:
+     • Label pill: “For Accredited Investors” in a pill component at the top left.
+     • Main heading: “How SSP partners with investors”
+     • Subheading text (two or three short sentences) explaining that SSP sources undervalued residential deals, structures transparent partnerships, and delivers institutional style returns.
+     • Two buttons below:
+       • Primary button: text “Explore properties” linking to the marketplace route.
+       • Secondary outline button: text “Talk with our team” linking to a contact or scheduling route.
+   • Right side visual:
+     • A stacked card illustration similar to the hero property stack on the homepage.
+     • Use one or two mock property cards showing price and equity, slightly rotated, with a soft shadow.
+
+2. Three Step Process Section
+   Component name: `StepsSection`
+
+   Background: plain white.
+
+   At the top center:
+   • Small overline label: “Simple process”
+   • Heading: “Three steps to partnering with SSP”
+   • Short one line description.
+
+   Below the heading, render a three column grid on desktop and a single column on mobile. Each item is a white card with rounded corners.
+
+   Card base classes should be something like:
+   `bg-white rounded-2xl shadow-md p-6 flex flex-col gap-3`
+
+   Step cards:
+   • Step 1
+     • Label: “Step 1”
+     • Title: “We source undervalued deals”
+     • Body: one or two sentences about using BPOs, data and local partners to find properties with significant equity at purchase.
+   • Step 2
+     • Label: “Step 2”
+     • Title: “We structure the partnership”
+     • Body: explain that SSP creates a simple deal structure where the investor provides capital and SSP handles acquisition, rehab, and exit, with aligned returns.
+   • Step 3
+     • Label: “Step 3”
+     • Title: “We execute and manage the project”
+     • Body: explain that SSP manages renovations, timelines, and sale, and provides updates along the way.
+
+   Each card can have a circular icon at the top using a simple emoji or a placeholder icon from lucide react.
+
+3. Comparison Section
+   Component name: `ComparisonSection`
+
+   Background: light grey such as `bg-slate-50`.
+
+   Layout
+   • Centered title and subtitle:
+     • Heading: “How SSP compares to other investments”
+     • Subcopy: one sentence that compares SSP to rentals and traditional funds.
+   • Below the heading, create a responsive grid with three comparison cards.
+
+   Each card is a white rounded card with subtle shadow and padding. All three cards share the same layout:
+   • Title
+   • Short description
+   • Three bullet points describing key features.
+
+   Cards:
+   • Card 1: “Traditional rentals”
+     • Bullet examples: active management, tenant risk, slow equity growth.
+   • Card 2: “Syndications and funds”
+     • Bullet examples: limited visibility into individual deals, multi year lockups, fees.
+   • Card 3: “SSP Deal Flow”
+     • Should be visually highlighted:
+       • Add a small “Featured” badge or green accent along the top edge.
+       • Bullet examples: deal by deal transparency, short projected hold periods, aligned incentives and simple profit splits.
+
+4. Investment Model Section
+   Component name: `InvestmentModelSection`
+
+   Background: white.
+
+   Layout
+   • Title centered: “Our investment model”
+   • Subtitle: “Simple, transparent, and aligned with investors.”
+
+   Below the heading, use a two column grid on desktop and single column on mobile with gap.
+
+   Left card
+   • Title: “What SSP does”
+   • White card with bullets describing the SSP role such as sourcing deals, underwriting, negotiating, managing renovations, listing and selling.
+
+   Right card
+   • Title: “What investors do”
+   • White card with bullets describing the investor role: review deals, choose which ones to fund, provide capital at closing, receive profit share at exit, and monitor updates through the dashboard.
+
+   Both cards should look consistent with all other cards on the page.
+
+5. Capital Protection Section
+   Component name: `CapitalProtectionSection`
+
+   Background: light grey such as `bg-slate-50`.
+
+   Layout
+   • Centered heading: “How your capital is protected”
+   • Single line subheading about structure, security, and clear downside protections.
+
+   Below the heading, create a three column grid of small protection feature cards.
+
+   Each card:
+   • Icon at the top inside a small circle.
+   • Title line.
+   • Two or three line description.
+
+   Example cards:
+   • “Real assets as collateral”
+     Text: deals are backed by titled real estate at conservative valuations.
+   • “Aligned profit structure”
+     Text: SSP earns only when the project performs, no management fees or layers of carry.
+   • “Focused risk management”
+     Text: conservative renovation budgets, local contractors, and clear exit strategies.
+
+6. Timeline Section
+   Component name: `TimelineSection`
+
+   Background: white.
+
+   Layout
+   • Heading centered: “What a typical deal timeline looks like”
+   • Short description about a typical sixty to one hundred twenty day cycle.
+
+   Below that, show a responsive horizontal timeline on desktop and vertical stack on mobile.
+
+   Implement as three to four step cards connected by a thin progress line. Sample steps:
+
+   • Step “Day 1”
+     Title: “Capital committed and property purchased”
+     Description: investor funds are wired to close and SSP takes ownership.
+   • Step “Days 30 to 60”
+     Title: “Renovation and value add work”
+     Description: SSP manages renovations, inspections, and listing prep.
+   • Step “Days 60 to 120”
+     Title: “Property listed and sold”
+     Description: SSP lists the property, negotiates offers, and closes the sale.
+   • Step “Post closing”
+     Title: “Profit distribution”
+     Description: Costs and capital are repaid, then profits are split per deal terms.
+
+   Visually, each step is a small white card, with a colored dot or node and a connecting line.
+
+7. Return Calculator Section
+   Component name: `ReturnCalculatorSection`
+
+   Background: dark blue or dark slate gradient. This is the only dark section to feel like a calculator tool. Use rounded border and keep it feeling premium and modern.
+
+   Layout
+   • Place this section on a full width dark block but center a large card with rounded corners.
+   • Heading text in white: “Estimate your potential return”
+   • Inside the card, use a simple form with:
+     • Input for “Investment amount”
+     • Input or select for “Projected equity spread” or “Estimated profit on deal”
+     • Optional select for term length or hold period.
+
+   Derived outputs:
+   • Show estimated profit and multiple or percent return.
+   • Example formula: if the investor amount is X and projected net profit is Y, show “Estimated profit: Y” and “Estimated return: Y divided by X as a percent.”
+
+   You can keep the logic simple and defined in the component with React state and TypeScript types. No need for external libraries.
+
+8. Recently Funded Deals Section
+   Component name: `RecentlyFundedSection`
+
+   Background: white.
+
+   Layout
+   • Heading centered: “Recently funded deals”
+   • Subcopy: one short line about track record and real completed projects.
+
+   Below this, reuse the same property card component style from the marketplace page so the design is consistent. You can hardcode a small sample array of three or four funded deals.
+
+   Each card shows:
+   • Property image
+   • Address and city
+   • Purchase price
+   • Net profit or equity spread in green
+   • Tag ribbon that says “Funded”
+
+9. FAQ Section
+   Component name: `FAQSection`
+
+   Background: light grey such as `bg-slate-50`.
+
+   Layout
+   • Centered heading: “Common questions from new investors”
+   • Use a simple accordion component, for example a shadcn ui Accordion, where each item contains a question and answer.
+
+   Example questions:
+   • “Who can invest with SSP?”
+   • “How long is my capital typically deployed?”
+   • “How do I track my deals?”
+
+   Content can be simple placeholder text for now but structure is important.
+
+10. Final Call To Action Section
+    Component name: `FinalCTASection`
+
+    Background: soft gradient similar to the hero.
+
+    Layout
+    • Centered heading: “Ready to see live opportunities?”
+    • Subcopy: one sentence about joining as an accredited investor and viewing the current pipeline.
+    • Primary button: “Browse properties” linking to the marketplace route.
+    • Secondary button or subtle text link: “Schedule an intro call.”
+
+Implementation details
+• The main `HowItWorksPage` component should import and render the sections in order inside a `main` element:
+  `HeroSection`
+  `StepsSection`
+  `ComparisonSection`
+  `InvestmentModelSection`
+  `CapitalProtectionSection`
+  `TimelineSection`
+  `ReturnCalculatorSection`
+  `RecentlyFundedSection`
+  `FAQSection`
+  `FinalCTASection`
+• Use Tailwind class names to keep the look close to the new SSP pages:
+  • Cards: `bg-white rounded-2xl shadow-sm border border-slate-100`
+  • Section wrappers: `py-16 lg:py-20`
+  • Titles: `text-3xl md:text-4xl font-semibold tracking-tight`
+  • Body text: `text-slate-600 leading-relaxed`
+
+Deliverable
+Generate all React and TypeScript code for this `HowItWorksPage` and its child section components, fully styled with Tailwind and ready to plug into the existing SSP Deal Flow app. The page must visually match the homepage and marketplace design language: light, airy, and investor friendly.
