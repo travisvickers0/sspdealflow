@@ -29,95 +29,33 @@ import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm
 
 function HeroSection() {
   return (
-    <section className="relative min-h-[85vh] w-full overflow-hidden bg-gradient-to-b from-rose-50 via-amber-50 to-white">
-      <div className="absolute inset-0 opacity-40">
-        <img 
-          src={airbnbHero}
-          alt="background"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      
-      <div className="hidden sm:block absolute top-32 right-32 w-72 h-72 bg-primary/5 rounded-full filter blur-3xl animate-pulse" />
-      <div className="hidden sm:block absolute bottom-20 left-20 w-64 h-64 bg-orange-200/10 rounded-full filter blur-3xl animate-pulse delay-1000" />
-      
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/60 backdrop-blur border border-gray-200/50 rounded-full shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="font-medium text-gray-700 text-sm">For Accredited Investors</span>
-            </div>
+    <section className="bg-[#faf9f7] py-14 lg:py-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">
+        <div className="text-center">
+          <p className="text-sm font-medium text-slate-500 mb-4 uppercase tracking-wide">
+            Investor Partnership Model
+          </p>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-gray-900 leading-tight">
-              How SSP partners<br />
-              <span className="text-primary">with investors</span>
-            </h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-6 text-gray-900 leading-tight">
+            How SSP partners with investors
+          </h1>
 
-            <p className="text-lg text-gray-600 max-w-lg mb-8 leading-relaxed">
-              SSP sources undervalued residential deals, structures transparent partnerships, 
-              and delivers institutional-style returns. We handle the work. You share in the profits.
-            </p>
+          <p className="text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
+            SSP sources undervalued residential deals, structures transparent partnerships, 
+            and delivers institutional-style returns. We handle the work. You share in the profits.
+          </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/properties">
-                <Button 
-                  size="lg"
-                  className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-8 h-12 shadow-lg hover:shadow-xl transition-all"
-                  data-testid="button-explore-properties"
-                >
-                  Explore Properties
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Button 
-                size="lg"
-                variant="outline" 
-                className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-8 h-12 bg-white/60 backdrop-blur-sm"
-                data-testid="button-talk-team"
-              >
-                Talk with our team
-              </Button>
-            </div>
-          </div>
-
-          <div className="relative h-[400px] lg:h-[500px] hidden lg:block animate-in fade-in slide-in-from-right duration-700 delay-200">
-            <div className="absolute right-0 top-16 w-[320px] bg-white rounded-2xl shadow-lg overflow-hidden transform rotate-3 opacity-60 z-10 border border-gray-100">
-              <div className="h-40 bg-gradient-to-br from-gray-200 to-gray-300" />
-              <div className="p-4">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                <div className="h-3 bg-gray-100 rounded w-1/2" />
-              </div>
-            </div>
-            
-            <div className="absolute right-8 top-8 w-[320px] bg-white rounded-2xl shadow-xl overflow-hidden transform -rotate-2 opacity-80 z-20 border border-gray-100">
-              <div className="h-40 bg-gradient-to-br from-gray-300 to-gray-400" />
-              <div className="p-4">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                <div className="h-3 bg-gray-100 rounded w-1/2" />
-              </div>
-            </div>
-            
-            <div className="absolute right-16 top-0 w-[320px] bg-white rounded-2xl shadow-2xl overflow-hidden z-30 border border-gray-100">
-              <div className="h-44 bg-gradient-to-br from-primary/20 to-primary/40 relative">
-                <div className="absolute top-4 left-4 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold">
-                  $185,000
-                </div>
-                <div className="absolute bottom-4 right-4 bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold">
-                  +$42k Equity
-                </div>
-              </div>
-              <div className="p-5">
-                <h3 className="font-semibold text-gray-900 mb-1">123 Oak Street</h3>
-                <p className="text-sm text-gray-600">Phoenix, AZ</p>
-                <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-                  <span>3 bed</span>
-                  <span>2 bath</span>
-                  <span>1,450 sqft</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Link href="/properties">
+            <Button 
+              size="lg"
+              variant="outline"
+              className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-8 h-12 bg-white"
+              data-testid="button-explore-properties"
+            >
+              Explore properties
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
