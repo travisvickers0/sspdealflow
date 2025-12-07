@@ -419,10 +419,10 @@ function TimelineSection() {
             {timeline.map((item, idx) => (
               <div key={idx} className="flex flex-col items-center" data-testid={`timeline-step-${idx}`}>
                 <div className="w-6 h-6 rounded-full bg-primary border-4 border-white shadow-md mb-8" />
-                <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 w-full">
+                <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 w-full h-full flex flex-col">
                   <span className="text-xs font-semibold text-primary uppercase tracking-widest">{item.day}</span>
-                  <h3 className="text-base font-semibold text-gray-900 mt-3 mb-2 leading-snug">{item.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
+                  <h3 className="text-sm font-semibold text-gray-900 mt-3 mb-3 leading-tight line-clamp-2">{item.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed flex-grow">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -432,14 +432,14 @@ function TimelineSection() {
         <div className="md:hidden space-y-6">
           {timeline.map((item, idx) => (
             <div key={idx} className="flex gap-6" data-testid={`timeline-mobile-step-${idx}`}>
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center pt-2">
                 <div className="w-5 h-5 rounded-full bg-primary border-3 border-white shadow-md" />
                 {idx < timeline.length - 1 && <div className="w-1 flex-grow bg-gradient-to-b from-primary to-slate-200 mt-3 mb-3" />}
               </div>
-              <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 flex-1 pb-8">
+              <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 flex-1 flex flex-col">
                 <span className="text-xs font-semibold text-primary uppercase tracking-widest">{item.day}</span>
-                <h3 className="text-base font-semibold text-gray-900 mt-3 mb-2 leading-snug">{item.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
+                <h3 className="text-sm font-semibold text-gray-900 mt-3 mb-3 leading-tight line-clamp-2">{item.title}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed flex-grow">{item.description}</p>
               </div>
             </div>
           ))}
