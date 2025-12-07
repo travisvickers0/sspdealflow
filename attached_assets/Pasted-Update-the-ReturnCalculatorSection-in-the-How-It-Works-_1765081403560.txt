@@ -1,0 +1,75 @@
+Update the ReturnCalculatorSection in the How It Works page so that the calculator correctly models SSP’s real investor partnership structure.
+
+Replace the current calculator labels, helper text, and math with the following updated version.
+
+=========================
+CALCULATOR INPUT LABELS
+=========================
+
+1. Investment Amount
+   Helper: “The amount you contribute to the deal at closing.”
+
+2. Projected Deal Profit (after all costs)
+   Helper: “Total estimated profit after renovation and sale before the profit split.”
+
+3. Expected Hold Period (months)
+   Helper: “Typical SSP deals range from 60 to 120 days.”
+
+All three fields should be controlled inputs with React state and Tailwind styling consistent with the rest of the page.
+
+=========================
+CALCULATOR LOGIC (USE THIS EXACT FORMULA)
+=========================
+
+Steps to compute results:
+
+Step 1: remainingProfit
+--------------------------------
+remainingProfit = projectedDealProfit - investmentAmount
+If remainingProfit < 0, set remainingProfit = 0
+
+Step 2: investorProfit
+--------------------------------
+investorProfit = remainingProfit * 0.5
+
+Step 3: roiPercent
+--------------------------------
+roiPercent = (investorProfit / investmentAmount) * 100
+
+Step 4: annualizedReturn
+--------------------------------
+annualizedReturn = roiPercent * (12 / holdPeriodMonths)
+
+Step 5: totalReturn
+--------------------------------
+totalReturn = investmentAmount + investorProfit
+
+=========================
+OUTPUT LABELS
+=========================
+
+• Investor Profit
+• Return on Investment (ROI percent)
+• Annualized Return (Annualized ROI based on hold period)
+• Total Return at Exit (investment amount + investorProfit)
+
+Formatting:
+• Investor Profit and Total Return should use currency formatting.
+• ROI and Annualized Return should show percentages with one decimal place.
+
+=========================
+UI & DESIGN REQUIREMENTS
+=========================
+
+• Use the dark card container style currently on the page.
+• Use green text for profit numbers to match equity styling on property cards.
+• Add the following helper footnote below the results in subtle muted text:
+
+   “Your capital is returned first. Remaining profit is split 50/50 between you and SSP.”
+
+• Add live updating: all numbers should update immediately when inputs change.
+• Make sure the card remains responsive and maintains the same rounded-2xl silhouette used throughout SSP Deal Flow.
+
+=========================
+
+Generate the complete updated React + TypeScript code for this calculator component using Tailwind classes consistent with the rest of the project.

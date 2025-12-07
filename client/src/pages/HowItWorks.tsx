@@ -388,13 +388,25 @@ function TimelineSection() {
 }
 
 function ReturnCalculatorSection() {
-  const [investmentAmount, setInvestmentAmount] = useState(100000);
-  const [equitySpread, setEquitySpread] = useState(25);
-  const [holdPeriod, setHoldPeriod] = useState(90);
+  const [investmentAmount, setInvestmentAmount] = useState(250000);
+  const [projectedDealProfit, setProjectedDealProfit] = useState(80000);
+  const [holdPeriodMonths, setHoldPeriodMonths] = useState(3);
 
-  const estimatedProfit = Math.round((investmentAmount * (equitySpread / 100)) * 0.5);
-  const returnPercent = ((estimatedProfit / investmentAmount) * 100).toFixed(1);
-  const annualizedReturn = ((estimatedProfit / investmentAmount) * (365 / holdPeriod) * 100).toFixed(1);
+  // Calculate results using the exact formula
+  const remainingProfit = Math.max(projectedDealProfit - investmentAmount, 0);
+  const investorProfit = remainingProfit * 0.5;
+  const roiPercent = (investorProfit / investmentAmount) * 100;
+  const annualizedReturn = roiPercent * (12 / holdPeriodMonths);
+  const totalReturn = investmentAmount + investorProfit;
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   return (
     <section className="py-16 lg:py-24 bg-gradient-to-br from-slate-800 to-slate-900">
@@ -411,15 +423,16 @@ function ReturnCalculatorSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 Investment Amount
               </label>
+              <p className="text-xs text-gray-600 mb-3">The amount you contribute to the deal at closing.</p>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input
                   type="number"
                   value={investmentAmount}
-                  onChange={(e) => setInvestmentAmount(Number(e.target.value))}
+                  onChange={(e) => setInvestmentAmount(Math.max(0, Number(e.target.value)))}
                   className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
                   data-testid="input-investment-amount"
                 />
@@ -427,62 +440,70 @@ function ReturnCalculatorSection() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Projected Equity Spread
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                Projected Deal Profit
               </label>
-              <select
-                value={equitySpread}
-                onChange={(e) => setEquitySpread(Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
-                data-testid="select-equity-spread"
-              >
-                <option value={15}>15% (Conservative)</option>
-                <option value={20}>20% (Moderate)</option>
-                <option value={25}>25% (Target)</option>
-                <option value={30}>30% (Strong)</option>
-              </select>
+              <p className="text-xs text-gray-600 mb-3">Total estimated profit after renovation and sale before the profit split.</p>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                <input
+                  type="number"
+                  value={projectedDealProfit}
+                  onChange={(e) => setProjectedDealProfit(Math.max(0, Number(e.target.value)))}
+                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                  data-testid="input-projected-profit"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hold Period
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                Expected Hold Period
               </label>
-              <select
-                value={holdPeriod}
-                onChange={(e) => setHoldPeriod(Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
-                data-testid="select-hold-period"
-              >
-                <option value={60}>60 days</option>
-                <option value={90}>90 days</option>
-                <option value={120}>120 days</option>
-              </select>
+              <p className="text-xs text-gray-600 mb-3">Typical SSP deals range from 60 to 120 days.</p>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={holdPeriodMonths}
+                  onChange={(e) => setHoldPeriodMonths(Math.max(0.1, Number(e.target.value)))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                  data-testid="input-hold-period"
+                  step="0.1"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">months</span>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-8 border-t border-gray-200">
             <div className="text-center p-4 bg-slate-50 rounded-xl">
-              <p className="text-sm text-gray-600 mb-1">Estimated Profit</p>
-              <p className="text-3xl font-bold text-green-600" data-testid="text-estimated-profit">
-                ${estimatedProfit.toLocaleString()}
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Investor Profit</p>
+              <p className="text-2xl font-bold text-green-600" data-testid="text-investor-profit">
+                {formatCurrency(investorProfit)}
               </p>
             </div>
             <div className="text-center p-4 bg-slate-50 rounded-xl">
-              <p className="text-sm text-gray-600 mb-1">Return on Investment</p>
-              <p className="text-3xl font-bold text-gray-900" data-testid="text-roi">
-                {returnPercent}%
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Return on Investment</p>
+              <p className="text-2xl font-bold text-gray-900" data-testid="text-roi">
+                {roiPercent.toFixed(1)}%
+              </p>
+            </div>
+            <div className="text-center p-4 bg-slate-50 rounded-xl">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Annualized Return</p>
+              <p className="text-2xl font-bold text-gray-900" data-testid="text-annualized-return">
+                {annualizedReturn.toFixed(1)}%
               </p>
             </div>
             <div className="text-center p-4 bg-primary/10 rounded-xl">
-              <p className="text-sm text-gray-600 mb-1">Annualized Return</p>
-              <p className="text-3xl font-bold text-primary" data-testid="text-annualized-return">
-                {annualizedReturn}%
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Total Return at Exit</p>
+              <p className="text-2xl font-bold text-green-600" data-testid="text-total-return">
+                {formatCurrency(totalReturn)}
               </p>
             </div>
           </div>
 
-          <p className="text-xs text-gray-500 text-center mt-6">
-            *This calculator provides estimates only. Actual returns may vary based on deal performance.
+          <p className="text-xs text-gray-500 text-center mt-6 leading-relaxed">
+            Your capital is returned first. Remaining profit is split 50/50 between you and SSP.
           </p>
         </div>
       </div>
