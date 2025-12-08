@@ -433,6 +433,48 @@ export default function Admin() {
   );
 }
 
+interface HeroPhotoProps {
+  url: string;
+  onRemove: () => void;
+}
+
+function HeroPhoto({ url, onRemove }: HeroPhotoProps) {
+  const [showDelete, setShowDelete] = useState(false);
+  
+  return (
+    <div 
+      className="relative group"
+      onMouseEnter={() => setShowDelete(true)}
+      onMouseLeave={() => setShowDelete(false)}
+    >
+      <div className="absolute top-1 left-1 z-10 bg-amber-500 text-white text-xs px-2 py-0.5 rounded font-medium flex items-center gap-1">
+        <Star className="h-3 w-3" /> Hero
+      </div>
+      <img 
+        src={url} 
+        alt="Main" 
+        className="w-full aspect-square object-cover rounded-lg border-2 border-amber-500 shadow-md cursor-pointer"
+        onClick={() => setShowDelete(!showDelete)}
+      />
+      <div className={`absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center transition-opacity ${showDelete ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+        <button
+          type="button"
+          className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 active:scale-95 transition-transform"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+            setShowDelete(false);
+          }}
+          title="Remove photo"
+          data-testid={`button-delete-hero-${url.split('/').pop()}`}
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 interface SortablePhotoProps {
   id: string;
   url: string;
@@ -442,6 +484,7 @@ interface SortablePhotoProps {
 
 function SortablePhoto({ id, url, onSetHero, onRemove }: SortablePhotoProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const [showActions, setShowActions] = useState(false);
   
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -451,11 +494,18 @@ function SortablePhoto({ id, url, onSetHero, onRemove }: SortablePhotoProps) {
   };
   
   return (
-    <div ref={setNodeRef} style={style} className="relative group">
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className="relative group"
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
       <img 
         src={url} 
         alt="Gallery photo" 
-        className="w-full aspect-square object-cover rounded-lg border border-gray-200 hover:border-amber-400 transition-all"
+        className="w-full aspect-square object-cover rounded-lg border border-gray-200 hover:border-amber-400 transition-all cursor-pointer"
+        onClick={() => setShowActions(!showActions)}
       />
       <div 
         {...attributes} 
@@ -465,20 +515,30 @@ function SortablePhoto({ id, url, onSetHero, onRemove }: SortablePhotoProps) {
       >
         <GripVertical className="h-4 w-4 text-gray-500" />
       </div>
-      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2 pointer-events-none">
+      <div className={`absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center gap-2 transition-opacity ${showActions || !isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
         <button
           type="button"
-          className="p-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 pointer-events-auto"
-          onClick={onSetHero}
+          className="p-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 active:scale-95 transition-transform"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSetHero();
+            setShowActions(false);
+          }}
           title="Set as hero"
+          data-testid={`button-set-hero-${url.split('/').pop()}`}
         >
           <Star className="h-4 w-4" />
         </button>
         <button
           type="button"
-          className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 pointer-events-auto"
-          onClick={onRemove}
+          className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 active:scale-95 transition-transform"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+            setShowActions(false);
+          }}
           title="Remove photo"
+          data-testid={`button-delete-photo-${url.split('/').pop()}`}
         >
           <X className="h-4 w-4" />
         </button>
@@ -538,26 +598,10 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
       <div className="space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {mainPhotoUrl && (
-            <div className="relative group">
-              <div className="absolute top-1 left-1 z-10 bg-amber-500 text-white text-xs px-2 py-0.5 rounded font-medium flex items-center gap-1">
-                <Star className="h-3 w-3" /> Hero
-              </div>
-              <img 
-                src={mainPhotoUrl} 
-                alt="Main" 
-                className="w-full aspect-square object-cover rounded-lg border-2 border-amber-500 shadow-md"
-              />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                <button
-                  type="button"
-                  className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600"
-                  onClick={() => removePhoto(mainPhotoUrl, true)}
-                  title="Remove photo"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+            <HeroPhoto 
+              url={mainPhotoUrl} 
+              onRemove={() => removePhoto(mainPhotoUrl, true)}
+            />
           )}
           
           <DndContext 
@@ -579,10 +623,10 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
           </DndContext>
         </div>
         
-        <div className="flex items-center gap-4">
-          <Label className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors">
-            <Upload className="h-4 w-4" />
-            <span>Add Photos</span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <Label className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors active:bg-gray-300 text-sm sm:text-base">
+            <Upload className="h-4 w-4 flex-shrink-0" />
+            <span className="font-medium">Add Photos</span>
             <Input 
               type="file" 
               accept="image/*"
@@ -592,8 +636,8 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
               data-testid="input-gallery-photos"
             />
           </Label>
-          <span className="text-sm text-gray-500">
-            {(mainPhotoUrl ? 1 : 0) + galleryPhotoUrls.length} photo(s) uploaded
+          <span className="text-xs sm:text-sm text-gray-500">
+            {(mainPhotoUrl ? 1 : 0) + galleryPhotoUrls.length} photo(s)
           </span>
         </div>
       </div>
