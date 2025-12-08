@@ -245,7 +245,7 @@ export default function PropertyDetail() {
                       data-testid="text-property-description"
                     />
                     <p className="text-gray-700 leading-relaxed mt-4">
-                      This opportunity represents a prime value-add scenario in a rapidly appreciating neighborhood. Our team has secured this off-market deal at significantly below replacement cost. The renovation plan includes a full cosmetic update, modernizing the kitchen and baths, and enhancing curb appeal to maximize resale value.
+                      This opportunity represents a clear value-add scenario secured off-market at a competitive entry price. The project scope is a standardized, low-risk cosmetic update. The renovation plan focuses strictly on high-impact basics—new flooring, fresh paint, and a general spruce-up—to bring the property to market standards and maximize resale value.
                     </p>
                   </div>
                 </CardContent>
