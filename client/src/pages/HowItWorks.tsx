@@ -674,14 +674,16 @@ function FinalCTASection() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          <Button 
-            size="lg"
-            variant="outline" 
-            className="rounded-full border-gray-300 text-gray-900 hover:bg-white font-semibold px-10 h-14 bg-white/60 backdrop-blur-sm text-base"
-            data-testid="button-schedule-call"
-          >
-            Schedule an intro call
-          </Button>
+          <a href="https://calendly.com/sspdealflow/30min" target="_blank" rel="noopener noreferrer">
+            <Button 
+              size="lg"
+              variant="outline" 
+              className="rounded-full border-gray-300 text-gray-900 hover:bg-white font-semibold px-10 h-14 bg-white/60 backdrop-blur-sm text-base cursor-pointer"
+              data-testid="button-schedule-call"
+            >
+              Schedule an intro call
+            </Button>
+          </a>
         </div>
       </div>
     </section>
