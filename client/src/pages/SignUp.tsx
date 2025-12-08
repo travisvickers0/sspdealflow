@@ -4,10 +4,10 @@ import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm
 import { useState } from "react";
 import { Link } from "wouter";
 
-export default function SignIn() {
+export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignIn = () => {
+  const handleSignUp = () => {
     setIsLoading(true);
     window.location.href = "/api/login";
   };
@@ -38,24 +38,24 @@ export default function SignIn() {
               </div>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              Welcome to SSP
+              Join SSP
             </h1>
             <p className="text-base text-gray-600">
-              Sign in to access exclusive real estate investment opportunities
+              Create your account to explore exclusive real estate investment opportunities
             </p>
           </div>
 
-          {/* Sign In Card */}
+          {/* Sign Up Card */}
           <div className="p-6 sm:p-8 bg-white/70 backdrop-blur border border-gray-200/50 rounded-2xl shadow-lg space-y-6">
-            {/* Email/Password Sign In */}
+            {/* Email/Password Sign Up */}
             <button
-              onClick={handleSignIn}
+              onClick={handleSignUp}
               disabled={isLoading}
-              data-testid="button-signin-email"
+              data-testid="button-signup-email"
               className="w-full flex items-center justify-center gap-3 px-4 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-full transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Mail className="h-5 w-5" />
-              <span>Continue with Email</span>
+              <span>Create with Email</span>
             </button>
 
             {/* Divider */}
@@ -68,12 +68,12 @@ export default function SignIn() {
               </div>
             </div>
 
-            {/* Social Sign In */}
+            {/* Social Sign Up */}
             <div className="space-y-3">
               <button
-                onClick={handleSignIn}
+                onClick={handleSignUp}
                 disabled={isLoading}
-                data-testid="button-signin-google"
+                data-testid="button-signup-google"
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 hover:border-gray-400 bg-white/50 hover:bg-white/80 text-gray-900 font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -86,9 +86,9 @@ export default function SignIn() {
               </button>
 
               <button
-                onClick={handleSignIn}
+                onClick={handleSignUp}
                 disabled={isLoading}
-                data-testid="button-signin-github"
+                data-testid="button-signup-github"
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 hover:border-gray-400 bg-white/50 hover:bg-white/80 text-gray-900 font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Github className="h-5 w-5" />
@@ -96,9 +96,9 @@ export default function SignIn() {
               </button>
 
               <button
-                onClick={handleSignIn}
+                onClick={handleSignUp}
                 disabled={isLoading}
-                data-testid="button-signin-apple"
+                data-testid="button-signup-apple"
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 hover:border-gray-400 bg-white/50 hover:bg-white/80 text-gray-900 font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Apple className="h-5 w-5" />
@@ -108,7 +108,7 @@ export default function SignIn() {
 
             {/* Terms */}
             <p className="text-xs text-gray-600 text-center">
-              By signing in, you agree to our{" "}
+              By creating an account, you agree to our{" "}
               <a href="#" className="text-primary hover:underline font-medium">Terms of Service</a>
               {" "}and{" "}
               <a href="#" className="text-primary hover:underline font-medium">Privacy Policy</a>
@@ -118,9 +118,9 @@ export default function SignIn() {
           {/* Footer */}
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
-              <Link href="/signup" className="text-primary hover:underline font-semibold">
-                Create one
+              Already have an account?{" "}
+              <Link href="/signin" className="text-primary hover:underline font-semibold">
+                Sign in
               </Link>
             </p>
             <p className="text-xs text-gray-500">
