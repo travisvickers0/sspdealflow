@@ -53,7 +53,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   </a>
                 </>
               ) : (
-                <div className="flex gap-2 sm:gap-3">
+                <div className="hidden sm:flex gap-2 sm:gap-3">
                   <a href="/signin">
                     <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform">
                       Sign in
@@ -89,6 +89,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/properties" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
               >
                 Marketplace
+              </Link>
+              <Link 
+                href="/how-it-works" 
+                onClick={() => setMobileMenuOpen(false)}
+                className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/how-it-works" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                How It Works
               </Link>
               {isAdmin && (
                 <Link 
