@@ -50,11 +50,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   </a>
                 </>
               ) : (
-                <a href="/api/login">
-                  <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform">
-                    Sign in
-                  </Button>
-                </a>
+                <div className="flex gap-2 sm:gap-3">
+                  <a href="/signin">
+                    <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform">
+                      Sign in
+                    </Button>
+                  </a>
+                  <a href="/signup">
+                    <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform bg-white/90 hover:bg-white text-primary border-2 border-primary">
+                      Sign up
+                    </Button>
+                  </a>
+                </div>
               )
             )}
             {/* Mobile menu button */}
@@ -98,11 +105,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   </Button>
                 </a>
               ) : (
-                <a href="/api/login" className="w-full">
-                  <Button className="w-full justify-center cursor-pointer active:scale-95">
-                    Sign in
-                  </Button>
-                </a>
+                <div className="flex gap-2 w-full">
+                  <a href="/signin" className="flex-1">
+                    <Button className="w-full justify-center cursor-pointer active:scale-95">
+                      Sign in
+                    </Button>
+                  </a>
+                  <a href="/signup" className="flex-1">
+                    <Button className="w-full justify-center cursor-pointer active:scale-95 bg-white/90 hover:bg-white text-primary border-2 border-primary">
+                      Sign up
+                    </Button>
+                  </a>
+                </div>
               )}
             </nav>
           </div>
