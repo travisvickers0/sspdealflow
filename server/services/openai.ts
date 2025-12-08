@@ -2,15 +2,23 @@ import OpenAI from "openai";
 import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
-import { createRequire } from "module";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const require = createRequire(import.meta.url);
+// Load the CommonJS PDF parser wrapper at runtime
+// This works in both ESM source and CommonJS bundle output
+function loadPDFParser() {
+  // In CommonJS bundle, require is available globally
+  // @ts-ignore
+  if (typeof require !== 'undefined') {
+    // @ts-ignore
+    const pdfParserPath = path.join(process.cwd(), "server", "utils", "pdfParser.cjs");
+    // @ts-ignore
+    return require(pdfParserPath).parsePDF;
+  }
+  // Fallback for ESM (shouldn't happen in production bundle)
+  throw new Error("PDF parser requires CommonJS runtime");
+}
 
-// Load the CommonJS PDF parser wrapper
-const { parsePDF } = require(path.join(__dirname, "../utils/pdfParser.cjs"));
+const parsePDF = loadPDFParser();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "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",
