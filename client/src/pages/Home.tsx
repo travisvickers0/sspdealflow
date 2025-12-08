@@ -17,6 +17,11 @@ export default function Home() {
   // Hero stack shows first 3 needs_funding properties
   const heroStackProperties = needsFundingProperties.slice(0, 3);
   
+  // Helper to get image URL - use mainPhotoUrl or fallback to first gallery photo
+  const getPropertyImage = (property: any) => {
+    return property?.mainPhotoUrl || (property?.galleryPhotoUrls?.[0] ?? null);
+  };
+  
   // Featured Opportunities shows next 3 different needs_funding properties
   const featuredProperties = needsFundingProperties.slice(3, 6);
   
@@ -129,11 +134,12 @@ export default function Home() {
                   {heroStackProperties[2] && (
                     <div className="absolute left-4 top-8 w-[280px] bg-white rounded-xl shadow-md overflow-hidden transform -rotate-3 opacity-50 z-10">
                       <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {heroStackProperties[2]?.mainPhotoUrl && (
+                        {getPropertyImage(heroStackProperties[2]) && (
                           <img 
-                            src={heroStackProperties[2].mainPhotoUrl}
+                            src={getPropertyImage(heroStackProperties[2])}
                             alt={heroStackProperties[2].address}
                             className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
                       </div>
@@ -144,11 +150,12 @@ export default function Home() {
                   {heroStackProperties[1] && (
                     <div className="absolute left-2 top-4 w-[280px] bg-white rounded-xl shadow-lg overflow-hidden transform rotate-2 opacity-70 z-20">
                       <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {heroStackProperties[1]?.mainPhotoUrl && (
+                        {getPropertyImage(heroStackProperties[1]) && (
                           <img 
-                            src={heroStackProperties[1].mainPhotoUrl}
+                            src={getPropertyImage(heroStackProperties[1])}
                             alt={heroStackProperties[1].address}
                             className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
                       </div>
@@ -156,14 +163,15 @@ export default function Home() {
                   )}
                   
                   {/* Card 1 - Front */}
-                  <a href={`/properties/${heroStackProperties[0]?.id}`} className="block">
+                  <a href={`/property/${heroStackProperties[0]?.id}`} className="block">
                     <div className="absolute left-0 top-0 w-[280px] bg-white rounded-xl shadow-2xl overflow-hidden z-30">
                       <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {heroStackProperties[0]?.mainPhotoUrl && (
+                        {getPropertyImage(heroStackProperties[0]) && (
                           <img 
-                            src={heroStackProperties[0].mainPhotoUrl}
+                            src={getPropertyImage(heroStackProperties[0])}
                             alt={heroStackProperties[0].address}
                             className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
                         <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold">
@@ -202,11 +210,12 @@ export default function Home() {
                       onMouseLeave={() => setHoveredCard(null)}
                     >
                       <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {heroStackProperties[2]?.mainPhotoUrl && (
+                        {getPropertyImage(heroStackProperties[2]) && (
                           <img 
-                            src={heroStackProperties[2].mainPhotoUrl}
+                            src={getPropertyImage(heroStackProperties[2])}
                             alt={heroStackProperties[2].address}
                             className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
                         <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
@@ -230,11 +239,12 @@ export default function Home() {
                       onMouseLeave={() => setHoveredCard(null)}
                     >
                       <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {heroStackProperties[1]?.mainPhotoUrl && (
+                        {getPropertyImage(heroStackProperties[1]) && (
                           <img 
-                            src={heroStackProperties[1].mainPhotoUrl}
+                            src={getPropertyImage(heroStackProperties[1])}
                             alt={heroStackProperties[1].address}
                             className="w-full h-full object-cover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
                         <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
@@ -257,11 +267,12 @@ export default function Home() {
                     onMouseLeave={() => setHoveredCard(null)}
                   >
                     <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                      {heroStackProperties[0]?.mainPhotoUrl && (
+                      {getPropertyImage(heroStackProperties[0]) && (
                         <img 
-                          src={heroStackProperties[0].mainPhotoUrl}
+                          src={getPropertyImage(heroStackProperties[0])}
                           alt={heroStackProperties[0].address}
                           className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
                       )}
                       <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
