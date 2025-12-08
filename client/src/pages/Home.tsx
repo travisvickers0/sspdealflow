@@ -105,6 +105,14 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-3 sm:h-4 w-3 sm:w-4" />
                 </Button>
               </a>
+              <a href="/signup" className="w-full sm:w-auto">
+                <Button 
+                  size="sm"
+                  className="rounded-full bg-white/90 hover:bg-white text-primary font-semibold px-6 sm:px-8 h-10 sm:h-12 border-2 border-primary shadow-lg hover:shadow-xl transition-all w-full sm:w-auto text-sm sm:text-base cursor-pointer"
+                >
+                  Sign Up
+                </Button>
+              </a>
               <a href="/how-it-works" className="w-full sm:w-auto">
                 <Button 
                   size="sm"
