@@ -24,6 +24,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <Link href="/properties" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/properties" ? "text-foreground" : "text-muted-foreground"}`}>
                 Marketplace
               </Link>
+              <Link href="/how-it-works" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/how-it-works" ? "text-foreground" : "text-muted-foreground"}`}>
+                How It Works
+              </Link>
               {isAdmin && (
                 <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"}`}>
                   Admin
