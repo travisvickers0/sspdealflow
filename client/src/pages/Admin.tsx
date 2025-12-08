@@ -88,25 +88,26 @@ export default function Admin() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-gray-500 mt-1">Manage properties and investments</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-sm sm:text-base text-gray-500 mt-1">Manage properties and investments</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => refetch()} data-testid="button-refresh">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button variant="outline" onClick={() => refetch()} data-testid="button-refresh" className="w-full sm:w-auto">
               <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
+              <span className="sm:hidden">Refresh</span>
             </Button>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-add-property">
+                <Button data-testid="button-add-property" className="w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Property
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
                 <DialogHeader>
                   <DialogTitle>Add New Property</DialogTitle>
                 </DialogHeader>
@@ -130,55 +131,55 @@ export default function Admin() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <Building2 className="h-6 w-6 text-blue-600" />
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg w-fit">
+                  <Building2 className="h-4 sm:h-6 w-4 sm:w-6 text-blue-600" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Total Properties</p>
-                  <p className="text-2xl font-bold">{stats.total}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-500">Total Properties</p>
+                  <p className="text-xl sm:text-2xl font-bold">{stats.total}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-amber-100 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-amber-600" />
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <div className="p-2 sm:p-3 bg-amber-100 rounded-lg w-fit">
+                  <DollarSign className="h-4 sm:h-6 w-4 sm:w-6 text-amber-600" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Needs Funding</p>
-                  <p className="text-2xl font-bold">{stats.needsFunding}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Funded</p>
-                  <p className="text-2xl font-bold">{stats.funded}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-500">Needs Funding</p>
+                  <p className="text-xl sm:text-2xl font-bold">{stats.needsFunding}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-purple-600" />
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <div className="p-2 sm:p-3 bg-green-100 rounded-lg w-fit">
+                  <TrendingUp className="h-4 sm:h-6 w-4 sm:w-6 text-green-600" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Total Equity</p>
-                  <p className="text-2xl font-bold">${(stats.totalEquity / 1000).toFixed(0)}K</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-500">Funded</p>
+                  <p className="text-xl sm:text-2xl font-bold">{stats.funded}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg w-fit">
+                  <DollarSign className="h-4 sm:h-6 w-4 sm:w-6 text-purple-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-gray-500">Total Equity</p>
+                  <p className="text-xl sm:text-2xl font-bold">${(stats.totalEquity / 1000).toFixed(0)}K</p>
                 </div>
               </div>
             </CardContent>
@@ -198,95 +199,182 @@ export default function Admin() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Property</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Price</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Equity</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Closing</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {properties?.map((property) => (
-                      <tr key={property.id} className="hover:bg-gray-50" data-testid={`row-property-${property.id}`}>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            {property.mainPhotoUrl ? (
-                              <img 
-                                src={property.mainPhotoUrl} 
-                                alt={property.address}
-                                className="w-12 h-12 rounded-lg object-cover"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                                <Building2 className="h-6 w-6 text-gray-400" />
-                              </div>
-                            )}
-                            <div>
-                              <div className="font-medium text-gray-900" data-testid={`text-address-${property.id}`}>{property.address}</div>
-                              <div className="text-sm text-gray-500">{property.city}, {property.state}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <Badge className={
-                            property.status === 'needs_funding' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
-                            property.status === 'committed' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
-                            'bg-green-100 text-green-800 hover:bg-green-100'
-                          } data-testid={`badge-status-${property.id}`}>
-                            {property.status === 'needs_funding' ? 'Needs Funding' :
-                             property.status === 'committed' ? 'Committed' : 'Funded'}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-4 font-medium" data-testid={`text-price-${property.id}`}>${property.purchasePrice.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-green-600 font-medium" data-testid={`text-equity-${property.id}`}>${property.estimatedEquity.toLocaleString()}</td>
-                        <td className="px-4 py-4 text-sm text-gray-500">{property.closingDate}</td>
-                        <td className="px-4 py-4 text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => {
-                                setEditingProperty(property);
-                                setIsEditDialogOpen(true);
-                              }}
-                              data-testid={`button-edit-${property.id}`}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => {
-                                if (confirm("Are you sure you want to delete this property?")) {
-                                  deleteProperty.mutate(property.id);
-                                  toast({
-                                    title: "Property Deleted",
-                                    description: "The property has been removed.",
-                                  });
-                                }
-                              }}
-                              data-testid={`button-delete-${property.id}`}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block bg-white rounded-xl border shadow-sm overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Property</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Price</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Equity</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Closing</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y">
+                      {properties?.map((property) => (
+                        <tr key={property.id} className="hover:bg-gray-50" data-testid={`row-property-${property.id}`}>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-3">
+                              {property.mainPhotoUrl ? (
+                                <img 
+                                  src={property.mainPhotoUrl} 
+                                  alt={property.address}
+                                  className="w-12 h-12 rounded-lg object-cover"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                                  <Building2 className="h-6 w-6 text-gray-400" />
+                                </div>
+                              )}
+                              <div>
+                                <div className="font-medium text-gray-900" data-testid={`text-address-${property.id}`}>{property.address}</div>
+                                <div className="text-sm text-gray-500">{property.city}, {property.state}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <Badge className={
+                              property.status === 'needs_funding' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
+                              property.status === 'committed' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
+                              'bg-green-100 text-green-800 hover:bg-green-100'
+                            } data-testid={`badge-status-${property.id}`}>
+                              {property.status === 'needs_funding' ? 'Needs Funding' :
+                               property.status === 'committed' ? 'Committed' : 'Funded'}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-4 font-medium" data-testid={`text-price-${property.id}`}>${property.purchasePrice.toLocaleString()}</td>
+                          <td className="px-4 py-4 text-green-600 font-medium" data-testid={`text-equity-${property.id}`}>${property.estimatedEquity.toLocaleString()}</td>
+                          <td className="px-4 py-4 text-sm text-gray-500">{property.closingDate}</td>
+                          <td className="px-4 py-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => {
+                                  setEditingProperty(property);
+                                  setIsEditDialogOpen(true);
+                                }}
+                                data-testid={`button-edit-${property.id}`}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => {
+                                  if (confirm("Are you sure you want to delete this property?")) {
+                                    deleteProperty.mutate(property.id);
+                                    toast({
+                                      title: "Property Deleted",
+                                      description: "The property has been removed.",
+                                    });
+                                  }
+                                }}
+                                data-testid={`button-delete-${property.id}`}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {properties?.map((property) => (
+                    <Card key={property.id} data-testid={`row-property-${property.id}`} className="overflow-hidden">
+                      <CardContent className="p-4">
+                        <div className="flex gap-3 mb-3">
+                          {property.mainPhotoUrl ? (
+                            <img 
+                              src={property.mainPhotoUrl} 
+                              alt={property.address}
+                              className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <Building2 className="h-8 w-8 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-gray-900 text-sm truncate" data-testid={`text-address-${property.id}`}>{property.address}</div>
+                            <div className="text-xs text-gray-500 truncate">{property.city}, {property.state}</div>
+                            <Badge className={`mt-1 ${
+                              property.status === 'needs_funding' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
+                              property.status === 'committed' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
+                              'bg-green-100 text-green-800 hover:bg-green-100'
+                            }`} data-testid={`badge-status-${property.id}`}>
+                              {property.status === 'needs_funding' ? 'Needs Funding' :
+                               property.status === 'committed' ? 'Committed' : 'Funded'}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                          <div>
+                            <p className="text-gray-500">Purchase Price</p>
+                            <p className="font-semibold text-gray-900" data-testid={`text-price-${property.id}`}>${(property.purchasePrice / 1000).toFixed(0)}K</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">Equity</p>
+                            <p className="font-semibold text-green-600" data-testid={`text-equity-${property.id}`}>${(property.estimatedEquity / 1000).toFixed(0)}K</p>
+                          </div>
+                        </div>
+                        
+                        <div className="mb-3 pb-3 border-t">
+                          <p className="text-xs text-gray-500 mt-2 mb-1">Closing: <span className="text-gray-900 font-medium">{property.closingDate}</span></p>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={() => {
+                              setEditingProperty(property);
+                              setIsEditDialogOpen(true);
+                            }}
+                            data-testid={`button-edit-${property.id}`}
+                          >
+                            <Pencil className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this property?")) {
+                                deleteProperty.mutate(property.id);
+                                toast({
+                                  title: "Property Deleted",
+                                  description: "The property has been removed.",
+                                });
+                              }
+                            }}
+                            data-testid={`button-delete-${property.id}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
                 {(!properties || properties.length === 0) && (
                   <div className="text-center py-12 text-gray-500">
                     No properties yet. Click "Add Property" to create one.
                   </div>
                 )}
-              </div>
+              </>
             )}
           </TabsContent>
 
@@ -316,7 +404,7 @@ export default function Admin() {
 
         {/* Edit Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
             <DialogHeader>
               <DialogTitle>Edit Property</DialogTitle>
             </DialogHeader>
@@ -710,114 +798,123 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900">Location</h3>
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Location</h3>
           <div>
-            <Label>Address *</Label>
+            <Label className="text-xs sm:text-sm">Address *</Label>
             <Input 
               value={formData.address} 
               onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
               required
               data-testid="input-address"
+              className="text-sm"
             />
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <div>
-              <Label>City *</Label>
+              <Label className="text-xs sm:text-sm">City *</Label>
               <Input 
                 value={formData.city} 
                 onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
                 required
                 data-testid="input-city"
+                className="text-sm"
               />
             </div>
             <div>
-              <Label>State *</Label>
+              <Label className="text-xs sm:text-sm">State *</Label>
               <Input 
                 value={formData.state} 
                 onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
                 required
                 data-testid="input-state"
+                className="text-sm"
               />
             </div>
             <div>
-              <Label>ZIP *</Label>
+              <Label className="text-xs sm:text-sm">ZIP *</Label>
               <Input 
                 value={formData.zip} 
                 onChange={(e) => setFormData(prev => ({ ...prev, zip: e.target.value }))}
                 required
                 data-testid="input-zip"
+                className="text-sm"
               />
             </div>
           </div>
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900">Pricing</h3>
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Pricing</h3>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label>Purchase Price *</Label>
+              <Label className="text-xs sm:text-sm">Purchase Price *</Label>
               <Input 
                 type="number"
                 value={formData.purchasePrice} 
                 onChange={(e) => setFormData(prev => ({ ...prev, purchasePrice: parseInt(e.target.value) || 0 }))}
                 required
                 data-testid="input-purchase-price"
+                className="text-sm"
               />
             </div>
             <div>
-              <Label>Estimated Equity *</Label>
+              <Label className="text-xs sm:text-sm">Estimated Equity *</Label>
               <Input 
                 type="number"
                 value={formData.estimatedEquity} 
                 onChange={(e) => setFormData(prev => ({ ...prev, estimatedEquity: parseInt(e.target.value) || 0 }))}
                 required
                 data-testid="input-equity"
+                className="text-sm"
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label>BPO Value *</Label>
+              <Label className="text-xs sm:text-sm">BPO Value *</Label>
               <Input 
                 type="number"
                 value={formData.bpoValue} 
                 onChange={(e) => setFormData(prev => ({ ...prev, bpoValue: parseInt(e.target.value) || 0 }))}
                 required
                 data-testid="input-bpo"
+                className="text-sm"
               />
             </div>
             <div>
-              <Label>Rehab Budget</Label>
+              <Label className="text-xs sm:text-sm">Rehab Budget</Label>
               <Input 
                 type="number"
                 value={formData.rehabBudget} 
                 onChange={(e) => setFormData(prev => ({ ...prev, rehabBudget: parseInt(e.target.value) || 0 }))}
                 data-testid="input-rehab"
+                className="text-sm"
               />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900">Property Specs</h3>
-          <div className="grid grid-cols-3 gap-2">
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Property Specs</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <div>
-              <Label>Beds *</Label>
+              <Label className="text-xs sm:text-sm">Beds *</Label>
               <Input 
                 type="number"
                 value={formData.beds} 
                 onChange={(e) => setFormData(prev => ({ ...prev, beds: parseInt(e.target.value) || 0 }))}
                 required
                 data-testid="input-beds"
+                className="text-sm"
               />
             </div>
             <div>
-              <Label>Baths *</Label>
+              <Label className="text-xs sm:text-sm">Baths *</Label>
               <Input 
                 type="number"
                 step="0.5"
@@ -825,31 +922,33 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                 onChange={(e) => setFormData(prev => ({ ...prev, baths: parseFloat(e.target.value) || 0 }))}
                 required
                 data-testid="input-baths"
+                className="text-sm"
               />
             </div>
             <div>
-              <Label>Sq Ft *</Label>
+              <Label className="text-xs sm:text-sm">Sq Ft *</Label>
               <Input 
                 type="number"
                 value={formData.squareFeet} 
                 onChange={(e) => setFormData(prev => ({ ...prev, squareFeet: parseInt(e.target.value) || 0 }))}
                 required
                 data-testid="input-sqft"
+                className="text-sm"
               />
             </div>
           </div>
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900">Status & Dates</h3>
-          <div className="grid grid-cols-2 gap-2">
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Status & Dates</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
-              <Label>Status</Label>
+              <Label className="text-xs sm:text-sm">Status</Label>
               <Select 
                 value={formData.status} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
               >
-                <SelectTrigger data-testid="select-status">
+                <SelectTrigger data-testid="select-status" className="text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -860,13 +959,14 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               </Select>
             </div>
             <div>
-              <Label>Closing Date *</Label>
+              <Label className="text-xs sm:text-sm">Closing Date *</Label>
               <Input 
                 type="date"
                 value={formData.closingDate} 
                 onChange={(e) => setFormData(prev => ({ ...prev, closingDate: e.target.value }))}
                 required
                 data-testid="input-closing-date"
+                className="text-sm"
               />
             </div>
           </div>
@@ -874,13 +974,14 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       </div>
 
       <div className="space-y-4">
-        <h3 className="font-semibold text-gray-900">Description</h3>
+        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Description</h3>
         <Textarea 
           value={formData.description || ""} 
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-          rows={4}
+          rows={3}
           placeholder="Property description..."
           data-testid="input-description"
+          className="text-sm"
         />
       </div>
 
@@ -892,15 +993,15 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       />
 
       <div className="space-y-4">
-        <h3 className="font-semibold text-gray-900">Documents</h3>
+        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Documents</h3>
         <div className="space-y-2">
           {(formData.documents as any[]).map((doc, idx) => (
-            <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-              <FileText className="h-4 w-4 text-gray-500" />
-              <span className="flex-1 text-sm">{doc.name}</span>
+            <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
+              <FileText className="h-4 w-4 text-gray-500 flex-shrink-0" />
+              <span className="flex-1 text-xs sm:text-sm truncate">{doc.name}</span>
               <button 
                 type="button"
-                className="text-red-500"
+                className="text-red-500 flex-shrink-0"
                 onClick={() => setFormData(prev => ({
                   ...prev,
                   documents: (prev.documents as any[]).filter((_, i) => i !== idx)
@@ -916,6 +1017,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               accept=".pdf"
               onChange={handleDocumentUpload}
               data-testid="input-document"
+              className="text-sm"
             />
             <div className="flex items-center gap-2">
               <div className="flex-1 border-t border-gray-200"></div>
@@ -923,7 +1025,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               <div className="flex-1 border-t border-gray-200"></div>
             </div>
             <div>
-              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              <Label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
                 Upload BPO Document (Auto-extract Comps)
               </Label>
               <Input 
@@ -931,6 +1033,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                 accept=".pdf"
                 onChange={handleBPOUpload}
                 data-testid="input-bpo"
+                className="text-sm"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Upload a BPO PDF to automatically extract comparable sales data
@@ -942,33 +1045,35 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
 
       {/* Comparable Sales */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900">Comparable Sales</h3>
-          <Button type="button" variant="outline" size="sm" onClick={addComp}>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Comparable Sales</h3>
+          <Button type="button" variant="outline" size="sm" onClick={addComp} className="text-xs sm:text-sm">
             <Plus className="h-4 w-4 mr-1" />
-            Add Comp
+            <span className="hidden sm:inline">Add Comp</span>
+            <span className="sm:hidden">Add</span>
           </Button>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {(formData.comps as any[]).map((comp, idx) => (
-            <div key={comp.id || idx} className="p-4 border rounded-lg bg-gray-50 space-y-3">
+            <div key={comp.id || idx} className="p-3 border rounded-lg bg-gray-50 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Comp #{idx + 1}</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700">Comp #{idx + 1}</span>
                 <button 
                   type="button"
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 flex-shrink-0"
                   onClick={() => removeComp(idx)}
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="sm:col-span-2">
                   <Label className="text-xs">Address</Label>
                   <Input 
                     value={comp.address || ""}
                     onChange={(e) => updateComp(idx, "address", e.target.value)}
                     placeholder="123 Main St"
+                    className="text-sm"
                   />
                 </div>
                 <div>
@@ -977,6 +1082,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                     type="number"
                     value={comp.price || ""}
                     onChange={(e) => updateComp(idx, "price", parseInt(e.target.value) || 0)}
+                    className="text-sm"
                   />
                 </div>
                 <div>
@@ -985,6 +1091,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                     type="date"
                     value={comp.soldDate || ""}
                     onChange={(e) => updateComp(idx, "soldDate", e.target.value)}
+                    className="text-sm"
                   />
                 </div>
                 <div>
@@ -993,6 +1100,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                     type="number"
                     value={comp.beds || ""}
                     onChange={(e) => updateComp(idx, "beds", parseInt(e.target.value) || 0)}
+                    className="text-sm"
                   />
                 </div>
                 <div>
@@ -1002,6 +1110,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                     step="0.5"
                     value={comp.baths || ""}
                     onChange={(e) => updateComp(idx, "baths", parseFloat(e.target.value) || 0)}
+                    className="text-sm"
                   />
                 </div>
                 <div>
@@ -1010,6 +1119,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                     type="number"
                     value={comp.sqft || ""}
                     onChange={(e) => updateComp(idx, "sqft", parseInt(e.target.value) || 0)}
+                    className="text-sm"
                   />
                 </div>
                 <div>
@@ -1018,19 +1128,20 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                     value={comp.distance || ""}
                     onChange={(e) => updateComp(idx, "distance", e.target.value)}
                     placeholder="0.3 mi"
+                    className="text-sm"
                   />
                 </div>
               </div>
             </div>
           ))}
           {(formData.comps as any[]).length === 0 && (
-            <p className="text-sm text-gray-500 text-center py-4">No comparable sales added yet.</p>
+            <p className="text-xs sm:text-sm text-gray-500 text-center py-4">No comparable sales added yet.</p>
           )}
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button type="submit" disabled={isLoading} data-testid="button-submit">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t">
+        <Button type="submit" disabled={isLoading} data-testid="button-submit" className="w-full sm:w-auto text-sm">
           {isLoading ? (
             <>
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
