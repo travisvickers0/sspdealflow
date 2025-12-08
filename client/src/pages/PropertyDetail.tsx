@@ -6,6 +6,7 @@ import { useRoute, Link } from "wouter";
 import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CompsMap } from "@/components/CompsMap";
+import { generatePropertyDescription } from "@/lib/utils";
 
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
@@ -233,10 +234,17 @@ export default function PropertyDetail() {
                 </CardHeader>
                 <CardContent>
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-gray-700 leading-relaxed mb-4">
-                      {property.description || "Historic charm meets modern convenience. This property requires a light cosmetic rehab and foundation leveling."}
-                    </p>
-                    <p className="text-gray-700 leading-relaxed">
+                    <div 
+                      className="text-gray-700 leading-relaxed space-y-4"
+                      dangerouslySetInnerHTML={{
+                        __html: generatePropertyDescription(property)
+                          .split('\n\n')
+                          .map(para => `<p>${para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`)
+                          .join('')
+                      }}
+                      data-testid="text-property-description"
+                    />
+                    <p className="text-gray-700 leading-relaxed mt-4">
                       This opportunity represents a prime value-add scenario in a rapidly appreciating neighborhood. Our team has secured this off-market deal at significantly below replacement cost. The renovation plan includes a full cosmetic update, modernizing the kitchen and baths, and enhancing curb appeal to maximize resale value.
                     </p>
                   </div>
