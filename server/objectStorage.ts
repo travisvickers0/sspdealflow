@@ -22,7 +22,8 @@ export class ObjectStorageService {
 
   async uploadBuffer(buffer: Buffer, subfolder: string = "photos", contentType: string = "image/jpeg"): Promise<string> {
     const objectId = randomUUID();
-    const objectPath = `${subfolder}/${objectId}`;
+    const extension = this.getExtensionFromContentType(contentType);
+    const objectPath = `${subfolder}/${objectId}${extension}`;
 
     const { ok, error } = await this.client.uploadFromBytes(objectPath, buffer);
     
@@ -32,6 +33,23 @@ export class ObjectStorageService {
     }
 
     return `/objects/${objectPath}`;
+  }
+
+  private getExtensionFromContentType(contentType: string): string {
+    switch (contentType) {
+      case 'image/jpeg':
+        return '.jpg';
+      case 'image/png':
+        return '.png';
+      case 'image/webp':
+        return '.webp';
+      case 'image/gif':
+        return '.gif';
+      case 'application/pdf':
+        return '.pdf';
+      default:
+        return '';
+    }
   }
 
   async downloadObject(objectPath: string, res: Response): Promise<void> {
