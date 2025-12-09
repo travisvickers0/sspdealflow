@@ -602,19 +602,19 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
       <p className="text-sm text-gray-500">Drag photos to reorder. Click the star to set as hero image.</p>
       
       <div className="space-y-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {mainPhotoUrl && (
-            <HeroPhoto 
-              url={mainPhotoUrl} 
-              onRemove={() => removePhoto(mainPhotoUrl, true)}
-            />
-          )}
-          
-          <DndContext 
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
+        <DndContext 
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {mainPhotoUrl && (
+              <HeroPhoto 
+                url={mainPhotoUrl} 
+                onRemove={() => removePhoto(mainPhotoUrl, true)}
+              />
+            )}
+            
             <SortableContext items={galleryPhotoUrls} strategy={rectSortingStrategy}>
               {galleryPhotoUrls.map((url) => (
                 <SortablePhoto
@@ -626,8 +626,8 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
                 />
               ))}
             </SortableContext>
-          </DndContext>
-        </div>
+          </div>
+        </DndContext>
         
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <Label className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors active:bg-gray-300 text-sm sm:text-base">
