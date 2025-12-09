@@ -568,9 +568,10 @@ interface PhotoManagerProps {
   galleryPhotoUrls: string[];
   onUpdate: (main: string, gallery: string[]) => void;
   onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isUploading?: boolean;
 }
 
-function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: PhotoManagerProps) {
+function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload, isUploading }: PhotoManagerProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -646,15 +647,29 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
         </DndContext>
         
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-          <Label className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors active:bg-gray-300 text-sm sm:text-base">
-            <Upload className="h-4 w-4 flex-shrink-0" />
-            <span className="font-medium">Add Photos</span>
+          <Label className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm sm:text-base ${
+            isUploading 
+              ? 'bg-blue-100 text-blue-700 cursor-wait' 
+              : 'bg-gray-100 hover:bg-gray-200 cursor-pointer active:bg-gray-300'
+          }`}>
+            {isUploading ? (
+              <>
+                <RefreshCw className="h-4 w-4 flex-shrink-0 animate-spin" />
+                <span className="font-medium">Uploading...</span>
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium">Add Photos</span>
+              </>
+            )}
             <Input 
               type="file" 
               accept="image/*"
               multiple
               className="hidden"
               onChange={onUpload}
+              disabled={isUploading}
               data-testid="input-gallery-photos"
             />
           </Label>
@@ -689,6 +704,7 @@ interface PropertyFormProps {
 
 function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos, uploadDocument }: PropertyFormProps) {
   const { toast } = useToast();
+  const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
   const [formData, setFormData] = useState({
     address: property?.address || "",
     city: property?.city || "",
@@ -754,11 +770,28 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
-      const result = await uploadPhotos.mutateAsync(files);
-      setFormData(prev => ({ 
-        ...prev, 
-        galleryPhotoUrls: [...prev.galleryPhotoUrls, ...result.urls.map((u: any) => u.url)]
-      }));
+      setIsUploadingPhotos(true);
+      try {
+        const result = await uploadPhotos.mutateAsync(files);
+        setFormData(prev => ({ 
+          ...prev, 
+          galleryPhotoUrls: [...prev.galleryPhotoUrls, ...result.urls.map((u: any) => u.url)]
+        }));
+        toast({
+          title: "Photos Uploaded",
+          description: `Successfully uploaded ${files.length} photo(s)`,
+        });
+      } catch (error) {
+        toast({
+          title: "Upload Failed",
+          description: "Some photos may not have uploaded. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsUploadingPhotos(false);
+        // Reset the file input so the same files can be selected again
+        e.target.value = '';
+      }
     }
   };
 
@@ -1067,6 +1100,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
         galleryPhotoUrls={formData.galleryPhotoUrls}
         onUpdate={(main, gallery) => setFormData(prev => ({ ...prev, mainPhotoUrl: main, galleryPhotoUrls: gallery }))}
         onUpload={handleGalleryUpload}
+        isUploading={isUploadingPhotos}
       />
 
       <div className="space-y-4">
