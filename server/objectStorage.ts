@@ -30,23 +30,20 @@ export class ObjectStorageService {
     const stream = Readable.from(buffer);
     await this.client.uploadFromStream(objectPath, stream);
 
-    // Wait for object to be available (handle eventual consistency)
-    await this.waitForObject(objectPath);
+    // Brief verification - don't block too long as object storage is eventually consistent
+    // The client-side will retry loading if needed
+    const exists = await this.quickVerify(objectPath);
+    if (!exists) {
+      console.warn(`Object ${objectPath} not immediately available - client will retry`);
+    }
 
     return `/objects/${objectPath}`;
   }
 
-  private async waitForObject(objectPath: string, maxAttempts: number = 5, delayMs: number = 200): Promise<void> {
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      const { ok } = await this.client.exists(objectPath);
-      if (ok) {
-        return;
-      }
-      // Wait before next attempt
-      await new Promise(resolve => setTimeout(resolve, delayMs));
-    }
-    // Object should be available by now, but don't throw - let the client retry if needed
-    console.warn(`Object ${objectPath} not confirmed available after ${maxAttempts} attempts`);
+  private async quickVerify(objectPath: string): Promise<boolean> {
+    // Single quick check - don't wait too long to avoid timeouts with batch uploads
+    const { ok } = await this.client.exists(objectPath);
+    return ok;
   }
 
   private getExtensionFromContentType(contentType: string): string {
