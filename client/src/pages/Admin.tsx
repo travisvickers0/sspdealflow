@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { useProperties, useAdminProperties, useBulkEditor, useUpload } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
@@ -77,6 +77,22 @@ export default function Admin() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  // Sort properties to match marketplace: status priority, then by newest
+  const sortedProperties = useMemo(() => {
+    if (!properties) return [];
+    
+    return [...properties].sort((a, b) => {
+      // Status priority: needs_funding > committed > funded > archived
+      const statusOrder = { needs_funding: 0, committed: 1, funded: 2, archived: 3 };
+      const statusDiff = (statusOrder[a.status as keyof typeof statusOrder] ?? 99) - (statusOrder[b.status as keyof typeof statusOrder] ?? 99);
+      
+      if (statusDiff !== 0) return statusDiff;
+      
+      // Secondary sort by newest first
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    });
+  }, [properties]);
 
   const stats = {
     total: properties?.length || 0,
@@ -214,7 +230,7 @@ export default function Admin() {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {properties?.map((property) => (
+                      {sortedProperties.map((property) => (
                         <tr key={property.id} className="hover:bg-gray-50" data-testid={`row-property-${property.id}`}>
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-3">
@@ -288,7 +304,7 @@ export default function Admin() {
 
                 {/* Mobile Card View */}
                 <div className="md:hidden space-y-3">
-                  {properties?.map((property) => (
+                  {sortedProperties.map((property) => (
                     <Card key={property.id} data-testid={`row-property-${property.id}`} className="overflow-hidden">
                       <CardContent className="p-4">
                         <div className="flex gap-3 mb-3">
@@ -390,7 +406,7 @@ export default function Admin() {
 
           <TabsContent value="bulk-edit">
             <BulkEditor 
-              properties={properties || []} 
+              properties={sortedProperties} 
               onSuccess={() => {
                 refetch();
                 toast({
