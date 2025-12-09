@@ -86,3 +86,6 @@ integrations = ["javascript_database:1.0.0"]
 
 [userenv.shared]
 VITE_GOOGLE_MAPS_API_KEY = "${GOOGLE_MAPS_API_KEY}"
+
+[objectStorage]
+defaultBucketID = "replit-objstore-5f7040d4-adee-452b-8b7e-d507aece2c4e"
