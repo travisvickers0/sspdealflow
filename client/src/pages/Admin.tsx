@@ -590,6 +590,12 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
     }
   };
 
+  const removeAllPhotos = () => {
+    onUpdate("", []);
+  };
+
+  const totalPhotos = (mainPhotoUrl ? 1 : 0) + galleryPhotoUrls.length;
+
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-gray-900">Photos</h3>
@@ -636,8 +642,19 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload }: Ph
               data-testid="input-gallery-photos"
             />
           </Label>
+          {totalPhotos > 0 && (
+            <button
+              type="button"
+              onClick={removeAllPhotos}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors active:bg-red-300 text-sm sm:text-base"
+              data-testid="button-delete-all-photos"
+            >
+              <Trash2 className="h-4 w-4 flex-shrink-0" />
+              <span className="font-medium">Delete All Photos</span>
+            </button>
+          )}
           <span className="text-xs sm:text-sm text-gray-500">
-            {(mainPhotoUrl ? 1 : 0) + galleryPhotoUrls.length} photo(s)
+            {totalPhotos} photo(s)
           </span>
         </div>
       </div>
