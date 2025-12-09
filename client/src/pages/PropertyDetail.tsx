@@ -3,15 +3,23 @@ import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRoute, Link } from "wouter";
-import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight } from "lucide-react";
+import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import Counter from "yet-another-react-lightbox/plugins/counter";
+import "yet-another-react-lightbox/plugins/counter.css";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading, error } = useProperty(params?.slug);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Calculate images array early for keyboard navigation
   const galleryImages = property?.galleryPhotoUrls || [];
@@ -133,7 +141,11 @@ export default function PropertyDetail() {
               {/* Image Gallery */}
               <div>
                 {/* Main Image */}
-                <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-gray-200 shadow-lg group">
+                <div 
+                  className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-gray-200 shadow-lg group cursor-pointer"
+                  onClick={() => setLightboxOpen(true)}
+                  data-testid="button-open-gallery"
+                >
                   {allImages[selectedImage] ? (
                     <img 
                       src={allImages[selectedImage]} 
@@ -146,12 +158,29 @@ export default function PropertyDetail() {
                     </div>
                   )}
                   
+                  {/* View All Photos Button */}
+                  {allImages.length > 1 && (
+                    <button
+                      className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white/95 hover:bg-white rounded-lg shadow-lg text-sm font-medium text-gray-900 transition-all hover:scale-105"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLightboxOpen(true);
+                      }}
+                    >
+                      <Images className="w-4 h-4" />
+                      View all {allImages.length} photos
+                    </button>
+                  )}
+                  
                   {/* Navigation Arrows */}
                   {allImages.length > 1 && (
                     <>
                       {/* Previous Button */}
                       <button
-                        onClick={handlePreviousImage}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePreviousImage();
+                        }}
                         className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:scale-110 active:scale-95"
                         aria-label="Previous image"
                       >
@@ -160,7 +189,10 @@ export default function PropertyDetail() {
                       
                       {/* Next Button */}
                       <button
-                        onClick={handleNextImage}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNextImage();
+                        }}
                         className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:scale-110 active:scale-95"
                         aria-label="Next image"
                       >
@@ -174,6 +206,37 @@ export default function PropertyDetail() {
                     </>
                   )}
                 </div>
+
+                {/* Lightbox Gallery */}
+                <Lightbox
+                  open={lightboxOpen}
+                  close={() => setLightboxOpen(false)}
+                  index={selectedImage}
+                  slides={allImages.map(src => ({ src }))}
+                  plugins={[Thumbnails, Counter, Zoom]}
+                  thumbnails={{
+                    position: "bottom",
+                    width: 100,
+                    height: 70,
+                    gap: 8,
+                    padding: 8,
+                  }}
+                  counter={{ container: { style: { top: "unset", bottom: 0, left: "50%", transform: "translateX(-50%)" } } }}
+                  carousel={{
+                    finite: false,
+                    preload: 3,
+                  }}
+                  zoom={{
+                    maxZoomPixelRatio: 3,
+                    scrollToZoom: true,
+                  }}
+                  styles={{
+                    container: { backgroundColor: "rgba(0, 0, 0, 0.95)" },
+                  }}
+                  on={{
+                    view: ({ index }) => setSelectedImage(index),
+                  }}
+                />
               </div>
 
               {/* Property Specs */}
