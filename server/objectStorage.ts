@@ -4,6 +4,7 @@
 import { Client } from "@replit/object-storage";
 import { Response } from "express";
 import { randomUUID } from "crypto";
+import { Readable } from "stream";
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -25,12 +26,9 @@ export class ObjectStorageService {
     const extension = this.getExtensionFromContentType(contentType);
     const objectPath = `${subfolder}/${objectId}${extension}`;
 
-    const { ok, error } = await this.client.uploadFromBytes(objectPath, buffer);
-    
-    if (!ok) {
-      console.error("Object storage upload failed:", error);
-      throw new Error(`Failed to upload to object storage: ${error}`);
-    }
+    // Use uploadFromStream as it handles Buffer data correctly
+    const stream = Readable.from(buffer);
+    await this.client.uploadFromStream(objectPath, stream);
 
     return `/objects/${objectPath}`;
   }
@@ -61,15 +59,22 @@ export class ObjectStorageService {
         throw new ObjectNotFoundError();
       }
 
+      // SDK returns array with buffer inside
+      const buffer = Array.isArray(value) ? value[0] : value;
+      
+      if (!buffer || buffer.length === 0) {
+        throw new ObjectNotFoundError();
+      }
+
       const contentType = this.getContentType(objectPath);
       
       res.set({
         "Content-Type": contentType,
-        "Content-Length": value.length,
+        "Content-Length": buffer.length,
         "Cache-Control": "public, max-age=31536000",
       });
 
-      res.send(Buffer.from(value));
+      res.send(buffer);
     } catch (error) {
       console.error("Error downloading object:", error);
       throw error;
