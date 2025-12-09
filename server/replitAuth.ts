@@ -158,7 +158,7 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 };
 
 // Admin check middleware - admins by email or user ID
-const ADMIN_EMAILS = ["travisvickers0@gmail.com"];
+const ADMIN_EMAILS = ["travisvickers0@gmail.com", "dustin@sspiproperties.com"];
 const ADMIN_USER_IDS = ["50020607"];
 
 export const isAdmin: RequestHandler = async (req, res, next) => {
