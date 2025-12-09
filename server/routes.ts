@@ -425,20 +425,21 @@ export async function registerRoutes(
       }
       
       const objectStorageService = new ObjectStorageService();
-      const urls = [];
       
-      // Upload each file to object storage
-      for (const file of files) {
+      // Upload all files in parallel for much faster uploads
+      const uploadPromises = files.map(async (file) => {
         const url = await objectStorageService.uploadBuffer(
           file.buffer,
           "photos",
           file.mimetype
         );
-        urls.push({
+        return {
           url,
           filename: file.originalname,
-        });
-      }
+        };
+      });
+      
+      const urls = await Promise.all(uploadPromises);
       
       await storage.createActivityLog({
         action: "upload",
