@@ -157,8 +157,9 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
   }
 };
 
-// Admin check middleware - only travisvickers0@gmail.com is admin
-const ADMIN_EMAIL = "travisvickers0@gmail.com";
+// Admin check middleware - admins by email or user ID
+const ADMIN_EMAILS = ["travisvickers0@gmail.com"];
+const ADMIN_USER_IDS = ["50020607"];
 
 export const isAdmin: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
@@ -168,7 +169,10 @@ export const isAdmin: RequestHandler = async (req, res, next) => {
   }
 
   const email = user.claims.email;
-  if (email !== ADMIN_EMAIL) {
+  const userId = user.claims.sub;
+  const isAdminUser = ADMIN_EMAILS.includes(email) || ADMIN_USER_IDS.includes(userId);
+  
+  if (!isAdminUser) {
     return res.status(403).json({ message: "Forbidden - Admin access required" });
   }
 
