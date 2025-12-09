@@ -9,6 +9,7 @@ import fs from "fs";
 import { extractBPOData } from "./services/openai";
 import { geocodeComps } from "./services/geocoding";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -16,10 +17,13 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const fileStorage = multer.diskStorage({
+// Use memory storage for photos (will be uploaded to object storage)
+const memoryStorage = multer.memoryStorage();
+
+// Keep disk storage for documents (BPO PDFs need to be saved for processing)
+const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const subDir = file.mimetype.startsWith("image/") ? "photos" : "documents";
-    const fullPath = path.join(uploadDir, subDir);
+    const fullPath = path.join(uploadDir, "documents");
     if (!fs.existsSync(fullPath)) {
       fs.mkdirSync(fullPath, { recursive: true });
     }
@@ -31,9 +35,37 @@ const fileStorage = multer.diskStorage({
   },
 });
 
-const upload = multer({
-  storage: fileStorage,
+// Photo upload uses memory storage -> object storage
+const photoUpload = multer({
+  storage: memoryStorage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only JPEG, PNG, and WebP are allowed."));
+    }
+  },
+});
+
+// Document upload uses disk storage (for PDF processing)
+const documentUpload = multer({
+  storage: diskStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only PDF is allowed."));
+    }
+  },
+});
+
+// Legacy upload for backwards compatibility
+const upload = multer({
+  storage: diskStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
     if (allowedTypes.includes(file.mimetype)) {
@@ -69,13 +101,28 @@ export async function registerRoutes(
     res.json({ message: "API routes are working" });
   });
   
-  // Serve uploaded files
+  // Serve uploaded files from local filesystem (legacy - for documents)
   app.use("/uploads", (req, res, next) => {
     const filePath = path.join(uploadDir, req.path);
     if (fs.existsSync(filePath)) {
       res.sendFile(filePath);
     } else {
       res.status(404).json({ error: "File not found" });
+    }
+  });
+
+  // Serve files from object storage (persistent storage for photos)
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(`/objects/${req.params.objectPath}`);
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error fetching object:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      return res.status(500).json({ error: "Internal server error" });
     }
   });
 
@@ -277,9 +324,9 @@ export async function registerRoutes(
     }
   });
 
-  // POST /api/admin/upload/photo - Upload photo
+  // POST /api/admin/upload/photo - Upload photo to object storage
   app.post("/api/admin/upload/photo", isAdmin, (req: Request, res: Response, next: NextFunction) => {
-    upload.any()(req, res, (err) => {
+    photoUpload.any()(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
         if (err instanceof multer.MulterError) {
@@ -297,24 +344,31 @@ export async function registerRoutes(
       }
       
       const file = files[0];
-      const url = `/uploads/photos/${file.filename}`;
+      const objectStorageService = new ObjectStorageService();
+      
+      // Upload to object storage
+      const url = await objectStorageService.uploadBuffer(
+        file.buffer,
+        "photos",
+        file.mimetype
+      );
       
       await storage.createActivityLog({
         action: "upload",
         resourceType: "photo",
-        details: { filename: file.filename, url },
+        details: { originalName: file.originalname, url },
       });
       
-      res.json({ url, filename: file.filename });
+      res.json({ url, filename: file.originalname });
     } catch (error) {
       console.error("Error uploading photo:", error);
       res.status(500).json({ error: "Failed to upload photo" });
     }
   });
 
-  // POST /api/admin/upload/document - Upload document
+  // POST /api/admin/upload/document - Upload document (kept on disk for processing)
   app.post("/api/admin/upload/document", isAdmin, (req: Request, res: Response, next: NextFunction) => {
-    upload.any()(req, res, (err) => {
+    documentUpload.any()(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
         if (err instanceof multer.MulterError) {
@@ -352,9 +406,9 @@ export async function registerRoutes(
     }
   });
 
-  // POST /api/admin/upload/photos - Upload multiple photos
+  // POST /api/admin/upload/photos - Upload multiple photos to object storage
   app.post("/api/admin/upload/photos", isAdmin, (req: Request, res: Response, next: NextFunction) => {
-    upload.any()(req, res, (err) => {
+    photoUpload.any()(req, res, (err) => {
       if (err) {
         console.error("Multer error:", err);
         if (err instanceof multer.MulterError) {
@@ -371,10 +425,21 @@ export async function registerRoutes(
         return res.status(400).json({ error: "No files uploaded" });
       }
       
-      const urls = files.map(file => ({
-        url: `/uploads/photos/${file.filename}`,
-        filename: file.filename,
-      }));
+      const objectStorageService = new ObjectStorageService();
+      const urls = [];
+      
+      // Upload each file to object storage
+      for (const file of files) {
+        const url = await objectStorageService.uploadBuffer(
+          file.buffer,
+          "photos",
+          file.mimetype
+        );
+        urls.push({
+          url,
+          filename: file.originalname,
+        });
+      }
       
       await storage.createActivityLog({
         action: "upload",
