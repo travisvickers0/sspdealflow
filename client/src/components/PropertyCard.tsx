@@ -39,7 +39,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
     : 'TBD';
 
   return (
-    <Link href={`/property/${property.id}`}>
+    <Link href={`/property/${property.slug}`}>
       <div 
         className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col w-full font-sans border border-gray-100 cursor-pointer h-full"
         data-testid={`card-property-${property.id}`}
