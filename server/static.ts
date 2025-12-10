@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { extractPropertyId, getPropertyMeta, injectMetaTags } from "./seoMiddleware";
+import { extractPropertySlug, getPropertyMetaBySlug, injectMetaTags } from "./seoMiddleware";
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(process.cwd(), "dist", "public");
@@ -16,15 +16,15 @@ export function serveStatic(app: Express) {
   app.use("*", async (req, res) => {
     const indexPath = path.resolve(distPath, "index.html");
     const url = req.originalUrl;
-    const propertyId = extractPropertyId(url);
+    const slug = extractPropertySlug(url);
 
-    if (propertyId) {
+    if (slug) {
       try {
         const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
         const host = req.headers['x-forwarded-host'] || req.headers.host || '';
         const baseUrl = `${protocol}://${host}`;
         
-        const meta = await getPropertyMeta(propertyId, baseUrl);
+        const meta = await getPropertyMetaBySlug(slug, baseUrl);
         if (meta) {
           let html = await fs.promises.readFile(indexPath, "utf-8");
           html = injectMetaTags(html, meta);

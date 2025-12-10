@@ -7,9 +7,9 @@ interface PropertyMeta {
   url: string;
 }
 
-export async function getPropertyMeta(propertyId: string, baseUrl: string): Promise<PropertyMeta | null> {
+export async function getPropertyMetaBySlug(slug: string, baseUrl: string): Promise<PropertyMeta | null> {
   try {
-    const property = await storage.getProperty(propertyId);
+    const property = await storage.getPropertyBySlug(slug);
     if (!property) {
       return null;
     }
@@ -43,7 +43,7 @@ export async function getPropertyMeta(propertyId: string, baseUrl: string): Prom
       title,
       description,
       image,
-      url: `${baseUrl}/property/${propertyId}`,
+      url: `${baseUrl}/property/${property.slug}`,
     };
   } catch (error) {
     console.error('Error fetching property for SEO:', error);
@@ -94,7 +94,7 @@ function escapeHtml(text: string): string {
     .replace(/>/g, '&gt;');
 }
 
-export function extractPropertyId(url: string): string | null {
+export function extractPropertySlug(url: string): string | null {
   const match = url.match(/\/property\/([a-zA-Z0-9-]+)/);
   return match ? match[1] : null;
 }

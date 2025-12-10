@@ -2,7 +2,8 @@ import {
   users, properties, activityLogs,
   type User, type UpsertUser,
   type Property, type InsertProperty, type UpdateProperty,
-  type ActivityLog, type InsertActivityLog
+  type ActivityLog, type InsertActivityLog,
+  generatePropertySlug
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, ilike, and, gte, lte, inArray, sql } from "drizzle-orm";
@@ -29,6 +30,24 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Helper to generate unique slug with collision handling
+  private async generateUniqueSlug(address: string, city: string, state: string, excludeId?: string): Promise<string> {
+    const baseSlug = generatePropertySlug(address, city, state);
+    let slug = baseSlug;
+    let counter = 1;
+    
+    while (true) {
+      const existing = await db.select({ id: properties.id }).from(properties).where(eq(properties.slug, slug));
+      // If no conflict, or the conflict is the same property we're updating, we're good
+      if (existing.length === 0 || (excludeId && existing.length === 1 && existing[0].id === excludeId)) {
+        return slug;
+      }
+      // Append counter for uniqueness
+      counter++;
+      slug = `${baseSlug}-${counter}`;
+    }
+  }
+
   // User methods (for Replit Auth)
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -66,25 +85,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPropertyBySlug(slug: string): Promise<Property | undefined> {
-    const allProperties = await this.getAllProperties();
-    return allProperties.find(p => {
-      const propSlug = `${p.address}-${p.city}-${p.state}`
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-      return propSlug === slug;
-    });
+    const [property] = await db.select().from(properties).where(eq(properties.slug, slug));
+    return property || undefined;
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    const [newProperty] = await db.insert(properties).values(property).returning();
+    const slug = await this.generateUniqueSlug(property.address, property.city, property.state);
+    const [newProperty] = await db.insert(properties).values({ ...property, slug }).returning();
     return newProperty;
   }
 
   async updateProperty(id: string, property: UpdateProperty): Promise<Property | undefined> {
+    // If address fields are being updated, regenerate slug
+    let updateData: any = { ...property, updatedAt: new Date() };
+    
+    if (property.address || property.city || property.state) {
+      // Need to fetch the current property to get complete address info
+      const current = await this.getProperty(id);
+      if (current) {
+        const newAddress = property.address ?? current.address;
+        const newCity = property.city ?? current.city;
+        const newState = property.state ?? current.state;
+        updateData.slug = await this.generateUniqueSlug(newAddress, newCity, newState, id);
+      }
+    }
+    
     const [updated] = await db
       .update(properties)
-      .set({ ...property, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(properties.id, id))
       .returning();
     return updated || undefined;
@@ -97,7 +125,25 @@ export class DatabaseStorage implements IStorage {
 
   async bulkCreateProperties(propertyList: InsertProperty[]): Promise<Property[]> {
     if (propertyList.length === 0) return [];
-    return await db.insert(properties).values(propertyList).returning();
+    // Generate unique slugs for each property, tracking in-batch slugs
+    const propertiesWithSlugs = [];
+    const usedSlugsInBatch = new Set<string>();
+    
+    for (const p of propertyList) {
+      let slug = await this.generateUniqueSlug(p.address, p.city, p.state);
+      
+      // Handle in-batch collisions
+      let counter = 2;
+      const baseSlug = slug;
+      while (usedSlugsInBatch.has(slug)) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      
+      usedSlugsInBatch.add(slug);
+      propertiesWithSlugs.push({ ...p, slug });
+    }
+    return await db.insert(properties).values(propertiesWithSlugs).returning();
   }
 
   async bulkUpdateProperties(updates: { id: string; data: UpdateProperty }[]): Promise<Property[]> {
