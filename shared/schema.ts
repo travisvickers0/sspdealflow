@@ -32,6 +32,7 @@ export type User = typeof users.$inferSelect;
 // Properties table
 export const properties = pgTable("properties", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").unique(),
   status: text("status").notNull().default("needs_funding"), // "funded", "needs_funding", "committed"
   
   address: text("address").notNull(),
@@ -68,9 +69,18 @@ export const properties = pgTable("properties", {
 
 export const insertPropertySchema = createInsertSchema(properties).omit({
   id: true,
+  slug: true,
   createdAt: true,
   updatedAt: true,
 });
+
+// Utility function to generate slug from address
+export function generatePropertySlug(address: string, city: string, state: string): string {
+  return `${address}-${city}-${state}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
 
 export const updatePropertySchema = insertPropertySchema.partial();
 
