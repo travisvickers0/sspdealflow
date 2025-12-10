@@ -499,7 +499,11 @@ export default function PropertyDetail() {
                   </div>
 
                   {/* CTA Button */}
-                  <Link href={`/invest/${property.id}`}>
+                  <a 
+                    href="https://calendly.com/sspdealflow/30min" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
                     <Button 
                       className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
                       disabled={property.status !== 'needs_funding'}
@@ -516,7 +520,7 @@ export default function PropertyDetail() {
                         'Fully Funded'
                       )}
                     </Button>
-                  </Link>
+                  </a>
 
                   {/* Trust Badges */}
                   <div className="flex items-center justify-center gap-6 pt-2 text-xs text-gray-500">
