@@ -131,7 +131,7 @@ export default function PropertyDetail() {
                       href={`https://www.zillow.com/homes/${encodeURIComponent(`${property.address} ${property.city} ${property.state} ${property.zip}`.replace(/,/g, '').replace(/\s+/g, '-').trim())}_rb/`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-1.5 md:px-5 md:py-2.5 bg-[#006AFF] hover:bg-[#0055CC] text-white rounded-lg text-xs md:text-base font-bold transition-colors shadow-sm"
+                      className="px-2 py-1 md:px-5 md:py-2.5 bg-[#006AFF] hover:bg-[#0055CC] text-white rounded text-[10px] md:text-base font-bold transition-colors shadow-sm"
                       title="View on Zillow"
                       data-testid="link-zillow"
                     >
