@@ -126,23 +126,22 @@ export default function PropertyDetail() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
                     <a
                       href={`https://www.zillow.com/homes/${encodeURIComponent(`${property.address} ${property.city} ${property.state} ${property.zip}`.replace(/,/g, '').replace(/\s+/g, '-').trim())}_rb/`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 py-1 md:px-5 md:py-2.5 bg-[#006AFF] hover:bg-[#0055CC] text-white rounded text-[10px] md:text-base font-bold transition-colors shadow-sm"
+                      className="p-1.5 md:px-4 md:py-2 bg-[#006AFF] hover:bg-[#0055CC] text-white rounded-lg text-[10px] md:text-sm font-bold transition-colors"
                       title="View on Zillow"
                       data-testid="link-zillow"
                     >
                       Zillow
                     </a>
-                    <button className="p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors" title="Share">
-                      <Share2 className="w-5 h-5" />
+                    <button className="p-1.5 md:p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors" title="Share">
+                      <Share2 className="w-4 h-4 md:w-5 md:h-5" />
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                      <Heart className="w-4 h-4 text-gray-400" />
-                      Save
+                    <button className="p-1.5 md:p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors" title="Save">
+                      <Heart className="w-4 h-4 md:w-5 md:h-5" />
                     </button>
                   </div>
                 </div>
