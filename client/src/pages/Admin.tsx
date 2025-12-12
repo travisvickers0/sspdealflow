@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo } from "react";
+import { Link } from "wouter";
 import { Layout } from "@/components/Layout";
 import { useProperties, useAdminProperties, useBulkEditor, useUpload } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
@@ -234,17 +235,19 @@ export default function Admin() {
                         <tr key={property.id} className="hover:bg-gray-50" data-testid={`row-property-${property.id}`}>
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-3">
-                              {property.mainPhotoUrl ? (
-                                <img 
-                                  src={property.mainPhotoUrl} 
-                                  alt={property.address}
-                                  className="w-12 h-12 rounded-lg object-cover"
-                                />
-                              ) : (
-                                <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                                  <Building2 className="h-6 w-6 text-gray-400" />
-                                </div>
-                              )}
+                              <Link href={`/property/${property.slug}`}>
+                                {property.mainPhotoUrl ? (
+                                  <img 
+                                    src={property.mainPhotoUrl} 
+                                    alt={property.address}
+                                    className="w-12 h-12 rounded-lg object-cover hover:ring-2 hover:ring-primary cursor-pointer transition-all"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center hover:ring-2 hover:ring-primary cursor-pointer transition-all">
+                                    <Building2 className="h-6 w-6 text-gray-400" />
+                                  </div>
+                                )}
+                              </Link>
                               <div>
                                 <div className="font-medium text-gray-900" data-testid={`text-address-${property.id}`}>{property.address}</div>
                                 <div className="text-sm text-gray-500">{property.city}, {property.state}</div>
@@ -308,17 +311,19 @@ export default function Admin() {
                     <Card key={property.id} data-testid={`row-property-${property.id}`} className="overflow-hidden">
                       <CardContent className="p-4">
                         <div className="flex gap-3 mb-3">
-                          {property.mainPhotoUrl ? (
-                            <img 
-                              src={property.mainPhotoUrl} 
-                              alt={property.address}
-                              className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                              <Building2 className="h-8 w-8 text-gray-400" />
-                            </div>
-                          )}
+                          <Link href={`/property/${property.slug}`}>
+                            {property.mainPhotoUrl ? (
+                              <img 
+                                src={property.mainPhotoUrl} 
+                                alt={property.address}
+                                className="w-16 h-16 rounded-lg object-cover flex-shrink-0 hover:ring-2 hover:ring-primary cursor-pointer transition-all"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-primary cursor-pointer transition-all">
+                                <Building2 className="h-8 w-8 text-gray-400" />
+                              </div>
+                            )}
+                          </Link>
                           <div className="flex-1 min-w-0">
                             <div className="font-semibold text-gray-900 text-sm truncate" data-testid={`text-address-${property.id}`}>{property.address}</div>
                             <div className="text-xs text-gray-500 truncate">{property.city}, {property.state}</div>
