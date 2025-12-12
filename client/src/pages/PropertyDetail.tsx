@@ -131,14 +131,10 @@ export default function PropertyDetail() {
                       href={`https://www.zillow.com/homes/${encodeURIComponent(`${property.address} ${property.city} ${property.state} ${property.zip}`.replace(/,/g, '').replace(/\s+/g, '-').trim())}_rb/`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2.5 bg-[#006AFF] hover:bg-[#0055CC] text-white rounded-lg text-sm font-semibold transition-colors shadow-sm"
+                      className="px-5 py-2.5 bg-[#006AFF] hover:bg-[#0055CC] text-white rounded-lg text-base font-bold transition-colors shadow-sm"
                       title="View on Zillow"
                       data-testid="link-zillow"
                     >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0L1.5 6v12L12 24l10.5-6V6L12 0zm0 2.4l8.1 4.6v9.2L12 20.8l-8.1-4.6V7L12 2.4z"/>
-                        <path d="M12 5.5L6 9v6l6 3.5 6-3.5V9l-6-3.5zm0 2l3.5 2v4L12 15.5 8.5 13.5v-4L12 7.5z"/>
-                      </svg>
                       Zillow
                     </a>
                     <button className="p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors" title="Share">
