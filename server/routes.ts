@@ -243,6 +243,53 @@ export async function registerRoutes(
     }
   });
 
+  // GET /api/photos - Get all property photos (lightweight endpoint)
+  app.get("/api/photos", async (req: Request, res: Response) => {
+    try {
+      const properties = await storage.getAllProperties();
+      const photos = properties.map(p => ({
+        propertyId: p.id,
+        slug: p.slug,
+        address: p.address,
+        city: p.city,
+        state: p.state,
+        mainPhoto: p.mainPhotoUrl,
+        galleryPhotos: p.galleryPhotoUrls || [],
+      }));
+      res.json(photos);
+    } catch (error) {
+      console.error("Error fetching photos:", error);
+      res.status(500).json({ error: "Failed to fetch photos" });
+    }
+  });
+
+  // GET /api/photos/:id - Get photos for a single property
+  app.get("/api/photos/:id", async (req: Request, res: Response) => {
+    try {
+      let property = await storage.getProperty(req.params.id);
+      if (!property) {
+        property = await storage.getPropertyBySlug(req.params.id);
+      }
+      
+      if (!property) {
+        return res.status(404).json({ error: "Property not found" });
+      }
+      
+      res.json({
+        propertyId: property.id,
+        slug: property.slug,
+        address: property.address,
+        city: property.city,
+        state: property.state,
+        mainPhoto: property.mainPhotoUrl,
+        galleryPhotos: property.galleryPhotoUrls || [],
+      });
+    } catch (error) {
+      console.error("Error fetching property photos:", error);
+      res.status(500).json({ error: "Failed to fetch property photos" });
+    }
+  });
+
   // ============================================
   // ADMIN ENDPOINTS (Protected by isAdmin middleware)
   // ============================================
