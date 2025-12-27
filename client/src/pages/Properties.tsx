@@ -3,14 +3,16 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Map as MapIcon, List, Loader2, Building2, DollarSign, TrendingUp, Home } from "lucide-react";
+import { Search, Map as MapIcon, List, Loader2, Building2, DollarSign, TrendingUp, Home, LogIn } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { Property } from "@shared/schema";
 import { MarketplaceMap } from "@/components/MarketplaceMap";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Properties() {
-  const { data: properties, isLoading, error } = useProperties({ refetchInterval: 10000 });
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { data: properties, isLoading, error } = useProperties({ refetchInterval: 10000, enabled: isAuthenticated });
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -78,11 +80,37 @@ export default function Properties() {
     return { total, totalSpread, needsFunding, fundedDeals };
   }, [properties]);
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+          <div className="text-center max-w-md">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <LogIn className="h-8 w-8 text-primary" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">Sign In Required</h1>
+            <p className="text-gray-600 mb-6">
+              Access our exclusive marketplace of vetted real estate investment opportunities. Sign in to view available deals and start investing.
+            </p>
+            <a
+              href="/api/login"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
+              data-testid="button-sign-in"
+            >
+              <LogIn className="h-4 w-4" />
+              Sign In to Continue
+            </a>
+          </div>
         </div>
       </Layout>
     );
