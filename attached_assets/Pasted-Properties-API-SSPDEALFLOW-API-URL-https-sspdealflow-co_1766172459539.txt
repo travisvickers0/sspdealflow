@@ -1,0 +1,533 @@
+Properties API] SSPDEALFLOW_API_URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Properties API] Fetching photos for 53 properties
+[Photo Fetch] Property: 807 Cape Cod Circle, Valrico, FL
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 0f12f2c4-d4b0-42fe-b905-abde4d689c66, 807-cape-cod-circle-valrico-fl
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/0f12f2c4-d4b0-42fe-b905-abde4d689c66
+[Photo Fetch] Property: 1040 Veterans Pky, Columbus, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 83cd38e6-79fe-4c66-94f9-d2d373524395, 1040-veterans-pky-columbus-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/83cd38e6-79fe-4c66-94f9-d2d373524395
+[Photo Fetch] Property: 4320 Amanda Ave, North Port, FL
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 06356708-7d1b-4aec-96c4-ccd9b1864d17, 4320-amanda-ave-north-port-fl
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/06356708-7d1b-4aec-96c4-ccd9b1864d17
+[Photo Fetch] Property: 7832 Brickyard Rd, Powell, TN
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 9c7f296a-b838-4d95-856a-eb8ab9a9fef1, 7832-brickyard-rd-powell-tn
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/9c7f296a-b838-4d95-856a-eb8ab9a9fef1
+[Photo Fetch] Property: 500 Soho Pl, Locust Grove, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: b34abb4b-b45c-457e-8ed4-e5e48a3b5118, 500-soho-pl-locust-grove-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/b34abb4b-b45c-457e-8ed4-e5e48a3b5118
+[Photo Fetch] Property: 807 Redbud Dr, Paola, KS
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 9112398c-1bc3-46dc-b79d-2452d32a0dd3, 807-redbud-dr-paola-ks
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/9112398c-1bc3-46dc-b79d-2452d32a0dd3
+[Photo Fetch] Property: 844 Oconnor St, Smithville, TN
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 282f733c-2da5-4148-9de0-f45e5d974af2, 844-oconnor-st-smithville-tn
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/282f733c-2da5-4148-9de0-f45e5d974af2
+[Photo Fetch] Property: 4020 North 4th, Unknown, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 3d6208db-0c51-4c4e-8309-e4d22e5df4bb, 4020-north-4th-unknown-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/3d6208db-0c51-4c4e-8309-e4d22e5df4bb
+[Photo Fetch] Property: 3429 Wansford Ave Evansville, Unknown, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: d2e16af8-af5d-4300-9216-d295f19c86ec, 3429-wansford-ave-evansville-unknown-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/d2e16af8-af5d-4300-9216-d295f19c86ec
+[Photo Fetch] Property: 806 Rue Marseille, Chesapeake, VA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: bf20db53-a22b-46b7-b7b4-6cc22a3b0a09, 806-rue-marseille-chesapeake-va
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/bf20db53-a22b-46b7-b7b4-6cc22a3b0a09
+[Photo Fetch] Property: 55 Tommy Dyer St, Salyersville, KY
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: b5de320f-a304-466b-a987-5355e46c3976, 55-tommy-dyer-st-salyersville-ky
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/b5de320f-a304-466b-a987-5355e46c3976
+[Photo Fetch] Property: 9062 2nd Ave, Jacksonville, FL
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 4ee985d2-606b-40ba-a6f2-d168fb6f344e, 9062-2nd-ave-jacksonville-fl
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/4ee985d2-606b-40ba-a6f2-d168fb6f344e
+[Photo Fetch] Property: 200 N MARYLAND AVE, MANGUM, OK
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: d0c32860-79d7-48f6-a724-178176ae7f75, 200-n-maryland-ave-mangum-ok
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/d0c32860-79d7-48f6-a724-178176ae7f75
+[Photo Fetch] Property: 1900 Old Dogwood, Jonesboro, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: b2440030-b0bf-4d0f-a7a2-2721eb33075a, 1900-old-dogwood-jonesboro-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/b2440030-b0bf-4d0f-a7a2-2721eb33075a
+[Photo Fetch] Property: 1006 Iverson Ave, Nashville, TN
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 4e34f10a-8889-4b81-85f8-727732d852d3, 1006-iverson-ave-nashville-tn
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/4e34f10a-8889-4b81-85f8-727732d852d3
+[Photo Fetch] Property: 2016 Conrad Ave Se, Atlanta, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 14d7e98b-a6bb-42b7-a56f-c5e6dc5da591, 2016-conrad-ave-se-atlanta-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/14d7e98b-a6bb-42b7-a56f-c5e6dc5da591
+[Photo Fetch] Property: 4041 Se 56th Terr, Ocala, FL
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 96c1d806-f11d-49f2-bd55-306ffc871dea, 4041-se-56th-terr-ocala-fl
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/96c1d806-f11d-49f2-bd55-306ffc871dea
+[Photo Fetch] Property: 10911 Greentrail Dr, Boynton Beach, FL
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 3d389907-fc87-44df-a286-e6232ce1d2ab, 10911-greentrail-dr-boynton-beach-fl
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/3d389907-fc87-44df-a286-e6232ce1d2ab
+[Photo Fetch] Property: APN: 041-126-06  Juniper Dr, Charlotte, NC
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: eb728ff7-9fde-48b1-b19b-1d6bb1e068ab, apn-041-126-06-juniper-dr-charlotte-nc
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/eb728ff7-9fde-48b1-b19b-1d6bb1e068ab
+[Photo Fetch] Property: 111 S MAIN STREET, ALBION, IA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: dea1b359-3033-4350-8f36-d59a2eee8d1e, 111-s-main-street-albion-ia
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/dea1b359-3033-4350-8f36-d59a2eee8d1e
+[Photo Fetch] Property: 4306 Park Lake Ter S, Bradenton, FL
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: b8163ac1-f86e-48fb-b368-2359c0ca0215, 4306-park-lake-ter-s-bradenton-fl
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/b8163ac1-f86e-48fb-b368-2359c0ca0215
+[Photo Fetch] Property: 64301 Shady Lane Rd, Bellaire, OH
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 41d1e646-87b1-4ae3-97bc-9337b7a6fcfb, 64301-shady-lane-rd-bellaire-oh
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/41d1e646-87b1-4ae3-97bc-9337b7a6fcfb
+[Photo Fetch] Property: 70 Priscilla Way, Newnan, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 12fa9795-4acc-486c-b74a-e3f09b3a96c2, 70-priscilla-way-newnan-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/12fa9795-4acc-486c-b74a-e3f09b3a96c2
+[Photo Fetch] Property: 1650 Larkspur Trl, Conyers, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: d5906069-731b-4744-8a8e-a35525d81572, 1650-larkspur-trl-conyers-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/d5906069-731b-4744-8a8e-a35525d81572
+[Photo Fetch] Property: 305 Pine Hill Spur, Jeffersonville, KY
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 0d9d7bda-2a5f-4530-8081-2a6c7e55cd14, 305-pine-hill-spur-jeffersonville-ky
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/0d9d7bda-2a5f-4530-8081-2a6c7e55cd14
+[Photo Fetch] Property: 307 Dover Rd, Hampton, VA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 91ac92c5-9d5e-4c7c-bd60-a10673bdd6cd, 307-dover-rd-hampton-va
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/91ac92c5-9d5e-4c7c-bd60-a10673bdd6cd
+[Photo Fetch] Property: 327 Serengeti Blvd, Pooler, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 402753d4-8dad-41f4-8c77-584ec7911ede, 327-serengeti-blvd-pooler-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/402753d4-8dad-41f4-8c77-584ec7911ede
+[Photo Fetch] Property: 1717 Amaranth Ln, El Reno, OK
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 35b3f330-eff3-411c-9746-c9568d12940f, 1717-amaranth-ln-el-reno-ok
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/35b3f330-eff3-411c-9746-c9568d12940f
+[Photo Fetch] Property: 3110 Lamoka Lake, San Antonio, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 1926d4c6-99a0-4dd1-9e65-f6f93dabb2d9, 3110-lamoka-lake-san-antonio-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1926d4c6-99a0-4dd1-9e65-f6f93dabb2d9
+[Photo Fetch] Property: 3502 Bottomless Lake, San Antonio, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 2c51bbe5-4bc7-4a9b-8dfc-3fabe980ba4d, 3502-bottomless-lake-san-antonio-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/2c51bbe5-4bc7-4a9b-8dfc-3fabe980ba4d
+[Photo Fetch] Property: 12610 Cascade Hls, San Antonio, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: f8b63722-e959-4fc5-83f4-e3fdb69a398f, 12610-cascade-hls-san-antonio-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/f8b63722-e959-4fc5-83f4-e3fdb69a398f
+[Photo Fetch] Property: 41896 W AVELLA DR MARICOPA, Unknown, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: f619a9d7-f91c-4cde-9700-b95e7fd0577b, 41896-w-avella-dr-maricopa-unknown-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/f619a9d7-f91c-4cde-9700-b95e7fd0577b
+[Photo Fetch] Property: 133 Worchester Cir Perry, Unknown, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 02390aae-b29d-4d44-8a54-222d29df73ea, 133-worchester-cir-perry-unknown-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/02390aae-b29d-4d44-8a54-222d29df73ea
+[Photo Fetch] Property: 491 W Peacock Ave, Denton, NC
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 9e3f9e61-8f1a-474b-9029-338512265582, 491-w-peacock-ave-denton-nc
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/9e3f9e61-8f1a-474b-9029-338512265582
+[Photo Fetch] Property: 136 Jennifer Ln, Carrollton, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: f6b2ba54-03c7-4e55-bf00-6a850ec74e20, 136-jennifer-ln-carrollton-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/f6b2ba54-03c7-4e55-bf00-6a850ec74e20
+[Photo Fetch] Property: 1627 Victoria Gardens Dr, Deland, FL
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: b0b336b7-b6c8-4a38-94ba-ea0ca81e1986, 1627-victoria-gardens-dr-deland-fl
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/b0b336b7-b6c8-4a38-94ba-ea0ca81e1986
+[Photo Fetch] Property: 262 Coral Gable, Trinity, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 21f9a151-8a4a-4048-97dc-aee4f154f702, 262-coral-gable-trinity-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/21f9a151-8a4a-4048-97dc-aee4f154f702
+[Photo Fetch] Property: 2550 Everett Ave, Memphis, TN
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 1f9118e6-1f16-4e9a-be43-1b32309d4fbe, 2550-everett-ave-memphis-tn
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1f9118e6-1f16-4e9a-be43-1b32309d4fbe
+[Photo Fetch] Property: 87 Banks Blvd, Byhalia, MS
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 482d5e5c-b777-436c-a90b-20095dc8762e, 87-banks-blvd-byhalia-ms
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/482d5e5c-b777-436c-a90b-20095dc8762e
+[Photo Fetch] Property: 381 Fountain Lake Dr, Eutawville, SC
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: ca7b2c4a-3233-4e19-86d3-96137db438f7, 381-fountain-lake-dr-eutawville-sc
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/ca7b2c4a-3233-4e19-86d3-96137db438f7
+[Photo Fetch] Property: 1270 Pine Knoll Ln Ne, Conyers, GA
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: f1923ab9-20c8-4757-9b17-2ff3edeaf96d, 1270-pine-knoll-ln-ne-conyers-ga
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/f1923ab9-20c8-4757-9b17-2ff3edeaf96d
+[Photo Fetch] Property: 39 RIDGE BLVD, EAST GRANBY, CT
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 33acdc2d-39aa-43b5-88d0-155b316d7fd2, 39-ridge-blvd-east-granby-ct
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/33acdc2d-39aa-43b5-88d0-155b316d7fd2
+[Photo Fetch] Property: 9739 Crescent Moon, San Antonio, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: a20ec373-4b0b-4a8d-b742-c9cb31fd4ba4, 9739-crescent-moon-san-antonio-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/a20ec373-4b0b-4a8d-b742-c9cb31fd4ba4
+[Photo Fetch] Property: 240 Line Of Fire Way, Jarrell, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: e1c91b8e-ce61-4308-94b6-94c65ff2e441, 240-line-of-fire-way-jarrell-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/e1c91b8e-ce61-4308-94b6-94c65ff2e441
+[Photo Fetch] Property: 123 Test St, Dallas, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 98cecaea-a9c8-4c39-b15b-f40b34316010, 123-test-st-dallas-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/98cecaea-a9c8-4c39-b15b-f40b34316010
+[Photo Fetch] Property: 5678 Maple Avenue, Fort Worth, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: b0e62b02-5e07-4578-8da3-15361f924c1e, 5678-maple-avenue-fort-worth-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/b0e62b02-5e07-4578-8da3-15361f924c1e
+[Photo Fetch] Property: 6666 Hickory Blvd, Richardson, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 266d07f7-64ac-4942-b56c-2c18cc58402c, 6666-hickory-blvd-richardson-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/266d07f7-64ac-4942-b56c-2c18cc58402c
+[Photo Fetch] Property: 5555 Walnut Way, McKinney, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 112541dd-e7b4-47d3-8cd5-4ace17bc41ee, 5555-walnut-way-mckinney-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/112541dd-e7b4-47d3-8cd5-4ace17bc41ee
+[Photo Fetch] Property: 4444 Elm Court, Frisco, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 529dd07b-0fc2-4003-9aa7-8223377b0ccd, 4444-elm-court-frisco-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/529dd07b-0fc2-4003-9aa7-8223377b0ccd
+[Photo Fetch] Property: 3333 Birch Drive, Irving, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 8dfb015e-21ef-4da3-a6bc-845c20d1e0d6, 3333-birch-drive-irving-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/8dfb015e-21ef-4da3-a6bc-845c20d1e0d6
+[Photo Fetch] Property: 2222 Cedar Lane, Plano, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: d4945fb8-097c-4d44-acc2-9b533c7604d3, 2222-cedar-lane-plano-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/d4945fb8-097c-4d44-acc2-9b533c7604d3
+[Photo Fetch] Property: 910 Pine Road, Arlington, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: 302a6b23-516d-4184-8dd8-bad016c184d9, 910-pine-road-arlington-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/302a6b23-516d-4184-8dd8-bad016c184d9
+[Photo Fetch] Property: 1234 Oak Street, Dallas, TX
+[Photo Fetch] Using API URL: https://sspdealflow.com/api/photos/{id-or-slug}
+[Photo Fetch] Trying identifiers: d53f44cc-81f4-4816-8e5f-caab174dca54, 1234-oak-street-dallas-tx
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/d53f44cc-81f4-4816-8e5f-caab174dca54
+[Photo Fetch] Response status: 200 for 0f12f2c4-d4b0-42fe-b905-abde4d689c66
+[Photo Fetch] Fetch error for 0f12f2c4-d4b0-42fe-b905-abde4d689c66: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/807-cape-cod-circle-valrico-fl
+[Photo Fetch] Response status: 200 for 83cd38e6-79fe-4c66-94f9-d2d373524395
+[Photo Fetch] Fetch error for 83cd38e6-79fe-4c66-94f9-d2d373524395: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1040-veterans-pky-columbus-ga
+[Photo Fetch] Response status: 200 for 06356708-7d1b-4aec-96c4-ccd9b1864d17
+[Photo Fetch] Fetch error for 06356708-7d1b-4aec-96c4-ccd9b1864d17: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/4320-amanda-ave-north-port-fl
+[Photo Fetch] Response status: 200 for 9c7f296a-b838-4d95-856a-eb8ab9a9fef1
+[Photo Fetch] Fetch error for 9c7f296a-b838-4d95-856a-eb8ab9a9fef1: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/7832-brickyard-rd-powell-tn
+[Photo Fetch] Response status: 200 for b34abb4b-b45c-457e-8ed4-e5e48a3b5118
+[Photo Fetch] Fetch error for b34abb4b-b45c-457e-8ed4-e5e48a3b5118: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/500-soho-pl-locust-grove-ga
+[Photo Fetch] Response status: 200 for 9112398c-1bc3-46dc-b79d-2452d32a0dd3
+[Photo Fetch] Fetch error for 9112398c-1bc3-46dc-b79d-2452d32a0dd3: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/807-redbud-dr-paola-ks
+[Photo Fetch] Response status: 200 for 282f733c-2da5-4148-9de0-f45e5d974af2
+[Photo Fetch] Fetch error for 282f733c-2da5-4148-9de0-f45e5d974af2: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/844-oconnor-st-smithville-tn
+[Photo Fetch] Response status: 200 for 3d6208db-0c51-4c4e-8309-e4d22e5df4bb
+[Photo Fetch] Fetch error for 3d6208db-0c51-4c4e-8309-e4d22e5df4bb: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/4020-north-4th-unknown-tx
+[Photo Fetch] Response status: 200 for d2e16af8-af5d-4300-9216-d295f19c86ec
+[Photo Fetch] Fetch error for d2e16af8-af5d-4300-9216-d295f19c86ec: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/3429-wansford-ave-evansville-unknown-tx
+[Photo Fetch] Response status: 200 for b5de320f-a304-466b-a987-5355e46c3976
+[Photo Fetch] Fetch error for b5de320f-a304-466b-a987-5355e46c3976: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/55-tommy-dyer-st-salyersville-ky
+[Photo Fetch] Response status: 200 for 4ee985d2-606b-40ba-a6f2-d168fb6f344e
+[Photo Fetch] Fetch error for 4ee985d2-606b-40ba-a6f2-d168fb6f344e: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/9062-2nd-ave-jacksonville-fl
+[Photo Fetch] Response status: 200 for b2440030-b0bf-4d0f-a7a2-2721eb33075a
+[Photo Fetch] Fetch error for b2440030-b0bf-4d0f-a7a2-2721eb33075a: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1900-old-dogwood-jonesboro-ga
+[Photo Fetch] Response status: 200 for bf20db53-a22b-46b7-b7b4-6cc22a3b0a09
+[Photo Fetch] Fetch error for bf20db53-a22b-46b7-b7b4-6cc22a3b0a09: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/806-rue-marseille-chesapeake-va
+[Photo Fetch] Response status: 200 for 96c1d806-f11d-49f2-bd55-306ffc871dea
+[Photo Fetch] Fetch error for 96c1d806-f11d-49f2-bd55-306ffc871dea: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/4041-se-56th-terr-ocala-fl
+[Photo Fetch] Response status: 200 for 3d389907-fc87-44df-a286-e6232ce1d2ab
+[Photo Fetch] Fetch error for 3d389907-fc87-44df-a286-e6232ce1d2ab: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/10911-greentrail-dr-boynton-beach-fl
+[Photo Fetch] Response status: 200 for 4e34f10a-8889-4b81-85f8-727732d852d3
+[Photo Fetch] Fetch error for 4e34f10a-8889-4b81-85f8-727732d852d3: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1006-iverson-ave-nashville-tn
+[Photo Fetch] Response status: 200 for 14d7e98b-a6bb-42b7-a56f-c5e6dc5da591
+[Photo Fetch] Fetch error for 14d7e98b-a6bb-42b7-a56f-c5e6dc5da591: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/2016-conrad-ave-se-atlanta-ga
+[Photo Fetch] Response status: 200 for eb728ff7-9fde-48b1-b19b-1d6bb1e068ab
+[Photo Fetch] Fetch error for eb728ff7-9fde-48b1-b19b-1d6bb1e068ab: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/apn-041-126-06-juniper-dr-charlotte-nc
+[Photo Fetch] Response status: 200 for 12fa9795-4acc-486c-b74a-e3f09b3a96c2
+[Photo Fetch] Fetch error for 12fa9795-4acc-486c-b74a-e3f09b3a96c2: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/70-priscilla-way-newnan-ga
+[Photo Fetch] Response status: 200 for b8163ac1-f86e-48fb-b368-2359c0ca0215
+[Photo Fetch] Fetch error for b8163ac1-f86e-48fb-b368-2359c0ca0215: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/4306-park-lake-ter-s-bradenton-fl
+[Photo Fetch] Response status: 200 for dea1b359-3033-4350-8f36-d59a2eee8d1e
+[Photo Fetch] Fetch error for dea1b359-3033-4350-8f36-d59a2eee8d1e: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/111-s-main-street-albion-ia
+[Photo Fetch] Response status: 200 for d0c32860-79d7-48f6-a724-178176ae7f75
+[Photo Fetch] Fetch error for d0c32860-79d7-48f6-a724-178176ae7f75: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/200-n-maryland-ave-mangum-ok
+[Photo Fetch] Response status: 200 for 91ac92c5-9d5e-4c7c-bd60-a10673bdd6cd
+[Photo Fetch] Fetch error for 91ac92c5-9d5e-4c7c-bd60-a10673bdd6cd: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/307-dover-rd-hampton-va
+[Photo Fetch] Response status: 200 for 41d1e646-87b1-4ae3-97bc-9337b7a6fcfb
+[Photo Fetch] Fetch error for 41d1e646-87b1-4ae3-97bc-9337b7a6fcfb: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/64301-shady-lane-rd-bellaire-oh
+[Photo Fetch] Response status: 200 for d5906069-731b-4744-8a8e-a35525d81572
+[Photo Fetch] Fetch error for d5906069-731b-4744-8a8e-a35525d81572: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1650-larkspur-trl-conyers-ga
+[Photo Fetch] Response status: 200 for 35b3f330-eff3-411c-9746-c9568d12940f
+[Photo Fetch] Fetch error for 35b3f330-eff3-411c-9746-c9568d12940f: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1717-amaranth-ln-el-reno-ok
+[Photo Fetch] Response status: 200 for 0d9d7bda-2a5f-4530-8081-2a6c7e55cd14
+[Photo Fetch] Fetch error for 0d9d7bda-2a5f-4530-8081-2a6c7e55cd14: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/305-pine-hill-spur-jeffersonville-ky
+[Photo Fetch] Response status: 200 for 1926d4c6-99a0-4dd1-9e65-f6f93dabb2d9
+[Photo Fetch] Fetch error for 1926d4c6-99a0-4dd1-9e65-f6f93dabb2d9: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/3110-lamoka-lake-san-antonio-tx
+[Photo Fetch] Response status: 200 for 2c51bbe5-4bc7-4a9b-8dfc-3fabe980ba4d
+[Photo Fetch] Fetch error for 2c51bbe5-4bc7-4a9b-8dfc-3fabe980ba4d: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/3502-bottomless-lake-san-antonio-tx
+[Photo Fetch] Response status: 200 for f8b63722-e959-4fc5-83f4-e3fdb69a398f
+[Photo Fetch] Fetch error for f8b63722-e959-4fc5-83f4-e3fdb69a398f: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/12610-cascade-hls-san-antonio-tx
+[Photo Fetch] Response status: 200 for 02390aae-b29d-4d44-8a54-222d29df73ea
+[Photo Fetch] Fetch error for 02390aae-b29d-4d44-8a54-222d29df73ea: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/133-worchester-cir-perry-unknown-tx
+[Photo Fetch] Response status: 200 for 402753d4-8dad-41f4-8c77-584ec7911ede
+[Photo Fetch] Fetch error for 402753d4-8dad-41f4-8c77-584ec7911ede: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/327-serengeti-blvd-pooler-ga
+[Photo Fetch] Response status: 200 for 21f9a151-8a4a-4048-97dc-aee4f154f702
+[Photo Fetch] Fetch error for 21f9a151-8a4a-4048-97dc-aee4f154f702: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/262-coral-gable-trinity-tx
+[Photo Fetch] Response status: 200 for 1f9118e6-1f16-4e9a-be43-1b32309d4fbe
+[Photo Fetch] Fetch error for 1f9118e6-1f16-4e9a-be43-1b32309d4fbe: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/2550-everett-ave-memphis-tn
+[Photo Fetch] Response status: 200 for ca7b2c4a-3233-4e19-86d3-96137db438f7
+[Photo Fetch] Fetch error for ca7b2c4a-3233-4e19-86d3-96137db438f7: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/381-fountain-lake-dr-eutawville-sc
+[Photo Fetch] Response status: 200 for b0b336b7-b6c8-4a38-94ba-ea0ca81e1986
+[Photo Fetch] Fetch error for b0b336b7-b6c8-4a38-94ba-ea0ca81e1986: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1627-victoria-gardens-dr-deland-fl
+[Photo Fetch] Response status: 200 for f619a9d7-f91c-4cde-9700-b95e7fd0577b
+[Photo Fetch] Fetch error for f619a9d7-f91c-4cde-9700-b95e7fd0577b: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/41896-w-avella-dr-maricopa-unknown-tx
+[Photo Fetch] Response status: 200 for f1923ab9-20c8-4757-9b17-2ff3edeaf96d
+[Photo Fetch] Fetch error for f1923ab9-20c8-4757-9b17-2ff3edeaf96d: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1270-pine-knoll-ln-ne-conyers-ga
+[Photo Fetch] Response status: 200 for 482d5e5c-b777-436c-a90b-20095dc8762e
+[Photo Fetch] Fetch error for 482d5e5c-b777-436c-a90b-20095dc8762e: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/87-banks-blvd-byhalia-ms
+[Photo Fetch] Response status: 200 for a20ec373-4b0b-4a8d-b742-c9cb31fd4ba4
+[Photo Fetch] Fetch error for a20ec373-4b0b-4a8d-b742-c9cb31fd4ba4: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/9739-crescent-moon-san-antonio-tx
+[Photo Fetch] Response status: 200 for 9e3f9e61-8f1a-474b-9029-338512265582
+[Photo Fetch] Fetch error for 9e3f9e61-8f1a-474b-9029-338512265582: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/491-w-peacock-ave-denton-nc
+[Photo Fetch] Response status: 200 for f6b2ba54-03c7-4e55-bf00-6a850ec74e20
+[Photo Fetch] Fetch error for f6b2ba54-03c7-4e55-bf00-6a850ec74e20: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/136-jennifer-ln-carrollton-ga
+[Photo Fetch] Response status: 200 for 33acdc2d-39aa-43b5-88d0-155b316d7fd2
+[Photo Fetch] Fetch error for 33acdc2d-39aa-43b5-88d0-155b316d7fd2: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/39-ridge-blvd-east-granby-ct
+[Photo Fetch] Response status: 200 for 266d07f7-64ac-4942-b56c-2c18cc58402c
+[Photo Fetch] Fetch error for 266d07f7-64ac-4942-b56c-2c18cc58402c: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/6666-hickory-blvd-richardson-tx
+[Photo Fetch] Response status: 200 for 98cecaea-a9c8-4c39-b15b-f40b34316010
+[Photo Fetch] Fetch error for 98cecaea-a9c8-4c39-b15b-f40b34316010: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/123-test-st-dallas-tx
+[Photo Fetch] Response status: 200 for b0e62b02-5e07-4578-8da3-15361f924c1e
+[Photo Fetch] Fetch error for b0e62b02-5e07-4578-8da3-15361f924c1e: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/5678-maple-avenue-fort-worth-tx
+[Photo Fetch] Response status: 200 for 112541dd-e7b4-47d3-8cd5-4ace17bc41ee
+[Photo Fetch] Fetch error for 112541dd-e7b4-47d3-8cd5-4ace17bc41ee: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/5555-walnut-way-mckinney-tx
+[Photo Fetch] Response status: 200 for 8dfb015e-21ef-4da3-a6bc-845c20d1e0d6
+[Photo Fetch] Fetch error for 8dfb015e-21ef-4da3-a6bc-845c20d1e0d6: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/3333-birch-drive-irving-tx
+[Photo Fetch] Response status: 200 for e1c91b8e-ce61-4308-94b6-94c65ff2e441
+[Photo Fetch] Fetch error for e1c91b8e-ce61-4308-94b6-94c65ff2e441: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/240-line-of-fire-way-jarrell-tx
+[Photo Fetch] Response status: 200 for 806-rue-marseille-chesapeake-va
+[Photo Fetch] Fetch error for 806-rue-marseille-chesapeake-va: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 806 Rue Marseille
+[Photo Fetch] Response status: 200 for 529dd07b-0fc2-4003-9aa7-8223377b0ccd
+[Photo Fetch] Fetch error for 529dd07b-0fc2-4003-9aa7-8223377b0ccd: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/4444-elm-court-frisco-tx
+[Photo Fetch] Response status: 200 for d4945fb8-097c-4d44-acc2-9b533c7604d3
+[Photo Fetch] Fetch error for d4945fb8-097c-4d44-acc2-9b533c7604d3: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/2222-cedar-lane-plano-tx
+[Photo Fetch] Response status: 200 for 10911-greentrail-dr-boynton-beach-fl
+[Photo Fetch] Fetch error for 10911-greentrail-dr-boynton-beach-fl: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 10911 Greentrail Dr
+[Photo Fetch] Response status: 200 for 4041-se-56th-terr-ocala-fl
+[Photo Fetch] Fetch error for 4041-se-56th-terr-ocala-fl: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 4041 Se 56th Terr
+[Photo Fetch] Response status: 200 for 302a6b23-516d-4184-8dd8-bad016c184d9
+[Photo Fetch] Fetch error for 302a6b23-516d-4184-8dd8-bad016c184d9: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/910-pine-road-arlington-tx
+[Photo Fetch] Response status: 200 for d53f44cc-81f4-4816-8e5f-caab174dca54
+[Photo Fetch] Fetch error for d53f44cc-81f4-4816-8e5f-caab174dca54: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] Attempting: https://sspdealflow.com/api/photos/{id-or-slug}/api/photos/1234-oak-street-dallas-tx
+[Photo Fetch] Response status: 200 for 1006-iverson-ave-nashville-tn
+[Photo Fetch] Fetch error for 1006-iverson-ave-nashville-tn: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1006 Iverson Ave
+[Photo Fetch] Response status: 200 for 200-n-maryland-ave-mangum-ok
+[Photo Fetch] Fetch error for 200-n-maryland-ave-mangum-ok: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 200 N MARYLAND AVE
+[Photo Fetch] Response status: 200 for 2016-conrad-ave-se-atlanta-ga
+[Photo Fetch] Fetch error for 2016-conrad-ave-se-atlanta-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 2016 Conrad Ave Se
+[Photo Fetch] Response status: 200 for 64301-shady-lane-rd-bellaire-oh
+[Photo Fetch] Fetch error for 64301-shady-lane-rd-bellaire-oh: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 64301 Shady Lane Rd
+[Photo Fetch] Response status: 200 for apn-041-126-06-juniper-dr-charlotte-nc
+[Photo Fetch] Fetch error for apn-041-126-06-juniper-dr-charlotte-nc: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for APN: 041-126-06  Juniper Dr
+[Photo Fetch] Response status: 200 for 70-priscilla-way-newnan-ga
+[Photo Fetch] Fetch error for 70-priscilla-way-newnan-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 70 Priscilla Way
+[Photo Fetch] Response status: 200 for 4306-park-lake-ter-s-bradenton-fl
+[Photo Fetch] Fetch error for 4306-park-lake-ter-s-bradenton-fl: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 4306 Park Lake Ter S
+[Photo Fetch] Response status: 200 for 111-s-main-street-albion-ia
+[Photo Fetch] Fetch error for 111-s-main-street-albion-ia: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 111 S MAIN STREET
+[Photo Fetch] Response status: 200 for 307-dover-rd-hampton-va
+[Photo Fetch] Fetch error for 307-dover-rd-hampton-va: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 307 Dover Rd
+[Photo Fetch] Response status: 200 for 1627-victoria-gardens-dr-deland-fl
+[Photo Fetch] Fetch error for 1627-victoria-gardens-dr-deland-fl: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1627 Victoria Gardens Dr
+[Photo Fetch] Response status: 200 for 327-serengeti-blvd-pooler-ga
+[Photo Fetch] Fetch error for 327-serengeti-blvd-pooler-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 327 Serengeti Blvd
+[Photo Fetch] Response status: 200 for 7832-brickyard-rd-powell-tn
+[Photo Fetch] Fetch error for 7832-brickyard-rd-powell-tn: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 7832 Brickyard Rd
+[Photo Fetch] Response status: 200 for 262-coral-gable-trinity-tx
+[Photo Fetch] Fetch error for 262-coral-gable-trinity-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 262 Coral Gable
+[Photo Fetch] Response status: 200 for 1270-pine-knoll-ln-ne-conyers-ga
+[Photo Fetch] Fetch error for 1270-pine-knoll-ln-ne-conyers-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1270 Pine Knoll Ln Ne
+[Photo Fetch] Response status: 200 for 4320-amanda-ave-north-port-fl
+[Photo Fetch] Fetch error for 4320-amanda-ave-north-port-fl: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 4320 Amanda Ave
+[Photo Fetch] Response status: 200 for 381-fountain-lake-dr-eutawville-sc
+[Photo Fetch] Fetch error for 381-fountain-lake-dr-eutawville-sc: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 381 Fountain Lake Dr
+[Photo Fetch] Response status: 200 for 55-tommy-dyer-st-salyersville-ky
+[Photo Fetch] Fetch error for 55-tommy-dyer-st-salyersville-ky: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 55 Tommy Dyer St
+[Photo Fetch] Response status: 200 for 41896-w-avella-dr-maricopa-unknown-tx
+[Photo Fetch] Fetch error for 41896-w-avella-dr-maricopa-unknown-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 41896 W AVELLA DR MARICOPA
+[Photo Fetch] Response status: 200 for 3429-wansford-ave-evansville-unknown-tx
+[Photo Fetch] Fetch error for 3429-wansford-ave-evansville-unknown-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 3429 Wansford Ave Evansville
+[Photo Fetch] Response status: 200 for 807-redbud-dr-paola-ks
+[Photo Fetch] Fetch error for 807-redbud-dr-paola-ks: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 807 Redbud Dr
+[Photo Fetch] Response status: 200 for 6666-hickory-blvd-richardson-tx
+[Photo Fetch] Fetch error for 6666-hickory-blvd-richardson-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 6666 Hickory Blvd
+[Photo Fetch] Response status: 200 for 491-w-peacock-ave-denton-nc
+[Photo Fetch] Fetch error for 491-w-peacock-ave-denton-nc: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 491 W Peacock Ave
+[Photo Fetch] Response status: 200 for 136-jennifer-ln-carrollton-ga
+[Photo Fetch] Fetch error for 136-jennifer-ln-carrollton-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 136 Jennifer Ln
+[Photo Fetch] Response status: 200 for 807-cape-cod-circle-valrico-fl
+[Photo Fetch] Fetch error for 807-cape-cod-circle-valrico-fl: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 807 Cape Cod Circle
+[Photo Fetch] Response status: 200 for 9739-crescent-moon-san-antonio-tx
+[Photo Fetch] Fetch error for 9739-crescent-moon-san-antonio-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 9739 Crescent Moon
+[Photo Fetch] Response status: 200 for 1040-veterans-pky-columbus-ga
+[Photo Fetch] Fetch error for 1040-veterans-pky-columbus-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1040 Veterans Pky
+[Photo Fetch] Response status: 200 for 844-oconnor-st-smithville-tn
+[Photo Fetch] Fetch error for 844-oconnor-st-smithville-tn: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 844 Oconnor St
+[Photo Fetch] Response status: 200 for 5555-walnut-way-mckinney-tx
+[Photo Fetch] Fetch error for 5555-walnut-way-mckinney-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 5555 Walnut Way
+[Photo Fetch] Response status: 200 for 2222-cedar-lane-plano-tx
+[Photo Fetch] Fetch error for 2222-cedar-lane-plano-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 2222 Cedar Lane
+[Photo Fetch] Response status: 200 for 39-ridge-blvd-east-granby-ct
+[Photo Fetch] Fetch error for 39-ridge-blvd-east-granby-ct: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 39 RIDGE BLVD
+[Photo Fetch] Response status: 200 for 500-soho-pl-locust-grove-ga
+[Photo Fetch] Fetch error for 500-soho-pl-locust-grove-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 500 Soho Pl
+[Photo Fetch] Response status: 200 for 4020-north-4th-unknown-tx
+[Photo Fetch] Fetch error for 4020-north-4th-unknown-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 4020 North 4th
+[Photo Fetch] Response status: 200 for 9062-2nd-ave-jacksonville-fl
+[Photo Fetch] Fetch error for 9062-2nd-ave-jacksonville-fl: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 9062 2nd Ave
+[Photo Fetch] Response status: 200 for 3333-birch-drive-irving-tx
+[Photo Fetch] Fetch error for 3333-birch-drive-irving-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 3333 Birch Drive
+[Photo Fetch] Response status: 200 for 1717-amaranth-ln-el-reno-ok
+[Photo Fetch] Fetch error for 1717-amaranth-ln-el-reno-ok: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1717 Amaranth Ln
+[Photo Fetch] Response status: 200 for 133-worchester-cir-perry-unknown-tx
+[Photo Fetch] Response status: 200 for 123-test-st-dallas-tx
+[Photo Fetch] Fetch error for 123-test-st-dallas-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 123 Test St
+[Photo Fetch] Fetch error for 133-worchester-cir-perry-unknown-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 133 Worchester Cir Perry
+[Photo Fetch] Response status: 200 for 1900-old-dogwood-jonesboro-ga
+[Photo Fetch] Fetch error for 1900-old-dogwood-jonesboro-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1900 Old Dogwood
+[Photo Fetch] Response status: 200 for 2550-everett-ave-memphis-tn
+[Photo Fetch] Fetch error for 2550-everett-ave-memphis-tn: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 2550 Everett Ave
+[Photo Fetch] Response status: 200 for 12610-cascade-hls-san-antonio-tx
+[Photo Fetch] Fetch error for 12610-cascade-hls-san-antonio-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 12610 Cascade Hls
+[Photo Fetch] Response status: 200 for 5678-maple-avenue-fort-worth-tx
+[Photo Fetch] Fetch error for 5678-maple-avenue-fort-worth-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 5678 Maple Avenue
+[Photo Fetch] Response status: 200 for 240-line-of-fire-way-jarrell-tx
+[Photo Fetch] Fetch error for 240-line-of-fire-way-jarrell-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 240 Line Of Fire Way
+[Photo Fetch] Response status: 200 for 1234-oak-street-dallas-tx
+[Photo Fetch] Fetch error for 1234-oak-street-dallas-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1234 Oak Street
+[Photo Fetch] Response status: 200 for 3502-bottomless-lake-san-antonio-tx
+[Photo Fetch] Fetch error for 3502-bottomless-lake-san-antonio-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 3502 Bottomless Lake
+[Photo Fetch] Response status: 200 for 4444-elm-court-frisco-tx
+[Photo Fetch] Fetch error for 4444-elm-court-frisco-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 4444 Elm Court
+[Photo Fetch] Response status: 200 for 1650-larkspur-trl-conyers-ga
+[Photo Fetch] Fetch error for 1650-larkspur-trl-conyers-ga: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 1650 Larkspur Trl
+[Photo Fetch] Response status: 200 for 87-banks-blvd-byhalia-ms
+[Photo Fetch] Fetch error for 87-banks-blvd-byhalia-ms: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 87 Banks Blvd
+[Photo Fetch] Response status: 200 for 305-pine-hill-spur-jeffersonville-ky
+[Photo Fetch] Fetch error for 305-pine-hill-spur-jeffersonville-ky: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 305 Pine Hill Spur
+[Photo Fetch] Response status: 200 for 910-pine-road-arlington-tx
+[Photo Fetch] Fetch error for 910-pine-road-arlington-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 910 Pine Road
+[Photo Fetch] Response status: 200 for 3110-lamoka-lake-san-antonio-tx
+[Photo Fetch] Fetch error for 3110-lamoka-lake-san-antonio-tx: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[Photo Fetch] No photos found for 3110 Lamoka Lake
+[Properties API] Returning 53 properties, 0 with photos
