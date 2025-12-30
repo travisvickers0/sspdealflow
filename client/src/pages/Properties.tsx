@@ -33,16 +33,32 @@ export default function Properties() {
           p.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
           p.zip.includes(searchQuery);
         
+        // Normalize status for filtering (backwards compatible)
+        const normalizeStatus = (status: string) => {
+          if (status === "needs_funding" || status === "committed") return "AVAILABLE";
+          if (status === "funded" || status === "archived") return "FUNDED";
+          return status;
+        };
+        
         const matchesStatus = statusFilter === "all" || 
-          (statusFilter === "open" && p.status === "needs_funding") ||
-          (statusFilter === "funded" && (p.status === "funded" || p.status === "committed"));
+          (statusFilter === "open" && normalizeStatus(p.status) === "AVAILABLE") ||
+          (statusFilter === "funded" && normalizeStatus(p.status) === "FUNDED");
 
         return matchesSearch && matchesStatus;
       })
       .sort((a, b) => {
-        // Status priority: needs_funding > committed > funded
-        const statusOrder = { needs_funding: 0, committed: 1, funded: 2, archived: 3 };
-        const statusDiff = (statusOrder[a.status as keyof typeof statusOrder] ?? 99) - (statusOrder[b.status as keyof typeof statusOrder] ?? 99);
+        // Normalize status for comparison
+        const normalizeStatus = (status: string) => {
+          if (status === "needs_funding" || status === "committed") return "AVAILABLE";
+          if (status === "funded" || status === "archived") return "FUNDED";
+          return status;
+        };
+        
+        // Status priority: AVAILABLE > FUNDED > SOLD
+        const statusOrder = { AVAILABLE: 0, FUNDED: 1, SOLD: 2 };
+        const statusA = normalizeStatus(a.status);
+        const statusB = normalizeStatus(b.status);
+        const statusDiff = (statusOrder[statusA as keyof typeof statusOrder] ?? 99) - (statusOrder[statusB as keyof typeof statusOrder] ?? 99);
         
         if (statusDiff !== 0) return statusDiff;
         
@@ -72,10 +88,17 @@ export default function Properties() {
   const stats = useMemo(() => {
     if (!properties) return { total: 0, totalSpread: 0, needsFunding: 0, fundedDeals: 0 };
     
+    // Normalize status for stats (backwards compatible)
+    const normalizeStatus = (status: string) => {
+      if (status === "needs_funding" || status === "committed") return "AVAILABLE";
+      if (status === "funded" || status === "archived") return "FUNDED";
+      return status;
+    };
+    
     const total = properties.length;
     const totalSpread = properties.reduce((sum, p) => sum + (p.estimatedEquity || 0), 0);
-    const needsFunding = properties.filter(p => p.status === "needs_funding").length;
-    const fundedDeals = properties.filter(p => p.status === "funded" || p.status === "committed").length;
+    const needsFunding = properties.filter(p => normalizeStatus(p.status) === "AVAILABLE").length;
+    const fundedDeals = properties.filter(p => normalizeStatus(p.status) === "FUNDED").length;
     
     return { total, totalSpread, needsFunding, fundedDeals };
   }, [properties]);

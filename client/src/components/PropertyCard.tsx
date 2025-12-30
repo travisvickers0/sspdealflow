@@ -14,26 +14,33 @@ const formatMoney = (amount: number) => {
 };
 
 export function PropertyCard({ property }: PropertyCardProps) {
+  // Normalize status with backwards compatibility
+  const normalizedStatus = property.status === "needs_funding" || property.status === "committed" 
+    ? "AVAILABLE" 
+    : property.status === "funded" || property.status === "archived"
+    ? "FUNDED"
+    : property.status;
+  
+  const isSold = normalizedStatus === "SOLD";
+  const isFunded = normalizedStatus === "FUNDED";
+  const isAvailable = normalizedStatus === "AVAILABLE";
+
   const statusConfig = {
-    needs_funding: {
+    AVAILABLE: {
       label: "Needs Funding",
       bg: "bg-emerald-500"
     },
-    committed: {
-      label: "Funding Committed",
-      bg: "bg-yellow-500"
-    },
-    funded: {
+    FUNDED: {
       label: "Funded",
       bg: "bg-blue-500"
     },
-    archived: {
-      label: "Archived",
-      bg: "bg-gray-500"
+    SOLD: {
+      label: "SOLD · Case Study",
+      bg: "bg-amber-600"
     }
   };
 
-  const status = statusConfig[property.status as keyof typeof statusConfig] || statusConfig.needs_funding;
+  const status = statusConfig[normalizedStatus as keyof typeof statusConfig] || statusConfig.AVAILABLE;
   const closeDate = property.closingDate 
     ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : 'TBD';
@@ -50,7 +57,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <img 
             src={property.mainPhotoUrl || "/placeholder.jpg"} 
             alt={property.address} 
-            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${property.status === 'funded' ? 'grayscale opacity-75' : ''}`}
+            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${isFunded || isSold ? 'grayscale opacity-75' : ''}`}
           />
           
           {/* Status Badge */}
@@ -58,8 +65,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
             {status.label}
           </div>
 
-          {/* FUNDED Stamp Overlay */}
-          {property.status === 'funded' && (
+          {/* FUNDED Stamp Overlay - Only for FUNDED, not SOLD */}
+          {isFunded && !isSold && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
               <div className="border-4 border-green-600 text-green-600 px-6 py-3 rounded-lg -rotate-12 bg-white/10 backdrop-blur-sm shadow-xl">
                 <span className="text-3xl font-black uppercase tracking-widest">
@@ -95,10 +102,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </div>
             <div className="text-right">
               <p className="text-[10px] text-green-600 uppercase font-bold tracking-wider mb-0.5">
-                Est. Equity
+                {isSold ? 'Final Profit' : 'Est. Equity'}
               </p>
               <p className="text-2xl font-bold text-green-600">
-                +{formatMoney(property.estimatedEquity || 0)}
+                +{formatMoney(isSold && property.totalProjectProfit !== null && property.totalProjectProfit !== undefined 
+                  ? property.totalProjectProfit 
+                  : property.estimatedEquity || 0)}
               </p>
             </div>
           </div>
@@ -144,7 +153,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span>Closes {closeDate}</span>
+              <span>
+                {isSold && property.exitDate
+                  ? `Exited ${new Date(property.exitDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                  : `Closes ${closeDate}`}
+              </span>
             </div>
             <div className="flex items-center gap-1.5 text-green-600 font-bold bg-green-50 px-2 py-1 rounded">
               {/* Chart Icon */}
@@ -158,11 +171,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
           {/* 3. ACTION BUTTON */}
           <div className="mt-auto pt-2">
             <div className={`group/btn w-full font-semibold text-sm py-2.5 rounded-md flex justify-center items-center gap-1.5 transition-all cursor-pointer active:scale-95 ${
-              property.status === 'funded' 
+              isSold || isFunded
                 ? 'bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-300'
                 : 'bg-primary hover:bg-primary/90 active:bg-primary/80 text-white'
             }`}>
-              {property.status === 'funded' ? 'View Case Study' : 'View Details'}
+              {isSold || isFunded ? 'View Case Study' : 'View Details'}
               <svg className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
               </svg>

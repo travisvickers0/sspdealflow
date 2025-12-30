@@ -3,7 +3,7 @@ import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRoute, Link } from "wouter";
-import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images } from "lucide-react";
+import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images, Check, Download } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
@@ -66,12 +66,32 @@ export default function PropertyDetail() {
     );
   }
 
-  // Calculate 50/50 profit split - investor funds full purchase, splits equity 50/50
-  const totalEquity = property?.estimatedEquity || 0;
-  const investorProfitShare = totalEquity * 0.5; // 50% of equity goes to investor
-  const sspProfitShare = totalEquity * 0.5; // 50% of equity goes to SSP
+  // Status mode logic with backwards compatibility
+  // Map old status values to new system for backwards compatibility
+  const normalizedStatus = property.status === "needs_funding" || property.status === "committed" 
+    ? "AVAILABLE" 
+    : property.status === "funded" || property.status === "archived"
+    ? "FUNDED"
+    : property.status;
+  
+  const isAvailable = normalizedStatus === "AVAILABLE";
+  const isFunded = normalizedStatus === "FUNDED";
+  const isSold = normalizedStatus === "SOLD";
+
+  // Calculate profit metrics - use SOLD values if available, otherwise use estimates
+  const totalEquity = isSold && property.totalProjectProfit !== null && property.totalProjectProfit !== undefined
+    ? property.totalProjectProfit
+    : property?.estimatedEquity || 0;
+  const investorProfitShare = isSold && property.investorProfit !== null && property.investorProfit !== undefined
+    ? property.investorProfit
+    : totalEquity * 0.5; // 50% of equity goes to investor
+  const sspProfitShare = isSold && property.sponsorProfit !== null && property.sponsorProfit !== undefined
+    ? property.sponsorProfit
+    : totalEquity * 0.5; // 50% of equity goes to SSP
   const investorTotalReturn = (property?.purchasePrice || 0) + investorProfitShare;
-  const returnPercentage = property?.purchasePrice > 0 ? (investorProfitShare / property.purchasePrice) * 100 : 0;
+  const returnPercentage = isSold && property.realizedROI !== null && property.realizedROI !== undefined
+    ? property.realizedROI
+    : property?.purchasePrice > 0 ? (investorProfitShare / property.purchasePrice) * 100 : 0;
 
   const handlePreviousImage = () => {
     setSelectedImage((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
@@ -104,15 +124,17 @@ export default function PropertyDetail() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${
-                        property.status === 'needs_funding' 
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+                        isAvailable
                           ? 'bg-amber-50 text-amber-700 border-amber-200' 
-                          : property.status === 'committed'
+                          : isFunded
                           ? 'bg-blue-50 text-blue-700 border-blue-200'
-                          : 'bg-green-50 text-green-700 border-green-200'
+                          : 'bg-amber-100/80 text-amber-800 border-amber-300'
                       }`}>
-                        {property.status === "needs_funding" ? "Needs Funding" : 
-                         property.status === "committed" ? "Funding Committed" : "Funded"}
+                        {isSold && <Check className="w-3 h-3" />}
+                        {isAvailable ? "Needs Funding" : 
+                         isFunded ? "Funded" : 
+                         "SOLD · Case Study"}
                       </span>
                     </div>
                     
@@ -120,9 +142,14 @@ export default function PropertyDetail() {
                       {property.address}
                     </h1>
                     
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin className="w-4 h-4 text-gray-400" />
-                      <span className="text-base">{property.city}, {property.state} {property.zip}</span>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <MapPin className="w-4 h-4 text-gray-400" />
+                        <span className="text-base">{property.city}, {property.state} {property.zip}</span>
+                      </div>
+                      {isSold && (
+                        <span className="text-sm text-gray-500 mt-0.5">Exited Investment</span>
+                      )}
                     </div>
                   </div>
 
@@ -289,9 +316,13 @@ export default function PropertyDetail() {
                       </div>
                       <div>
                         <span className="block text-xl font-bold text-gray-900">
-                          {property.closingDate ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+                          {isSold && property.exitDate
+                            ? new Date(property.exitDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : property.closingDate 
+                            ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : 'N/A'}
                         </span>
-                        <span className="text-xs text-gray-500">Closing</span>
+                        <span className="text-xs text-gray-500">{isSold ? 'Exit Date' : 'Closing'}</span>
                       </div>
                     </div>
 
@@ -299,29 +330,99 @@ export default function PropertyDetail() {
                 </CardContent>
               </Card>
 
-              {/* About this Property */}
+              {/* About this Property / Deal Summary */}
               <Card className="border-0 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-xl">About this Property</CardTitle>
+                  <CardTitle className="text-xl">{isSold ? "Deal Summary" : "About this Property"}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="prose prose-sm max-w-none">
-                    <div 
-                      className="text-gray-700 leading-relaxed space-y-4"
-                      dangerouslySetInnerHTML={{
-                        __html: generatePropertyDescription(property)
-                          .split('\n\n')
-                          .map(para => `<p>${para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`)
-                          .join('')
-                      }}
-                      data-testid="text-property-description"
-                    />
-                    <p className="text-gray-700 leading-relaxed mt-4">
-                      This opportunity represents a clear value-add scenario secured off-market at a competitive entry price. The project scope is a standardized, low-risk cosmetic update. The renovation plan focuses strictly on high-impact basics—new flooring, fresh paint, and a general spruce-up—to bring the property to market standards and maximize resale value.
-                    </p>
+                    {isSold ? (
+                      <div className="text-gray-700 leading-relaxed space-y-4">
+                        <p>
+                          This property was successfully acquired, renovated, and sold as part of our value-add strategy. 
+                          The project was secured off-market at a competitive entry price and executed through a standardized, 
+                          low-risk cosmetic update. The renovation focused on high-impact basics—new flooring, fresh paint, 
+                          and general improvements—to bring the property to market standards and maximize resale value.
+                        </p>
+                        {property.description && (
+                          <p>{property.description}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        <div 
+                          className="text-gray-700 leading-relaxed space-y-4"
+                          dangerouslySetInnerHTML={{
+                            __html: generatePropertyDescription(property)
+                              .split('\n\n')
+                              .map(para => `<p>${para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`)
+                              .join('')
+                          }}
+                          data-testid="text-property-description"
+                        />
+                        <p className="text-gray-700 leading-relaxed mt-4">
+                          This opportunity represents a clear value-add scenario secured off-market at a competitive entry price. The project scope is a standardized, low-risk cosmetic update. The renovation plan focuses strictly on high-impact basics—new flooring, fresh paint, and a general spruce-up—to bring the property to market standards and maximize resale value.
+                        </p>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Optional Timeline Section - Only for SOLD */}
+              {isSold && (
+                <Card className="border-0 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl">Project Timeline</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {property.closingDate && (
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-1.5"></div>
+                          <div>
+                            <p className="font-semibold text-gray-900">Acquired</p>
+                            <p className="text-sm text-gray-500">{new Date(property.closingDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                          </div>
+                        </div>
+                      )}
+                      {property.exitDate && (
+                        <>
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gray-400 mt-1.5"></div>
+                            <div>
+                              <p className="font-semibold text-gray-900">Renovation Start</p>
+                              <p className="text-sm text-gray-500">Renovation completed</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gray-400 mt-1.5"></div>
+                            <div>
+                              <p className="font-semibold text-gray-900">Listed</p>
+                              <p className="text-sm text-gray-500">Property listed for sale</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gray-400 mt-1.5"></div>
+                            <div>
+                              <p className="font-semibold text-gray-900">Under Contract</p>
+                              <p className="text-sm text-gray-500">Sale contract executed</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-1.5"></div>
+                            <div>
+                              <p className="font-semibold text-gray-900">Closed</p>
+                              <p className="text-sm text-gray-500">{new Date(property.exitDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Location & Comps Map */}
               {(property.comps as any[])?.length > 0 && (
@@ -372,14 +473,30 @@ export default function PropertyDetail() {
             <div className="lg:col-span-1">
               <div className="sticky top-6 space-y-6">
               
-              {/* Investment Status Card */}
+              {/* Investment Status Card / Deal Outcome Card */}
               <Card className="shadow-lg border-0">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">Investment Status</CardTitle>
+                  <CardTitle className="text-lg">{isSold ? "Deal Outcome" : "Investment Status"}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Status Indicator */}
-                  {property.status === 'needs_funding' ? (
+                  {isSold ? (
+                    <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl p-5 border border-amber-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm font-semibold text-gray-700">Status</span>
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-amber-700" />
+                          <span className="text-xs font-bold text-amber-800 uppercase tracking-wide">Sold and Exited</span>
+                        </div>
+                      </div>
+                      <div className="text-amber-900 text-sm font-semibold mb-1">
+                        Successfully Exited
+                      </div>
+                      <p className="text-xs text-amber-700/80 leading-relaxed">
+                        This deal has been completed and exited. View the financial breakdown below.
+                      </p>
+                    </div>
+                  ) : isAvailable ? (
                     <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-5 border border-emerald-200">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-semibold text-gray-700">Status</span>
@@ -398,7 +515,7 @@ export default function PropertyDetail() {
                         Secure this deal with full funding commitment.
                       </p>
                     </div>
-                  ) : property.status === 'committed' ? (
+                  ) : (
                     <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-5 border border-blue-200">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-semibold text-gray-700">Status</span>
@@ -406,49 +523,86 @@ export default function PropertyDetail() {
                           <span className="relative flex h-3 w-3">
                             <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
                           </span>
-                          <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">Secured</span>
+                          <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">Funded</span>
                         </div>
                       </div>
                       <div className="text-blue-800 text-sm font-semibold mb-1">
-                        Funding Committed
-                      </div>
-                      <p className="text-xs text-blue-700/80 leading-relaxed">
-                        This deal has been secured by an investor.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-semibold text-gray-700">Status</span>
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-3 w-3">
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-gray-400"></span>
-                          </span>
-                          <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">Closed</span>
-                        </div>
-                      </div>
-                      <div className="text-gray-700 text-sm font-semibold mb-1">
                         Fully Funded
                       </div>
-                      <p className="text-xs text-gray-600 leading-relaxed">
+                      <p className="text-xs text-blue-700/80 leading-relaxed">
                         This deal has been fully funded and closed.
                       </p>
                     </div>
                   )}
 
-                  {/* Equity Available - Highlighted */}
-                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-green-600" />
-                        <span className="text-sm font-semibold text-gray-700">Equity Available</span>
-                      </div>
-                      <span className="text-2xl font-bold text-green-600" data-testid="text-estimated-equity">
-                        ${(property.estimatedEquity || 0).toLocaleString()}
-                      </span>
+                  {/* Equity Available / Deal Outcome Metrics */}
+                  {isSold ? (
+                    <div className="space-y-4">
+                      {property.exitDate && (
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-semibold text-gray-700">Exit Date</span>
+                            <span className="text-sm font-bold text-gray-900">
+                              {new Date(property.exitDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {property.holdPeriodMonths !== null && property.holdPeriodMonths !== undefined && (
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-semibold text-gray-700">Hold Period</span>
+                            <span className="text-sm font-bold text-gray-900">
+                              {property.holdPeriodMonths} {property.holdPeriodMonths === 1 ? 'month' : 'months'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {property.finalSalePrice !== null && property.finalSalePrice !== undefined && (
+                        <div className="p-4 bg-green-50 rounded-xl border-2 border-green-200">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm font-semibold text-gray-700">Final Sale Price</span>
+                            <span className="text-xl font-bold text-green-600">
+                              ${property.finalSalePrice.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {property.totalProjectProfit !== null && property.totalProjectProfit !== undefined && (
+                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-semibold text-gray-700">Total Project Profit</span>
+                            <span className="text-lg font-bold text-blue-600">
+                              ${property.totalProjectProfit.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      {property.investorProfit !== null && property.investorProfit !== undefined && (
+                        <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm font-semibold text-gray-700">Investor Profit</span>
+                            <span className="text-2xl font-bold text-green-600">
+                              ${property.investorProfit.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">Your potential profit share</p>
-                  </div>
+                  ) : (
+                    <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="w-5 h-5 text-green-600" />
+                          <span className="text-sm font-semibold text-gray-700">Equity Available</span>
+                        </div>
+                        <span className="text-2xl font-bold text-green-600" data-testid="text-estimated-equity">
+                          ${(property.estimatedEquity || 0).toLocaleString()}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-2">Your potential profit share</p>
+                    </div>
+                  )}
 
                   {/* Deal Financials */}
                   <div className="space-y-2.5 pt-2">
@@ -493,43 +647,56 @@ export default function PropertyDetail() {
                     </div>
                   </div>
 
-                  {/* Timeline */}
-                  <div className="pt-4 border-t border-gray-200 space-y-2.5">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Closing Date</span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {property.closingDate ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
-                      </span>
+                  {/* Timeline - Only show for AVAILABLE/FUNDED */}
+                  {!isSold && (
+                    <div className="pt-4 border-t border-gray-200 space-y-2.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Closing Date</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {property.closingDate ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                        </span>
+                      </div>
+                      {isAvailable && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Funding Deadline</span>
+                          <span className="text-sm font-semibold text-gray-900">14 days</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Funding Deadline</span>
-                      <span className="text-sm font-semibold text-gray-900">14 days</span>
-                    </div>
-                  </div>
+                  )}
 
                   {/* CTA Button */}
-                  <a 
-                    href="https://calendly.com/sspdealflow/30min" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
+                  {isSold ? (
                     <Button 
-                      className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
-                      disabled={property.status !== 'needs_funding'}
-                      data-testid="button-invest"
+                      variant="outline"
+                      className="w-full h-12 text-base font-semibold border-2 hover:bg-gray-50 transition-all"
+                      data-testid="button-case-study"
                     >
-                      {property.status === 'needs_funding' ? (
-                        <>
-                          Commit to Invest
-                          <ArrowRight className="ml-2 w-4 h-4" />
-                        </>
-                      ) : property.status === 'committed' ? (
-                        'Funding Secured'
-                      ) : (
-                        'Fully Funded'
-                      )}
+                      <Download className="mr-2 w-4 h-4" />
+                      Download Case Study PDF
                     </Button>
-                  </a>
+                  ) : (
+                    <a 
+                      href="https://calendly.com/sspdealflow/30min" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      <Button 
+                        className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
+                        disabled={!isAvailable}
+                        data-testid="button-invest"
+                      >
+                        {isAvailable ? (
+                          <>
+                            Commit to Invest
+                            <ArrowRight className="ml-2 w-4 h-4" />
+                          </>
+                        ) : (
+                          'Funding Secured'
+                        )}
+                      </Button>
+                    </a>
+                  )}
 
                   {/* Trust Badges */}
                   <div className="flex items-center justify-center gap-6 pt-2 text-xs text-gray-500">
@@ -574,12 +741,16 @@ export default function PropertyDetail() {
                   {/* Total Equity */}
                   <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm font-semibold text-gray-700">Total Projected Equity</span>
+                      <span className="text-sm font-semibold text-gray-700">
+                        {isSold ? "Final Project Profit" : "Total Projected Equity"}
+                      </span>
                       <span className="text-xl font-bold text-blue-600">
                         ${totalEquity.toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-xs text-blue-700/80">ARV minus purchase price and rehab costs</p>
+                    <p className="text-xs text-blue-700/80">
+                      {isSold ? "Total profit realized at exit" : "ARV minus purchase price and rehab costs"}
+                    </p>
                   </div>
 
                   {/* 50/50 Split Visualization */}
@@ -599,11 +770,11 @@ export default function PropertyDetail() {
                     {/* Split Details */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
-                        <p className="text-xs text-gray-600 mb-1">Your Share</p>
+                        <p className="text-xs text-gray-600 mb-1">{isSold ? "Investor Share" : "Your Share"}</p>
                         <p className="text-lg font-bold text-green-600">${investorProfitShare.toLocaleString()}</p>
                       </div>
                       <div className="p-3 bg-gray-100 rounded-lg border border-gray-200 text-center">
-                        <p className="text-xs text-gray-600 mb-1">SSP Share</p>
+                        <p className="text-xs text-gray-600 mb-1">{isSold ? "Sponsor Share" : "SSP Share"}</p>
                         <p className="text-lg font-bold text-gray-600">${sspProfitShare.toLocaleString()}</p>
                       </div>
                     </div>
@@ -621,18 +792,27 @@ export default function PropertyDetail() {
                       </span>
                     </div>
                     <div className="flex justify-between items-center pt-3 border-t border-green-200">
-                      <span className="text-xs font-medium text-gray-600">Estimated ROI</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        {isSold ? "Realized ROI" : "Estimated ROI"}
+                      </span>
                       <span className="text-lg font-bold text-green-700">
-                        +{returnPercentage.toFixed(1)}%
+                        +{typeof returnPercentage === 'number' ? returnPercentage.toFixed(1) : returnPercentage}%
                       </span>
                     </div>
                   </div>
 
-                  {/* How It Works Note */}
-                  <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
-                    <p className="font-semibold text-gray-700 mb-1">How it works:</p>
-                    <p>You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus 50% of the profit.</p>
-                  </div>
+                  {/* How It Works Note / Final Numbers Helper */}
+                  {isSold ? (
+                    <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                      <p className="font-semibold text-gray-700 mb-1">Final numbers at exit</p>
+                      <p>All figures reflect the actual financial results from this completed deal.</p>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                      <p className="font-semibold text-gray-700 mb-1">How it works:</p>
+                      <p>You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus 50% of the profit.</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

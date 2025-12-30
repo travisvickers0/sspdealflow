@@ -42,7 +42,7 @@ const createEmptyRow = (): NewPropertyRow => ({
   city: "",
   state: "",
   zip: "",
-  status: "needs_funding",
+  status: "AVAILABLE",
   purchasePrice: 0,
   estimatedEquity: 0,
   beds: 0,
@@ -84,9 +84,18 @@ export default function Admin() {
     if (!properties) return [];
     
     return [...properties].sort((a, b) => {
-      // Status priority: needs_funding > committed > funded > archived
-      const statusOrder = { needs_funding: 0, committed: 1, funded: 2, archived: 3 };
-      const statusDiff = (statusOrder[a.status as keyof typeof statusOrder] ?? 99) - (statusOrder[b.status as keyof typeof statusOrder] ?? 99);
+      // Normalize status for comparison (backwards compatible)
+      const normalizeStatus = (status: string) => {
+        if (status === "needs_funding" || status === "committed") return "AVAILABLE";
+        if (status === "funded" || status === "archived") return "FUNDED";
+        return status;
+      };
+      
+      // Status priority: AVAILABLE > FUNDED > SOLD
+      const statusOrder = { AVAILABLE: 0, FUNDED: 1, SOLD: 2 };
+      const statusA = normalizeStatus(a.status);
+      const statusB = normalizeStatus(b.status);
+      const statusDiff = (statusOrder[statusA as keyof typeof statusOrder] ?? 99) - (statusOrder[statusB as keyof typeof statusOrder] ?? 99);
       
       if (statusDiff !== 0) return statusDiff;
       
@@ -97,9 +106,15 @@ export default function Admin() {
 
   const stats = {
     total: properties?.length || 0,
-    needsFunding: properties?.filter(p => p.status === 'needs_funding').length || 0,
-    committed: properties?.filter(p => p.status === 'committed').length || 0,
-    funded: properties?.filter(p => p.status === 'funded').length || 0,
+    needsFunding: properties?.filter(p => {
+      const s = p.status;
+      return s === 'needs_funding' || s === 'committed' || s === 'AVAILABLE';
+    }).length || 0,
+    funded: properties?.filter(p => {
+      const s = p.status;
+      return s === 'funded' || s === 'archived' || s === 'FUNDED';
+    }).length || 0,
+    sold: properties?.filter(p => p.status === 'SOLD').length || 0,
     totalEquity: properties?.reduce((sum, p) => sum + p.estimatedEquity, 0) || 0,
   };
 
@@ -255,14 +270,24 @@ export default function Admin() {
                             </div>
                           </td>
                           <td className="px-4 py-4">
-                            <Badge className={
-                              property.status === 'needs_funding' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
-                              property.status === 'committed' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
-                              'bg-green-100 text-green-800 hover:bg-green-100'
-                            } data-testid={`badge-status-${property.id}`}>
-                              {property.status === 'needs_funding' ? 'Needs Funding' :
-                               property.status === 'committed' ? 'Committed' : 'Funded'}
-                            </Badge>
+                            {(() => {
+                              const normalizeStatus = (status: string) => {
+                                if (status === "needs_funding" || status === "committed") return "AVAILABLE";
+                                if (status === "funded" || status === "archived") return "FUNDED";
+                                return status;
+                              };
+                              const s = normalizeStatus(property.status);
+                              return (
+                                <Badge className={
+                                  s === 'AVAILABLE' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
+                                  s === 'FUNDED' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
+                                  'bg-amber-200 text-amber-900 hover:bg-amber-200'
+                                } data-testid={`badge-status-${property.id}`}>
+                                  {s === 'AVAILABLE' ? 'Needs Funding' :
+                                   s === 'FUNDED' ? 'Funded' : 'SOLD'}
+                                </Badge>
+                              );
+                            })()}
                           </td>
                           <td className="px-4 py-4 font-medium" data-testid={`text-price-${property.id}`}>${property.purchasePrice.toLocaleString()}</td>
                           <td className="px-4 py-4 text-green-600 font-medium" data-testid={`text-equity-${property.id}`}>${property.estimatedEquity.toLocaleString()}</td>
@@ -327,14 +352,24 @@ export default function Admin() {
                           <div className="flex-1 min-w-0">
                             <div className="font-semibold text-gray-900 text-sm truncate" data-testid={`text-address-${property.id}`}>{property.address}</div>
                             <div className="text-xs text-gray-500 truncate">{property.city}, {property.state}</div>
-                            <Badge className={`mt-1 ${
-                              property.status === 'needs_funding' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
-                              property.status === 'committed' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
-                              'bg-green-100 text-green-800 hover:bg-green-100'
-                            }`} data-testid={`badge-status-${property.id}`}>
-                              {property.status === 'needs_funding' ? 'Needs Funding' :
-                               property.status === 'committed' ? 'Committed' : 'Funded'}
-                            </Badge>
+                            {(() => {
+                              const normalizeStatus = (status: string) => {
+                                if (status === "needs_funding" || status === "committed") return "AVAILABLE";
+                                if (status === "funded" || status === "archived") return "FUNDED";
+                                return status;
+                              };
+                              const s = normalizeStatus(property.status);
+                              return (
+                                <Badge className={`mt-1 ${
+                                  s === 'AVAILABLE' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
+                                  s === 'FUNDED' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
+                                  'bg-amber-200 text-amber-900 hover:bg-amber-200'
+                                }`} data-testid={`badge-status-${property.id}`}>
+                                  {s === 'AVAILABLE' ? 'Needs Funding' :
+                                   s === 'FUNDED' ? 'Funded' : 'SOLD'}
+                                </Badge>
+                              );
+                            })()}
                           </div>
                         </div>
                         
@@ -715,7 +750,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
     city: property?.city || "",
     state: property?.state || "",
     zip: property?.zip || "",
-    status: property?.status || "needs_funding",
+    status: property?.status || "AVAILABLE",
     purchasePrice: property?.purchasePrice || 0,
     estimatedEquity: property?.estimatedEquity || 0,
     beds: property?.beds || 0,
@@ -730,6 +765,14 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
     documents: property?.documents || [],
     comps: property?.comps || [],
     description: property?.description || "",
+    // SOLD-only fields
+    exitDate: property?.exitDate || "",
+    finalSalePrice: property?.finalSalePrice || undefined,
+    holdPeriodMonths: property?.holdPeriodMonths || undefined,
+    totalProjectProfit: property?.totalProjectProfit || undefined,
+    investorProfit: property?.investorProfit || undefined,
+    sponsorProfit: property?.sponsorProfit || undefined,
+    realizedROI: property?.realizedROI || undefined,
   });
 
   const addComp = () => {
@@ -1067,9 +1110,9 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="needs_funding">Needs Funding</SelectItem>
-                  <SelectItem value="committed">Committed</SelectItem>
-                  <SelectItem value="funded">Funded</SelectItem>
+                  <SelectItem value="AVAILABLE">Needs Funding</SelectItem>
+                  <SelectItem value="FUNDED">Funded</SelectItem>
+                  <SelectItem value="SOLD">Sold</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1087,6 +1130,102 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
           </div>
         </div>
       </div>
+
+      {/* SOLD Fields - Only show when status is SOLD */}
+      {formData.status === "SOLD" && (
+        <div className="space-y-4 sm:space-y-6 border-t pt-6">
+          <div>
+            <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-4">Sold Deal Information</h3>
+            <p className="text-xs sm:text-sm text-gray-500 mb-4">Fill in the final numbers from the completed deal.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs sm:text-sm">Exit Date</Label>
+                <Input 
+                  type="date"
+                  value={formData.exitDate} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, exitDate: e.target.value }))}
+                  data-testid="input-exit-date"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs sm:text-sm">Hold Period (Months)</Label>
+                <Input 
+                  type="number"
+                  value={formData.holdPeriodMonths || ""} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, holdPeriodMonths: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  placeholder="e.g., 12"
+                  data-testid="input-hold-period"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs sm:text-sm">Final Sale Price</Label>
+                <Input 
+                  type="number"
+                  value={formData.finalSalePrice || ""} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, finalSalePrice: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  placeholder="0"
+                  data-testid="input-final-sale-price"
+                  className="text-sm"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs sm:text-sm">Total Project Profit</Label>
+                <Input 
+                  type="number"
+                  value={formData.totalProjectProfit || ""} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, totalProjectProfit: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  placeholder="0"
+                  data-testid="input-total-profit"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs sm:text-sm">Investor Profit (50%)</Label>
+                <Input 
+                  type="number"
+                  value={formData.investorProfit || ""} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, investorProfit: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  placeholder="0"
+                  data-testid="input-investor-profit"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs sm:text-sm">Sponsor Profit (50%)</Label>
+                <Input 
+                  type="number"
+                  value={formData.sponsorProfit || ""} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, sponsorProfit: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  placeholder="0"
+                  data-testid="input-sponsor-profit"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs sm:text-sm">Realized ROI (%)</Label>
+                <Input 
+                  type="number"
+                  step="0.1"
+                  value={formData.realizedROI || ""} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, realizedROI: e.target.value ? parseFloat(e.target.value) : undefined }))}
+                  placeholder="0.0"
+                  data-testid="input-realized-roi"
+                  className="text-sm"
+                />
+                <p className="text-xs text-gray-500 mt-1">Enter as percentage (e.g., 25.5 for 25.5%)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Description</h3>
@@ -1380,7 +1519,7 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
               case 'city': row.city = value; break;
               case 'state': row.state = value; break;
               case 'zip': row.zip = value; break;
-              case 'status': row.status = value || 'needs_funding'; break;
+              case 'status': row.status = value || 'AVAILABLE'; break;
               case 'purchaseprice': case 'purchase_price': row.purchasePrice = parseInt(value) || 0; break;
               case 'estimatedequity': case 'estimated_equity': case 'equity': row.estimatedEquity = parseInt(value) || 0; break;
               case 'beds': case 'bedrooms': row.beds = parseInt(value) || 0; break;
@@ -1405,7 +1544,7 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
 
   const downloadTemplate = () => {
     const headers = "address,city,state,zip,status,purchasePrice,estimatedEquity,beds,baths,squareFeet,closingDate,bpoValue,rehabBudget";
-    const example = "123 Main St,Atlanta,GA,30301,needs_funding,250000,50000,3,2,1500,2025-03-15,300000,25000";
+    const example = "123 Main St,Atlanta,GA,30301,AVAILABLE,250000,50000,3,2,1500,2025-03-15,300000,25000";
     const csv = `${headers}\n${example}`;
     
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -1653,7 +1792,7 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
     "city": "Atlanta",
     "state": "GA",
     "zip": "30301",
-    "status": "needs_funding",
+    "status": "AVAILABLE",
     "purchasePrice": 250000,
     "estimatedEquity": 50000,
     "beds": 3,
@@ -1698,7 +1837,15 @@ function BulkEditor({ properties, onSuccess }: { properties: Property[], onSucce
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const filteredProperties = properties.filter(p => {
-    if (filter.status && p.status !== filter.status) return false;
+    if (filter.status) {
+      // Normalize status for filtering (backwards compatible)
+      const normalizeStatus = (status: string) => {
+        if (status === "needs_funding" || status === "committed") return "AVAILABLE";
+        if (status === "funded" || status === "archived") return "FUNDED";
+        return status;
+      };
+      if (normalizeStatus(p.status) !== filter.status) return false;
+    }
     if (filter.state && !p.state.toLowerCase().includes(filter.state.toLowerCase())) return false;
     return true;
   });
@@ -1745,9 +1892,9 @@ function BulkEditor({ properties, onSuccess }: { properties: Property[], onSucce
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All Statuses</SelectItem>
-              <SelectItem value="needs_funding">Needs Funding</SelectItem>
-              <SelectItem value="committed">Committed</SelectItem>
-              <SelectItem value="funded">Funded</SelectItem>
+              <SelectItem value="AVAILABLE">Needs Funding</SelectItem>
+              <SelectItem value="FUNDED">Funded</SelectItem>
+              <SelectItem value="SOLD">Sold</SelectItem>
             </SelectContent>
           </Select>
           <Input 

@@ -4,6 +4,9 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
+export const propertyStatusSchema = z.enum(["AVAILABLE", "FUNDED", "SOLD"]);
+export type PropertyStatus = z.infer<typeof propertyStatusSchema>;
+
 // Session storage table for Replit Auth
 export const sessions = pgTable(
   "sessions",
@@ -33,7 +36,8 @@ export type User = typeof users.$inferSelect;
 export const properties = pgTable("properties", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   slug: text("slug").unique(),
-  status: text("status").notNull().default("needs_funding"), // "funded", "needs_funding", "committed"
+  // Deal page mode (controls AVAILABLE/FUNDED/SOLD rendering)
+  status: text("status").notNull().default("AVAILABLE"),
   
   address: text("address").notNull(),
   city: text("city").notNull(),
@@ -53,6 +57,15 @@ export const properties = pgTable("properties", {
   rehabBudget: integer("rehab_budget").notNull().default(0),
   
   fundingProgress: integer("funding_progress").notNull().default(0),
+
+  // SOLD-only fields (all optional to avoid breaking older records)
+  exitDate: text("exit_date"),
+  finalSalePrice: integer("final_sale_price"),
+  holdPeriodMonths: integer("hold_period_months"),
+  totalProjectProfit: integer("total_project_profit"),
+  investorProfit: integer("investor_profit"),
+  sponsorProfit: integer("sponsor_profit"),
+  realizedROI: real("realized_roi"),
   
   mainPhotoUrl: text("main_photo_url"),
   galleryPhotoUrls: text("gallery_photo_urls").array().default(sql`ARRAY[]::text[]`),
@@ -67,7 +80,9 @@ export const properties = pgTable("properties", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertPropertySchema = createInsertSchema(properties).omit({
+export const insertPropertySchema = createInsertSchema(properties, {
+  status: propertyStatusSchema,
+}).omit({
   id: true,
   slug: true,
   createdAt: true,
