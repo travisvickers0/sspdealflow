@@ -15,14 +15,17 @@ const formatMoney = (amount: number) => {
 
 export function PropertyCard({ property }: PropertyCardProps) {
   // Normalize status with backwards compatibility
-  const normalizedStatus = property.status === "needs_funding" || property.status === "committed" 
+  const normalizedStatus = property.status === "needs_funding"
     ? "AVAILABLE" 
+    : property.status === "committed"
+    ? "COMMITTED"
     : property.status === "funded" || property.status === "archived"
     ? "FUNDED"
     : property.status;
   
   const isSold = normalizedStatus === "SOLD";
   const isFunded = normalizedStatus === "FUNDED";
+  const isCommitted = normalizedStatus === "COMMITTED";
   const isAvailable = normalizedStatus === "AVAILABLE";
 
   const statusConfig = {
@@ -30,9 +33,13 @@ export function PropertyCard({ property }: PropertyCardProps) {
       label: "Needs Funding",
       bg: "bg-emerald-500"
     },
+    COMMITTED: {
+      label: "Funding Committed",
+      bg: "bg-blue-500"
+    },
     FUNDED: {
       label: "Funded",
-      bg: "bg-blue-500"
+      bg: "bg-green-600"
     },
     SOLD: {
       label: "SOLD · Case Study",

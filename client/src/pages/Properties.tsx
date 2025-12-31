@@ -299,11 +299,18 @@ export default function Properties() {
           </button>
         </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground">Available Properties</h2>
-          <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-            {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} available
-          </span>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Available Properties</h2>
+            <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+              {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} available
+            </span>
+          </div>
+          {statusFilter === "funded" && (
+            <p className="text-sm text-gray-500">
+              Deals funded by our network of 250+ private JV partners.
+            </p>
+          )}
         </div>
         
         {viewMode === "list" ? (

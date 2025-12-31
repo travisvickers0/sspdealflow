@@ -68,13 +68,16 @@ export default function PropertyDetail() {
 
   // Status mode logic with backwards compatibility
   // Map old status values to new system for backwards compatibility
-  const normalizedStatus = property.status === "needs_funding" || property.status === "committed" 
+  const normalizedStatus = property.status === "needs_funding"
     ? "AVAILABLE" 
+    : property.status === "committed"
+    ? "COMMITTED"
     : property.status === "funded" || property.status === "archived"
     ? "FUNDED"
     : property.status;
   
   const isAvailable = normalizedStatus === "AVAILABLE";
+  const isCommitted = normalizedStatus === "COMMITTED";
   const isFunded = normalizedStatus === "FUNDED";
   const isSold = normalizedStatus === "SOLD";
 
@@ -126,13 +129,16 @@ export default function PropertyDetail() {
                     <div className="flex items-center gap-3 mb-3">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
                         isAvailable
-                          ? 'bg-amber-50 text-amber-700 border-amber-200' 
-                          : isFunded
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                          : isCommitted
                           ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : isFunded
+                          ? 'bg-green-50 text-green-700 border-green-200'
                           : 'bg-amber-100/80 text-amber-800 border-amber-300'
                       }`}>
                         {isSold && <Check className="w-3 h-3" />}
                         {isAvailable ? "Needs Funding" : 
+                         isCommitted ? "Funding Committed" :
                          isFunded ? "Funded" : 
                          "SOLD · Case Study"}
                       </span>

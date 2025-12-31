@@ -4,7 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
-export const propertyStatusSchema = z.enum(["AVAILABLE", "FUNDED", "SOLD"]);
+export const propertyStatusSchema = z.enum(["needs_funding", "committed", "funded", "archived", "AVAILABLE", "FUNDED", "SOLD"]);
 export type PropertyStatus = z.infer<typeof propertyStatusSchema>;
 
 // Session storage table for Replit Auth
