@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { Property, InsertProperty, UpdateProperty } from "@shared/schema";
+import type { Property, InsertProperty, UpdateProperty, PropertyStatus } from "@shared/schema";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -750,7 +750,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
     city: property?.city || "",
     state: property?.state || "",
     zip: property?.zip || "",
-    status: property?.status || "AVAILABLE",
+    status: (property?.status || "needs_funding") as PropertyStatus,
     purchasePrice: property?.purchasePrice || 0,
     estimatedEquity: property?.estimatedEquity || 0,
     beds: property?.beds || 0,
@@ -1104,14 +1104,15 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               <Label className="text-xs sm:text-sm">Status</Label>
               <Select 
                 value={formData.status} 
-                onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, status: value as PropertyStatus }))}
               >
                 <SelectTrigger data-testid="select-status" className="text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="AVAILABLE">Needs Funding</SelectItem>
-                  <SelectItem value="FUNDED">Funded</SelectItem>
+                  <SelectItem value="needs_funding">Needs Funding</SelectItem>
+                  <SelectItem value="committed">Funding Committed</SelectItem>
+                  <SelectItem value="funded">Funded</SelectItem>
                   <SelectItem value="SOLD">Sold</SelectItem>
                 </SelectContent>
               </Select>
