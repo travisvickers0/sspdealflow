@@ -102,34 +102,34 @@ export default function Home() {
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              <div className="p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                  <TrendingUp className="h-3 sm:h-4 w-3 sm:w-4 text-primary shrink-0" />
-                  <span className="text-base sm:text-2xl font-bold text-gray-900 truncate">{formatMoney(totalEquity)}</span>
+            <div className="flex flex-row overflow-x-auto sm:grid sm:grid-cols-4 gap-2 sm:gap-4 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 pb-2 sm:pb-0 scrollbar-hide no-scrollbar">
+              <div className="flex-none w-[105px] sm:w-auto p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-2">
+                  <TrendingUp className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-primary shrink-0" />
+                  <span className="text-sm sm:text-2xl font-bold text-gray-900 whitespace-nowrap">{formatMoney(totalEquity)}</span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider">Equity</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider whitespace-nowrap">Equity</p>
               </div>
-              <div className="p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                  <Lock className="h-3 sm:h-4 w-3 sm:w-4 text-primary shrink-0" />
-                  <span className="text-base sm:text-2xl font-bold text-gray-900 truncate">{dealsClosed}</span>
+              <div className="flex-none w-[105px] sm:w-auto p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-2">
+                  <Lock className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-primary shrink-0" />
+                  <span className="text-sm sm:text-2xl font-bold text-gray-900 whitespace-nowrap">{dealsClosed}</span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider">Closed</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider whitespace-nowrap">Closed</p>
               </div>
-              <div className="p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                  <Zap className="h-3 sm:h-4 w-3 sm:w-4 text-primary shrink-0" />
-                  <span className="text-base sm:text-2xl font-bold text-gray-900 truncate">{averageHoldPeriod}d</span>
+              <div className="flex-none w-[105px] sm:w-auto p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-2">
+                  <Zap className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-primary shrink-0" />
+                  <span className="text-sm sm:text-2xl font-bold text-gray-900 whitespace-nowrap">{averageHoldPeriod}d</span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider">Hold</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider whitespace-nowrap">Hold</p>
               </div>
-              <div className="p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md hidden sm:block">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-                  <Zap className="h-3 sm:h-4 w-3 sm:w-4 text-primary shrink-0" />
-                  <span className="text-base sm:text-2xl font-bold text-gray-900 truncate">250+</span>
+              <div className="flex-none w-[105px] sm:w-auto p-2 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md hidden sm:block">
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5 sm:mb-2">
+                  <Zap className="h-3.5 sm:h-4 w-3.5 sm:w-4 text-primary shrink-0" />
+                  <span className="text-sm sm:text-2xl font-bold text-gray-900 whitespace-nowrap">250+</span>
                 </div>
-                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider">Investors</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 font-medium uppercase tracking-wider whitespace-nowrap">Investors</p>
               </div>
             </div>
 
