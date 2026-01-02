@@ -70,9 +70,24 @@ export default function Home() {
             </h1>
 
             {/* Subheading */}
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-xl mb-8 sm:mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 font-light">
-              10+ years of verified foreclosure and REO exits nationwide. Deal-by-deal joint ventures with no fees, no pooled funds, and profits split 50/50 at sale.
-            </p>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-8 sm:mb-12 space-y-4">
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/40 backdrop-blur-sm border border-gray-200/50 shadow-sm max-w-xl">
+                <div className="mt-1 bg-primary/10 p-1.5 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                </div>
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
+                  10+ years of verified foreclosure and REO exits nationwide.
+                </p>
+              </div>
+              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/40 backdrop-blur-sm border border-gray-200/50 shadow-sm max-w-xl">
+                <div className="mt-1 bg-primary/10 p-1.5 rounded-lg">
+                  <Zap className="h-4 w-4 text-primary" />
+                </div>
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
+                  Deal-by-deal joint ventures with no fees, no pooled funds, and profits split 50/50 at sale.
+                </p>
+              </div>
+            </div>
 
             {/* Stats Row */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
