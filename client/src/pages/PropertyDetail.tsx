@@ -3,7 +3,13 @@ import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRoute, Link } from "wouter";
-import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images, Check, Download } from "lucide-react";
+import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images, Check, Download, AlertTriangle } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
@@ -137,7 +143,7 @@ export default function PropertyDetail() {
                           : 'bg-amber-100/80 text-amber-800 border-amber-300'
                       }`}>
                         {isSold && <Check className="w-3 h-3" />}
-                        {isAvailable ? "Needs Funding" : 
+                        {isAvailable ? "Open for Partnership" : 
                          isCommitted ? "Funding Committed" :
                          isFunded ? "Funded" : 
                          "SOLD · Case Study"}
@@ -375,6 +381,49 @@ export default function PropertyDetail() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Risk Considerations Section */}
+              {!isSold && (
+                <Card className="border-0 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-amber-600" />
+                      Risk Considerations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="risks" className="border-0">
+                        <AccordionTrigger className="text-left font-semibold text-gray-900 hover:no-underline py-2">
+                          What could go wrong?
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4 pb-2">
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm font-medium text-gray-900 mb-2">Potential Risks:</p>
+                              <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
+                                <li>Renovation delays</li>
+                                <li>Pricing shifts</li>
+                                <li>Market absorption risk</li>
+                                <li>Longer hold periods</li>
+                              </ul>
+                            </div>
+                            <div className="pt-2 border-t border-gray-200">
+                              <p className="text-sm font-medium text-gray-900 mb-2">Mitigations:</p>
+                              <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
+                                <li>Conservative ARV</li>
+                                <li>Light rehab scope</li>
+                                <li>Local contractors</li>
+                                <li>Margin buffer</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Optional Timeline Section - Only for SOLD */}
               {isSold && (
@@ -807,6 +856,13 @@ export default function PropertyDetail() {
                     </div>
                   </div>
 
+                  {/* Disclaimer */}
+                  {!isSold && (
+                    <p className="text-xs text-gray-500 text-center mt-4 italic">
+                      Returns are projections only. Actual results vary by execution and market conditions.
+                    </p>
+                  )}
+
                   {/* How It Works Note / Final Numbers Helper */}
                   {isSold ? (
                     <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
@@ -816,7 +872,8 @@ export default function PropertyDetail() {
                   ) : (
                     <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
                       <p className="font-semibold text-gray-700 mb-1">How it works:</p>
-                      <p>You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus 50% of the profit.</p>
+                      <p className="mb-2">You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus 50% of the profit.</p>
+                      <p>Investor capital is deployed at closing through a licensed title company pursuant to a joint venture agreement.</p>
                     </div>
                   )}
                 </CardContent>

@@ -136,29 +136,36 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <footer className="border-t py-12 bg-gray-50 dark:bg-gray-900/50">
-        <div className="container mx-auto px-4 sm:px-8 flex flex-col md:flex-row justify-between gap-8">
-          <div>
-            <div className="flex items-center gap-2 font-bold text-lg mb-4">
-              <ShieldCheck className="h-5 w-5 text-primary" />
-              <span>SSP Deal Flow</span>
+        <div className="container mx-auto px-4 sm:px-8">
+          <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 font-bold text-lg mb-4">
+                <ShieldCheck className="h-5 w-5 text-primary" />
+                <span>SSP Deal Flow</span>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Premium real estate investment opportunities for accredited investors.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground max-w-xs">
-              Premium real estate investment opportunities for accredited investors.
-            </p>
+            <div className="flex gap-12 text-sm text-muted-foreground">
+              <div className="flex flex-col gap-3">
+                <span className="font-semibold text-foreground">Platform</span>
+                <a href="#" className="hover:text-primary">Browse Properties</a>
+                <a href="#" className="hover:text-primary">How it Works</a>
+                <a href="#" className="hover:text-primary">Pricing</a>
+              </div>
+              <div className="flex flex-col gap-3">
+                <span className="font-semibold text-foreground">Company</span>
+                <a href="#" className="hover:text-primary">About Us</a>
+                <a href="#" className="hover:text-primary">Contact</a>
+                <a href="#" className="hover:text-primary">Terms</a>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-12 text-sm text-muted-foreground">
-            <div className="flex flex-col gap-3">
-              <span className="font-semibold text-foreground">Platform</span>
-              <a href="#" className="hover:text-primary">Browse Properties</a>
-              <a href="#" className="hover:text-primary">How it Works</a>
-              <a href="#" className="hover:text-primary">Pricing</a>
-            </div>
-            <div className="flex flex-col gap-3">
-              <span className="font-semibold text-foreground">Company</span>
-              <a href="#" className="hover:text-primary">About Us</a>
-              <a href="#" className="hover:text-primary">Contact</a>
-              <a href="#" className="hover:text-primary">Terms</a>
-            </div>
+          <div className="border-t pt-6">
+            <p className="text-xs text-muted-foreground text-center max-w-4xl mx-auto">
+              SSP Deal Flow facilitates private, deal-by-deal joint venture partnerships. This is not a fund, syndication, or pooled investment vehicle.
+            </p>
           </div>
         </div>
       </footer>

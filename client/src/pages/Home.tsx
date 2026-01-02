@@ -27,6 +27,19 @@ export default function Home() {
   
   // Calculate total equity from all properties
   const totalEquity = properties?.reduce((sum, p) => sum + (p.estimatedEquity || 0), 0) || 0;
+  
+  // Calculate deals closed (SOLD status properties)
+  const dealsClosed = properties?.filter(p => {
+    const normalizedStatus = p.status === "funded" || p.status === "archived" ? "FUNDED" : p.status;
+    return normalizedStatus === "SOLD" || normalizedStatus === "FUNDED";
+  }).length || 0;
+  
+  // Calculate average hold period from SOLD properties with holdPeriodMonths (convert to days)
+  const soldProperties = properties?.filter(p => p.status === "SOLD" && p.holdPeriodMonths) || [];
+  const averageHoldPeriod = soldProperties.length > 0
+    ? Math.round((soldProperties.reduce((sum, p) => sum + (p.holdPeriodMonths || 0), 0) / soldProperties.length) * 30.44)
+    : 94; // Default fallback (94 days ≈ 3 months)
+  
   const formatMoney = (amount: number) => {
     if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
     if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}k`;
@@ -62,35 +75,33 @@ export default function Home() {
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-4 sm:mb-6 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
-              Real Estate Opportunities<br />
-              <span className="text-primary">
-                Built for Investors
-              </span>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-3 sm:mb-4 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+              Real Estate Opportunities<br className="hidden sm:block" />
+              <span className="text-primary"> Built for Investors</span>
             </h1>
 
-            {/* Subheading */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-8 sm:mb-12 space-y-4">
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/40 backdrop-blur-sm border border-gray-200/50 shadow-sm max-w-xl">
-                <div className="mt-1 bg-primary/10 p-1.5 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-primary" />
+            {/* Track Record Line */}
+            <div className="flex items-center gap-2 mb-4 sm:mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-75">
+              <div className="h-px w-8 bg-primary/30 hidden sm:block" />
+              <p className="text-sm sm:text-lg text-gray-600 font-medium leading-relaxed">
+                10+ years of verified foreclosure and REO exits nationwide.
+              </p>
+            </div>
+
+            {/* Subheading Card */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-8 sm:mb-12">
+              <div className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-white/60 backdrop-blur-md border border-gray-200/50 shadow-sm max-w-xl hover:bg-white/80 transition-colors group">
+                <div className="flex-shrink-0 bg-primary/10 p-2 rounded-xl group-hover:scale-110 transition-transform">
+                  <Zap className="h-5 w-5 text-primary" />
                 </div>
-                <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-                  10+ years of verified foreclosure and REO exits nationwide.
-                </p>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/40 backdrop-blur-sm border border-gray-200/50 shadow-sm max-w-xl">
-                <div className="mt-1 bg-primary/10 p-1.5 rounded-lg">
-                  <Zap className="h-4 w-4 text-primary" />
-                </div>
-                <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-medium">
-                  Deal-by-deal joint ventures with no fees, no pooled funds, and profits split 50/50 at sale.
+                <p className="text-sm sm:text-base text-gray-800 leading-snug font-semibold">
+                  Deal-by-deal joint ventures with no fees and 50/50 profit splits at sale.
                 </p>
               </div>
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               <div className="p-3 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="h-3 sm:h-4 w-3 sm:w-4 text-primary" />
@@ -101,9 +112,16 @@ export default function Home() {
               <div className="p-3 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
                 <div className="flex items-center gap-2 mb-2">
                   <Lock className="h-3 sm:h-4 w-3 sm:w-4 text-primary" />
-                  <span className="text-lg sm:text-2xl font-bold text-gray-900">$15M+</span>
+                  <span className="text-lg sm:text-2xl font-bold text-gray-900">{dealsClosed}</span>
                 </div>
-                <p className="text-xs text-gray-600">Deployed</p>
+                <p className="text-xs text-gray-600">Deals Closed</p>
+              </div>
+              <div className="p-3 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="h-3 sm:h-4 w-3 sm:w-4 text-primary" />
+                  <span className="text-lg sm:text-2xl font-bold text-gray-900">{averageHoldPeriod} Day</span>
+                </div>
+                <p className="text-xs text-gray-600">Avg Hold</p>
               </div>
               <div className="p-3 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md hidden sm:block">
                 <div className="flex items-center gap-2 mb-2">

@@ -30,7 +30,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
   const statusConfig = {
     AVAILABLE: {
-      label: "Needs Funding",
+      label: "Open for Partnership",
       bg: "bg-emerald-500"
     },
     COMMITTED: {
