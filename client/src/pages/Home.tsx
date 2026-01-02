@@ -71,7 +71,7 @@ export default function Home() {
 
             {/* Subheading */}
             <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-xl mb-8 sm:mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 font-light">
-              Discover curated real estate deals with transparent structures, real-time dashboards, and institutional returns. All in one place.
+              10+ years of verified foreclosure and REO exits nationwide. Deal-by-deal joint ventures with no fees, no pooled funds, and profits split 50/50 at sale.
             </p>
 
             {/* Stats Row */}
