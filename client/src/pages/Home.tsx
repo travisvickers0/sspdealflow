@@ -80,16 +80,17 @@ export default function Home() {
               <span className="text-primary"> Built for Investors</span>
             </h1>
 
-            {/* Track Record Line */}
-            <div className="flex items-center gap-2 mb-4 sm:mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-75">
-              <div className="h-px w-8 bg-primary/30 hidden sm:block" />
-              <p className="text-sm sm:text-lg text-gray-600 font-medium leading-relaxed">
-                10+ years of verified foreclosure and REO exits nationwide.
-              </p>
-            </div>
+            {/* Subheading Cards */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-8 sm:mb-12 space-y-3 sm:space-y-4">
+              <div className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-white/60 backdrop-blur-md border border-gray-200/50 shadow-sm max-w-xl hover:bg-white/80 transition-colors group">
+                <div className="flex-shrink-0 bg-primary/10 p-2 rounded-xl group-hover:scale-110 transition-transform">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                </div>
+                <p className="text-sm sm:text-base text-gray-800 leading-snug font-semibold">
+                  10+ years of verified foreclosure and REO exits nationwide.
+                </p>
+              </div>
 
-            {/* Subheading Card */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-8 sm:mb-12">
               <div className="flex items-center gap-3 p-3 sm:p-4 rounded-2xl bg-white/60 backdrop-blur-md border border-gray-200/50 shadow-sm max-w-xl hover:bg-white/80 transition-colors group">
                 <div className="flex-shrink-0 bg-primary/10 p-2 rounded-xl group-hover:scale-110 transition-transform">
                   <Zap className="h-5 w-5 text-primary" />
