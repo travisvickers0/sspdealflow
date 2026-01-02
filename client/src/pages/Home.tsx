@@ -62,9 +62,11 @@ export default function Home() {
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4 sm:mb-6 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
-              Real Estate Opportunities<br className="hidden sm:block" />
-              <span className="text-primary"> Built for Investors</span>
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-4 sm:mb-6 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+              Real Estate Opportunities<br />
+              <span className="text-primary">
+                Built for Investors
+              </span>
             </h1>
 
             {/* Subheading */}
