@@ -82,14 +82,14 @@ export default function Home() {
 
               {/* TIER 2: THE TRUST STRIP */}
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-12">
-                <div className="inline-flex items-center px-6 py-2.5 bg-white/50 backdrop-blur-sm border border-primary/10 rounded-lg max-w-xl shadow-[0_2px_12px_-3px_rgba(0,0,0,0.05)]">
-                  <p className="text-[10px] sm:text-[13px] text-gray-500 font-semibold leading-relaxed flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <span className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-primary/40" /> 10+ years verified foreclosure & REO exits nationwide</span>
-                    <span className="text-gray-300 hidden sm:inline">·</span>
-                    <span className="flex items-center gap-1.5"><Zap className="h-3 w-3 text-primary/40" /> Deal-by-deal joint ventures</span>
-                    <span className="text-gray-300 hidden sm:inline">·</span>
+                <div className="inline-flex items-center px-6 py-2.5 bg-gray-100/50 backdrop-blur-sm border border-gray-200/50 rounded-full max-w-xl">
+                  <p className="text-[10px] sm:text-[13px] text-gray-500 font-medium leading-relaxed flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span>10+ years verified foreclosure & REO exits nationwide</span>
+                    <span className="text-gray-300">·</span>
+                    <span>Deal-by-deal joint ventures</span>
+                    <span className="text-gray-300">·</span>
                     <span>No fees</span>
-                    <span className="text-gray-300 hidden sm:inline">·</span>
+                    <span className="text-gray-300">·</span>
                     <span>50/50 profit split at sale</span>
                   </p>
                 </div>
@@ -104,14 +104,14 @@ export default function Home() {
                   { label: 'Active Investors', value: '250+', important: false },
                 ].map((stat, i) => (
                   <div key={i} className="flex flex-col border-l border-gray-200 pl-6 first:border-l-0 first:pl-0">
-                    <span className={`text-2xl font-bold tracking-tight tabular-nums leading-none ${stat.important ? 'text-gray-800' : 'text-gray-400 font-semibold'}`}>{stat.value}</span>
+                    <span className={`text-xl font-bold tracking-tight tabular-nums leading-none ${stat.important ? 'text-gray-800' : 'text-gray-500 font-semibold'}`}>{stat.value}</span>
                     <span className={`text-[10px] font-bold uppercase tracking-[0.12em] mt-3 leading-none ${stat.important ? 'text-gray-400' : 'text-gray-300'}`}>{stat.label}</span>
                   </div>
                 ))}
               </div>
 
               {/* TIER 4: ACTION ZONE */}
-              <div className="flex flex-col gap-8 sm:flex-row sm:items-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                   <a href="/properties" className="w-full sm:w-auto">
                     <Button 
@@ -126,16 +126,16 @@ export default function Home() {
                     <Button 
                       size="lg"
                       variant="outline" 
-                      className="rounded-full border-gray-200 text-gray-700 hover:bg-gray-50 font-semibold px-8 h-14 bg-white/80 backdrop-blur-sm w-full sm:w-auto text-base cursor-pointer transition-all"
+                      className="rounded-full border-gray-200 text-gray-500 hover:bg-gray-50 font-semibold px-8 h-14 bg-white/50 backdrop-blur-sm w-full sm:w-auto text-base cursor-pointer transition-all"
                     >
                       View Partnership Structure
                     </Button>
                   </a>
                 </div>
                 
-                {/* Optional Badge */}
-                <div className="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200/60 bg-white/40 backdrop-blur-sm">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em]">First-Position JV Structure</span>
+                {/* First-Position Badge */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5">
+                  <span className="text-[10px] font-bold text-primary/60 uppercase tracking-[0.15em]">First-Position JV Structure</span>
                 </div>
               </div>
             </div>
@@ -218,11 +218,11 @@ export default function Home() {
                 </div>
               ) : heroStackProperties.length > 0 ? (
                 <div className="relative w-full h-full">
-                  {/* Card 2 - Middle */}
+                  {/* Card 2 - Middle (Back) */}
                   {heroStackProperties[1] && (
                     <div 
                       className={`absolute right-8 top-24 w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100/50 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer ${
-                        hoveredCard === 1 ? 'z-50 scale-[1.02] opacity-100 rotate-0 translate-x-[-10px] translate-y-[-10px]' : 'z-20 rotate-3 opacity-60 translate-x-2 translate-y-4'
+                        hoveredCard === 1 ? 'z-50 scale-[1.02] opacity-100 rotate-0 translate-x-[-10px] translate-y-[-10px]' : 'z-20 rotate-3 opacity-40 translate-x-2 translate-y-4'
                       }`}
                       onMouseEnter={() => setHoveredCard(1)}
                       onMouseLeave={() => setHoveredCard(null)}
