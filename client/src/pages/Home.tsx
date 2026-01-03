@@ -81,12 +81,12 @@ export default function Home() {
               </h1>
 
               {/* TIER 2: THE TRUST STRIP */}
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-10">
-                <div className="inline-flex items-center px-4 py-2.5 bg-white/50 backdrop-blur-sm border border-gray-200/40 rounded-lg max-w-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)]">
-                  <p className="text-[11px] sm:text-sm text-gray-500 font-medium leading-relaxed flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span>10+ years verified foreclosure & REO exits nationwide</span>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-12">
+                <div className="inline-flex items-center px-6 py-2.5 bg-white/50 backdrop-blur-sm border border-primary/10 rounded-lg max-w-xl shadow-[0_2px_12px_-3px_rgba(0,0,0,0.05)]">
+                  <p className="text-[10px] sm:text-[13px] text-gray-500 font-semibold leading-relaxed flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <span className="flex items-center gap-1.5"><TrendingUp className="h-3 w-3 text-primary/40" /> 10+ years verified foreclosure & REO exits nationwide</span>
                     <span className="text-gray-300 hidden sm:inline">·</span>
-                    <span>Deal-by-deal joint ventures</span>
+                    <span className="flex items-center gap-1.5"><Zap className="h-3 w-3 text-primary/40" /> Deal-by-deal joint ventures</span>
                     <span className="text-gray-300 hidden sm:inline">·</span>
                     <span>No fees</span>
                     <span className="text-gray-300 hidden sm:inline">·</span>
@@ -96,16 +96,16 @@ export default function Home() {
               </div>
 
               {/* TIER 3: THE METRICS BAR */}
-              <div className="flex flex-wrap items-center gap-x-10 gap-y-6 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+              <div className="flex flex-wrap items-center gap-x-12 gap-y-6 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
                 {[
-                  { label: 'Deals Closed', value: dealsClosed },
-                  { label: 'Avg Hold', value: `${averageHoldPeriod}d` },
-                  { label: 'Total Equity', value: formatMoney(totalEquity) },
-                  { label: 'Active Investors', value: '250+' },
+                  { label: 'Deals Closed', value: dealsClosed, important: true },
+                  { label: 'Avg Hold', value: `${averageHoldPeriod}d`, important: true },
+                  { label: 'Total Equity', value: formatMoney(totalEquity), important: true },
+                  { label: 'Active Investors', value: '250+', important: false },
                 ].map((stat, i) => (
-                  <div key={i} className="flex flex-col border-l border-gray-200 pl-5 first:border-l-0 first:pl-0">
-                    <span className="text-2xl font-bold text-gray-800 tracking-tight tabular-nums leading-none">{stat.value}</span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.12em] mt-2.5 leading-none">{stat.label}</span>
+                  <div key={i} className="flex flex-col border-l border-gray-200 pl-6 first:border-l-0 first:pl-0">
+                    <span className={`text-2xl font-bold tracking-tight tabular-nums leading-none ${stat.important ? 'text-gray-800' : 'text-gray-400 font-semibold'}`}>{stat.value}</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-[0.12em] mt-3 leading-none ${stat.important ? 'text-gray-400' : 'text-gray-300'}`}>{stat.label}</span>
                   </div>
                 ))}
               </div>
@@ -166,7 +166,7 @@ export default function Home() {
                   
                   {/* Card 2 - Middle */}
                   {heroStackProperties[1] && (
-                    <div className="absolute left-3 top-5 w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform rotate-3 opacity-60 z-20">
+                    <div className="absolute left-3 top-5 w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform rotate-2 opacity-80 z-20 transition-all duration-500">
                       <div className="aspect-[16/10] bg-gray-100 relative">
                         {getPropertyImage(heroStackProperties[1]) && (
                           <img 
@@ -182,13 +182,13 @@ export default function Home() {
                   
                   {/* Card 1 - Front */}
                   <a href={`/property/${heroStackProperties[0]?.id}`} className="block relative z-30">
-                    <div className="absolute left-0 top-0 w-[280px] bg-white rounded-2xl shadow-[0_30px_50px_-15px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden">
-                      <div className="aspect-[16/10] bg-gray-100 relative">
+                    <div className="absolute left-0 top-0 w-[280px] bg-white rounded-2xl shadow-[0_30px_50px_-15px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden group">
+                      <div className="aspect-[16/10] bg-gray-100 relative overflow-hidden">
                         {getPropertyImage(heroStackProperties[0]) && (
                           <img 
                             src={getPropertyImage(heroStackProperties[0])}
                             alt={heroStackProperties[0].address}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
@@ -218,40 +218,11 @@ export default function Home() {
                 </div>
               ) : heroStackProperties.length > 0 ? (
                 <div className="relative w-full h-full">
-                  {/* Card 3 - Back */}
-                  {heroStackProperties[2] && (
-                    <div 
-                      className={`absolute right-16 top-48 w-[420px] bg-white rounded-2xl shadow-xl border border-gray-100/50 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer ${
-                        hoveredCard === 2 ? 'z-50 scale-[1.02] opacity-100 rotate-0 translate-x-[-10px] translate-y-[-10px]' : 'z-10 -rotate-6 opacity-40 translate-x-4 translate-y-8'
-                      }`}
-                      onMouseEnter={() => setHoveredCard(2)}
-                      onMouseLeave={() => setHoveredCard(null)}
-                    >
-                      <div className="aspect-[4/3] bg-gray-100 relative">
-                        {getPropertyImage(heroStackProperties[2]) && (
-                          <img 
-                            src={getPropertyImage(heroStackProperties[2])}
-                            alt={heroStackProperties[2].address}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        )}
-                        <div className="absolute top-4 left-4 bg-primary/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-bold tracking-wider">
-                          ${(heroStackProperties[2]?.purchasePrice / 1000).toFixed(0)}k
-                        </div>
-                      </div>
-                      <div className="p-5">
-                        <h3 className="font-bold text-gray-900 mb-1">{heroStackProperties[2]?.address}</h3>
-                        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{heroStackProperties[2]?.city}, {heroStackProperties[2]?.state}</p>
-                      </div>
-                    </div>
-                  )}
-
                   {/* Card 2 - Middle */}
                   {heroStackProperties[1] && (
                     <div 
                       className={`absolute right-8 top-24 w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100/50 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer ${
-                        hoveredCard === 1 ? 'z-50 scale-[1.02] opacity-100 rotate-0 translate-x-[-10px] translate-y-[-10px]' : 'z-20 rotate-3 opacity-75 translate-x-2 translate-y-4'
+                        hoveredCard === 1 ? 'z-50 scale-[1.02] opacity-100 rotate-0 translate-x-[-10px] translate-y-[-10px]' : 'z-20 rotate-3 opacity-60 translate-x-2 translate-y-4'
                       }`}
                       onMouseEnter={() => setHoveredCard(1)}
                       onMouseLeave={() => setHoveredCard(null)}
@@ -279,18 +250,18 @@ export default function Home() {
                   {/* Card 1 - Front */}
                   <a href={`/property/${heroStackProperties[0]?.id}`} className="block relative z-30">
                     <div 
-                      className={`absolute right-0 top-0 w-[420px] bg-white rounded-2xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer ${
+                      className={`absolute right-0 top-0 w-[420px] bg-white rounded-2xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer group ${
                         hoveredCard === 0 ? 'z-50 scale-[1.02]' : hoveredCard !== null ? 'z-30 opacity-90' : 'z-30'
                       }`}
                       onMouseEnter={() => setHoveredCard(0)}
                       onMouseLeave={() => setHoveredCard(null)}
                     >
-                      <div className="aspect-[4/3] bg-gray-100 relative">
+                      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
                         {getPropertyImage(heroStackProperties[0]) && (
                           <img 
                             src={getPropertyImage(heroStackProperties[0])}
                             alt={heroStackProperties[0].address}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
