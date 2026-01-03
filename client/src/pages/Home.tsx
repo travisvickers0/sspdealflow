@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, TrendingUp, Zap } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
