@@ -21,14 +21,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <span className="xs:hidden">SSP</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/properties" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/properties" ? "text-foreground" : "text-muted-foreground"}`}>
+              <Link href="/properties" className={`text-sm font-bold transition-colors hover:text-primary ${location === "/properties" ? "text-black" : "text-black"}`}>
                 Marketplace
               </Link>
-              <Link href="/how-it-works" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/how-it-works" ? "text-foreground" : "text-muted-foreground"}`}>
+              <Link href="/how-it-works" className={`text-sm font-bold transition-colors hover:text-primary ${location === "/how-it-works" ? "text-black" : "text-black"}`}>
                 How It Works
               </Link>
               {isAdmin && (
-                <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"}`}>
+                <Link href="/admin" className={`text-sm font-bold transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-black" : "text-black"}`}>
                   Admin
                 </Link>
               )}
@@ -86,14 +86,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <Link 
                 href="/properties" 
                 onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/properties" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
+                className={`text-sm font-bold py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/properties" ? "bg-primary/10 text-primary" : "text-black hover:bg-muted"}`}
               >
                 Marketplace
               </Link>
               <Link 
                 href="/how-it-works" 
                 onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/how-it-works" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
+                className={`text-sm font-bold py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/how-it-works" ? "bg-primary/10 text-primary" : "text-black hover:bg-muted"}`}
               >
                 How It Works
               </Link>
@@ -101,7 +101,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link 
                   href="/admin" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
+                  className={`text-sm font-bold py-3 px-4 rounded-lg transition-colors active:scale-98 ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-black hover:bg-muted"}`}
                 >
                   Admin
                 </Link>
