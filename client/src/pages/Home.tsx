@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
-import { ArrowRight, Loader2, TrendingUp, Zap } from "lucide-react";
+import { ArrowRight, Check, Loader2, ShieldCheck, TrendingUp, Zap } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -49,69 +49,72 @@ export default function Home() {
   return (
     <Layout>
       {/* High-End Minimalist Hero Section */}
-      <div className="relative min-h-[95vh] lg:min-h-[90vh] w-full overflow-hidden bg-[#faf9f6] border-b border-gray-100">
-        {/* Subtle Background Texture */}
-        <div className="absolute inset-0 opacity-[0.08] mix-blend-multiply pointer-events-none">
-          <img 
-            src={airbnbHero}
-            alt="background"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        {/* Refined Animated Accents */}
-        <div className="hidden sm:block absolute top-[-10%] right-[-5%] w-[40%] h-[60%] bg-primary/5 rounded-full filter blur-[120px] animate-pulse pointer-events-none" />
-        <div className="hidden sm:block absolute bottom-[-10%] left-[-5%] w-[30%] h-[50%] bg-orange-200/10 rounded-full filter blur-[100px] animate-pulse delay-1000 pointer-events-none" />
+      <div className="relative min-h-[95vh] lg:min-h-[90vh] w-full overflow-hidden bg-white border-b border-gray-100">
+        {/* Subtle Blurred Orb - Top Left Background */}
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#FFE4E6] opacity-50 rounded-full filter blur-[120px] pointer-events-none" />
         
         {/* Content */}
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full py-12 sm:py-16 lg:py-20 flex items-center">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full py-8 sm:py-12 lg:py-12 flex items-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 w-full items-center">
             {/* Left Side - Positioning & Proof */}
             <div className="max-w-2xl">
               {/* TIER 0: SUBTLE ANNOUNCEMENT */}
-              <div className="inline-flex items-center gap-2 mb-8 px-3 py-1.5 bg-white/40 backdrop-blur-sm border border-gray-200/30 rounded-full animate-in fade-in slide-in-from-top duration-700">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-pulse" />
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em]">Accredited Investors Only</span>
+              <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 bg-red-50 border border-red-200/50 rounded-full animate-in fade-in slide-in-from-top duration-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                <span className="text-xs font-bold text-red-600 uppercase tracking-[0.15em]">Accredited Investors Only</span>
               </div>
 
               {/* TIER 1: THE POSITIONING STATEMENT */}
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-[1.05]">
-                Real Estate Opportunities<br className="hidden sm:block" />
-                <span className="text-primary/90"> Built for Investors</span>
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+                <span className="text-gray-900">Real Estate Opportunities</span><br className="hidden sm:block" />
+                <span className="text-primary"> Built for Investors</span>
               </h1>
 
-              {/* TIER 2: THE TRUST STRIP */}
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 mb-12">
-                <div className="inline-flex items-center px-6 py-2.5 bg-gray-100/50 backdrop-blur-sm border border-gray-200/50 rounded-full max-w-xl">
-                  <p className="text-[10px] sm:text-[13px] text-gray-500 font-medium leading-relaxed flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span>10+ years verified foreclosure & REO exits nationwide</span>
-                    <span className="text-gray-300">·</span>
-                    <span>Deal-by-deal joint ventures</span>
-                    <span className="text-gray-300">·</span>
-                    <span>No fees</span>
-                    <span className="text-gray-300">·</span>
-                    <span>50/50 profit split at sale</span>
+              {/* TIER 2: FEATURE GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 mt-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
+                  <p className="text-base text-slate-700 font-medium">
+                    <span className="font-bold">10+ Years</span> Verified Exits
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
+                  <p className="text-base text-slate-700 font-medium">
+                    <span className="font-bold">Deal-by-Deal</span> Joint Ventures
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
+                  <p className="text-base text-slate-700 font-medium">
+                    <span className="font-bold">No Fees</span> (100% Transparent)
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
+                  <p className="text-base text-slate-700 font-medium">
+                    <span className="font-bold">50/50</span> Profit Split at Sale
                   </p>
                 </div>
               </div>
 
               {/* TIER 3: THE METRICS BAR */}
-              <div className="flex flex-wrap items-center gap-x-12 gap-y-6 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+              <div className="flex flex-wrap items-center gap-x-12 gap-y-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 ml-0">
                 {[
-                  { label: 'Deals Closed', value: dealsClosed, important: true },
-                  { label: 'Avg Hold', value: `${averageHoldPeriod}d`, important: true },
-                  { label: 'Total Equity', value: formatMoney(totalEquity), important: true },
-                  { label: 'Active Investors', value: '250+', important: false },
+                  { label: 'Deals Closed', value: dealsClosed },
+                  { label: 'Avg Hold', value: `${averageHoldPeriod}d` },
+                  { label: 'Total Equity', value: formatMoney(totalEquity) },
+                  { label: 'Active Investors', value: '250+' },
                 ].map((stat, i) => (
                   <div key={i} className="flex flex-col border-l border-gray-200 pl-6 first:border-l-0 first:pl-0">
-                    <span className={`text-xl font-bold tracking-tight tabular-nums leading-none ${stat.important ? 'text-gray-800' : 'text-gray-500 font-semibold'}`}>{stat.value}</span>
-                    <span className={`text-[10px] font-bold uppercase tracking-[0.12em] mt-3 leading-none ${stat.important ? 'text-gray-400' : 'text-gray-300'}`}>{stat.label}</span>
+                    <span className="text-xl font-bold tracking-tight tabular-nums leading-none text-gray-800">{stat.value}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] mt-3 leading-none text-gray-400">{stat.label}</span>
                   </div>
                 ))}
               </div>
 
               {/* TIER 4: ACTION ZONE */}
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                   <a href="/properties" className="w-full sm:w-auto">
                     <Button 
@@ -126,16 +129,19 @@ export default function Home() {
                     <Button 
                       size="lg"
                       variant="outline" 
-                      className="rounded-full border-gray-200 text-gray-500 hover:bg-gray-50 font-semibold px-8 h-14 bg-white/50 backdrop-blur-sm w-full sm:w-auto text-base cursor-pointer transition-all"
+                      className="rounded-full border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-8 h-14 bg-white w-full sm:w-auto text-base cursor-pointer transition-all"
                     >
                       View Partnership Structure
                     </Button>
                   </a>
                 </div>
                 
-                {/* First-Position Badge */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5">
-                  <span className="text-[10px] font-bold text-primary/60 uppercase tracking-[0.15em]">First-Position JV Structure</span>
+                {/* Trust Indicator */}
+                <div className="flex items-center gap-2 mt-4">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                  <p className="text-sm font-medium text-gray-500">
+                    Secured by First-Position Lien Structure
+                  </p>
                 </div>
               </div>
             </div>
@@ -150,7 +156,7 @@ export default function Home() {
                 <div className="relative h-[320px] mx-auto max-w-[320px]">
                   {/* Card 3 - Back */}
                   {heroStackProperties[2] && (
-                    <div className="absolute left-6 top-10 w-[280px] bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transform -rotate-6 opacity-30 z-10">
+                    <div className="absolute left-6 top-10 w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform -rotate-6 opacity-30 z-10">
                       <div className="aspect-[16/10] bg-gray-100 relative">
                         {getPropertyImage(heroStackProperties[2]) && (
                           <img 
@@ -182,7 +188,7 @@ export default function Home() {
                   
                   {/* Card 1 - Front */}
                   <a href={`/property/${heroStackProperties[0]?.id}`} className="block relative z-30">
-                    <div className="absolute left-0 top-0 w-[280px] bg-white rounded-2xl shadow-[0_30px_50px_-15px_rgba(0,0,0,0.2)] border border-gray-100 overflow-hidden group">
+                    <div className="absolute left-0 top-0 w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden group">
                       <div className="aspect-[16/10] bg-gray-100 relative overflow-hidden">
                         {getPropertyImage(heroStackProperties[0]) && (
                           <img 
@@ -211,17 +217,17 @@ export default function Home() {
             </div>
 
             {/* Desktop Stacked Property Cards */}
-            <div className="hidden lg:block relative h-[600px]">
+            <div className="hidden lg:flex relative h-full items-center justify-end">
               {isLoading ? (
-                <div className="flex items-center justify-center h-full">
+                <div className="flex items-center justify-center h-full w-full">
                   <Loader2 className="h-8 w-8 animate-spin text-primary/30" />
                 </div>
               ) : heroStackProperties.length > 0 ? (
-                <div className="relative w-full h-full">
+                <div className="relative w-[420px] h-[500px]">
                   {/* Card 2 - Middle (Back) */}
                   {heroStackProperties[1] && (
                     <div 
-                      className={`absolute right-8 top-24 w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100/50 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer ${
+                      className={`absolute right-8 top-12 w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer ${
                         hoveredCard === 1 ? 'z-50 scale-[1.02] opacity-100 rotate-0 translate-x-[-10px] translate-y-[-10px]' : 'z-20 rotate-3 opacity-40 translate-x-2 translate-y-4'
                       }`}
                       onMouseEnter={() => setHoveredCard(1)}
@@ -250,7 +256,7 @@ export default function Home() {
                   {/* Card 1 - Front */}
                   <a href={`/property/${heroStackProperties[0]?.id}`} className="block relative z-30">
                     <div 
-                      className={`absolute right-0 top-0 w-[420px] bg-white rounded-2xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.15)] border border-gray-100/80 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer group ${
+                      className={`absolute right-0 top-0 w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer group ${
                         hoveredCard === 0 ? 'z-50 scale-[1.02]' : hoveredCard !== null ? 'z-30 opacity-90' : 'z-30'
                       }`}
                       onMouseEnter={() => setHoveredCard(0)}

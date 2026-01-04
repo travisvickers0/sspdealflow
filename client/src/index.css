@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
   --font-serif: 'Playfair Display', serif;
 
   --radius-sm: 0.5rem;
@@ -68,10 +68,8 @@
   --popover: 0 0% 100%;
   --popover-foreground: 240 10% 3.9%;
 
-  /* Primary - Dark elegant gray/black for primary actions, or the accent? 
-     Usually primary actions are the brand color. 
-     Let's make Primary the Brand Color (Warm Red/Orange) */
-  --primary: 350 75% 55%; /* Airbnb-ish Red/Pink */
+  /* Primary - Premium deep red for fintech/real estate brand */
+  --primary: 347 77% 50%; /* #E11D48 - Premium deep red */
   --primary-foreground: 0 0% 98%;
 
   /* Secondary - Soft grays for secondary buttons */
@@ -91,12 +89,12 @@
 
   --border: 240 5.9% 90%;
   --input: 240 5.9% 90%;
-  --ring: 350 75% 55%; /* Ring matches primary */
+  --ring: 347 77% 50%; /* Ring matches primary */
 
   --radius: 1rem;
 
   /* Chart colors */
-  --chart-1: 350 75% 55%;
+  --chart-1: 347 77% 50%;
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
@@ -124,7 +122,7 @@
   --popover: 240 10% 3.9%;
   --popover-foreground: 0 0% 98%;
 
-  --primary: 350 75% 55%;
+  --primary: 347 77% 50%;
   --primary-foreground: 0 0% 98%;
 
   --secondary: 240 3.7% 15.9%;
@@ -141,9 +139,9 @@
 
   --border: 240 3.7% 15.9%;
   --input: 240 3.7% 15.9%;
-  --ring: 350 75% 55%;
+  --ring: 347 77% 50%;
 
-  --chart-1: 350 75% 55%;
+  --chart-1: 347 77% 50%;
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
