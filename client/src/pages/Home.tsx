@@ -298,8 +298,8 @@ export default function Home() {
                           onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
                       )}
-                      <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                        ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                      <div className="absolute top-4 left-4 bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                        ${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity
                       </div>
                     </div>
                     <div className="p-5">
