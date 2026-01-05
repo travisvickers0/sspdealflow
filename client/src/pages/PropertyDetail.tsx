@@ -382,6 +382,37 @@ export default function PropertyDetail() {
                 </CardContent>
               </Card>
 
+              {/* Why First-Position Matters Section */}
+              {!isSold && (
+                <Card className="border-0 shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="text-xl">Why First-Position Matters</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gray-900">Capital Protection</h3>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          Your capital is secured in first position via joint venture agreement. SSP capital is subordinated.
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gray-900">Title Company Control</h3>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          All funds flow through licensed title company. No direct transfers to SSP operating accounts.
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gray-900">Clear Structure</h3>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          50/50 profit split. No fees. No preferred returns. Simple, transparent.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Risk Considerations Section */}
               {!isSold && (
                 <Card className="border-0 shadow-sm">

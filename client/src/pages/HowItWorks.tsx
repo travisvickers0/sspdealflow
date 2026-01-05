@@ -629,32 +629,36 @@ function RecentlyFundedSection() {
 function FAQSection() {
   const faqs = [
     {
-      question: "Who holds title to the property?",
-      answer: "Title to the property is held by SSP through the joint venture entity created for each deal. The property is purchased and held in the name of the joint venture, with investor capital deployed through a licensed title company at closing. Title transfers to the buyer upon sale and exit."
+      question: "Is this a fund or pooled capital?",
+      answer: "No. SSP structures deal-by-deal joint ventures. Each property is a separate partnership. Your capital funds one specific property, not a pool. This is not a fund, syndication, or pooled investment vehicle."
     },
     {
-      question: "What happens if a property takes longer to sell?",
-      answer: "While most deals target a 60-120 day hold period, market conditions can sometimes extend the timeline. SSP covers all holding costs (taxes, insurance, utilities) during extended periods. Your capital remains secured by the real estate asset, and profits are distributed once the property sells, regardless of timeline."
+      question: "What if the property doesn't sell?",
+      answer: "Standard market risk applies. Properties are held until sale. SSP covers holding costs during extended periods. We use conservative ARV estimates and light rehab scope to minimize hold time, but market conditions can vary. Your capital remains secured by the real estate asset."
     },
     {
-      question: "How are profits distributed at closing?",
-      answer: "At closing, proceeds flow through the title company. Your original capital is returned first, followed by your 50% share of the net profits. Distribution occurs automatically at the sale closing, typically via wire transfer within standard closing procedures."
+      question: "How is my capital protected?",
+      answer: "Your capital is secured in first position via joint venture agreement. All funds flow through a licensed title company at closing. SSP capital is subordinated. Title company holds funds in escrow. No direct transfers to SSP operating accounts."
     },
     {
-      question: "Who can invest with SSP?",
-      answer: "SSP opportunities are available to accredited investors as defined by SEC regulations. This typically includes individuals with a net worth exceeding $1 million (excluding primary residence) or annual income exceeding $200,000 ($300,000 with spouse) for the past two years."
+      question: "What are the fees?",
+      answer: "No fees. 50/50 profit split only. Your capital goes to purchase. SSP advances rehab and holding costs. We split profit at sale. No management fees, no preferred returns, no hidden costs."
     },
     {
-      question: "How long is my capital typically deployed?",
-      answer: "Most deals have a target hold period of 60 to 120 days, from acquisition through sale. This short-term deployment allows for multiple investment cycles per year and provides more liquidity compared to traditional real estate investments."
+      question: "What if SSP goes out of business?",
+      answer: "Title company holds funds in escrow. Your capital is secured by the real estate asset and first-position lien structure. Joint venture agreements are independent legal entities. Property ownership and capital protection remain intact regardless of SSP's operational status."
     },
     {
-      question: "How do I track my deals?",
-      answer: "All investors have access to the SSP Deal Flow dashboard where you can monitor your active investments, view property updates, track renovation progress, and see detailed financial breakdowns for each deal."
+      question: "How long until I see returns?",
+      answer: "Typical hold period is 3-6 months from purchase to sale. This includes 4-8 weeks for renovation and 30-60 days for listing and sale. Timeline varies by market conditions and property specifics. Returns are distributed at sale closing."
     },
     {
-      question: "What happens if a deal doesn't perform as expected?",
-      answer: "SSP structures deals with built-in protections. Your capital is returned first before any profit splits. In slower deals, our minimum return guarantee ensures you still receive a baseline return on your investment."
+      question: "Can I invest in multiple deals?",
+      answer: "Yes. Each deal is independent. You can invest in one property or multiple properties. Each partnership is separate with its own capital deployment, timeline, and profit distribution."
+    },
+    {
+      question: "What's the minimum investment?",
+      answer: "Full purchase price per property. Typical range is $175k-$220k per deal. You fund the entire purchase price. SSP advances rehab and holding costs. There is no partial investment or fractional ownership per property."
     }
   ];
 

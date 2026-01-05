@@ -163,8 +163,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="border-t pt-6">
-            <p className="text-xs text-muted-foreground text-center max-w-4xl mx-auto">
+            <p className="text-xs text-muted-foreground text-center max-w-4xl mx-auto mb-3">
               SSP Deal Flow facilitates private, deal-by-deal joint venture partnerships. This is not a fund, syndication, or pooled investment vehicle.
+            </p>
+            <p className="text-xs text-muted-foreground text-center max-w-4xl mx-auto">
+              Securities offered through [broker-dealer if applicable]. Not a solicitation. Accredited investors only. Past performance does not guarantee future results. Investments involve risk of loss.
             </p>
           </div>
         </div>

@@ -12,6 +12,8 @@ import HowItWorks from "@/pages/HowItWorks";
 import PropertyDetail from "@/pages/PropertyDetail";
 import Invest from "@/pages/Invest";
 import Admin from "@/pages/Admin";
+import MetaLanding from "@/pages/MetaLanding";
+import Qualify from "@/pages/Qualify";
 import { useAuth } from "@/hooks/useAuth";
 
 function AdminRoute() {
@@ -42,6 +44,8 @@ function Router() {
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/property/:slug" component={PropertyDetail} />
       <Route path="/invest/:propertyId" component={Invest} />
+      <Route path="/investor-intro" component={MetaLanding} />
+      <Route path="/qualify" component={Qualify} />
       <Route path="/admin" component={AdminRoute} />
       <Route component={NotFound} />
     </Switch>
