@@ -2,11 +2,12 @@ import { Layout } from "@/components/Layout";
 import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, Redirect } from "wouter";
 import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images, Check, Download, Shield, ArrowDown, Building2, Wallet, Lock, CheckCircle2, Landmark, Home, Coins, ArrowUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
@@ -18,6 +19,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading, error } = useProperty(params?.slug);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -43,7 +45,12 @@ export default function PropertyDetail() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [allImages.length]);
 
-  if (isLoading) {
+  // Require authentication to view property details
+  if (!authLoading && !isAuthenticated) {
+    return <Redirect to="/signin" />;
+  }
+
+  if (isLoading || authLoading) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[60vh]">

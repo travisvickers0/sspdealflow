@@ -2,9 +2,24 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Calendar, Mail } from "lucide-react";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
+
+// Declare fbq for TypeScript
+declare global {
+  interface Window {
+    fbq: (action: string, event: string, params?: any) => void;
+  }
+}
 
 export default function ThankYou() {
   const [, setLocation] = useLocation();
+
+  // Track Schedule event when page loads (after Calendly booking)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'Schedule');
+    }
+  }, []);
 
   return (
     <Layout>

@@ -1,5 +1,6 @@
 import type { Property } from "@shared/schema";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PropertyCardProps {
   property: Property;
@@ -52,8 +53,18 @@ export function PropertyCard({ property }: PropertyCardProps) {
     ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : 'TBD';
 
+  const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setLocation('/signin');
+    }
+  };
+
   return (
-    <Link href={`/property/${property.slug}`}>
+    <Link href={isAuthenticated ? `/property/${property.slug}` : '/signin'} onClick={handleClick}>
       <div 
         className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col w-full font-sans border border-gray-100 cursor-pointer h-full"
         data-testid={`card-property-${property.id}`}

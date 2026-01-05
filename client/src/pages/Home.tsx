@@ -1,14 +1,17 @@
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
+import { useAuth } from "@/hooks/useAuth";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
 import { ArrowRight, CheckCircle, TrendingUp, ShieldCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
   const { data: properties, isLoading } = useProperties();
+  const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   
   // Filter for properties that need funding
@@ -198,8 +201,16 @@ export default function Home() {
                   )}
                   
                   {/* Card 1 - Front */}
-                  <a href={`/property/${heroStackProperties[0]?.id}`} className="block">
-                    <div className="absolute left-0 top-0 w-[320px] bg-white rounded-xl shadow-2xl overflow-hidden z-30">
+                  <div 
+                    onClick={() => {
+                      if (isAuthenticated) {
+                        setLocation(`/property/${heroStackProperties[0]?.slug || heroStackProperties[0]?.id}`);
+                      } else {
+                        setLocation('/signin');
+                      }
+                    }}
+                    className="absolute left-0 top-0 w-[320px] bg-white rounded-xl shadow-2xl overflow-hidden z-30 cursor-pointer"
+                  >
                       <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
                         {getPropertyImage(heroStackProperties[0]) && (
                           <img 
@@ -222,7 +233,7 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                  </a>
+                  </div>
                 </div>
               ) : null}
             </div>
@@ -243,6 +254,13 @@ export default function Home() {
                       }`}
                       onMouseEnter={() => setHoveredCard(2)}
                       onMouseLeave={() => setHoveredCard(null)}
+                      onClick={() => {
+                        if (isAuthenticated) {
+                          setLocation(`/property/${heroStackProperties[2]?.slug || heroStackProperties[2]?.id}`);
+                        } else {
+                          setLocation('/signin');
+                        }
+                      }}
                     >
                       <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
                         {getPropertyImage(heroStackProperties[2]) && (
@@ -279,6 +297,13 @@ export default function Home() {
                       }`}
                       onMouseEnter={() => setHoveredCard(1)}
                       onMouseLeave={() => setHoveredCard(null)}
+                      onClick={() => {
+                        if (isAuthenticated) {
+                          setLocation(`/property/${heroStackProperties[1]?.slug || heroStackProperties[1]?.id}`);
+                        } else {
+                          setLocation('/signin');
+                        }
+                      }}
                     >
                       <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
                         {getPropertyImage(heroStackProperties[1]) && (
@@ -314,6 +339,13 @@ export default function Home() {
                     }`}
                     onMouseEnter={() => setHoveredCard(0)}
                     onMouseLeave={() => setHoveredCard(null)}
+                    onClick={() => {
+                      if (isAuthenticated) {
+                        setLocation(`/property/${heroStackProperties[0]?.slug || heroStackProperties[0]?.id}`);
+                      } else {
+                        setLocation('/signin');
+                      }
+                    }}
                   >
                     <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 relative">
                       {getPropertyImage(heroStackProperties[0]) && (

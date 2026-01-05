@@ -1,12 +1,20 @@
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { useEffect } from "react";
 import { 
   ArrowRight, 
   Shield,
   TrendingUp,
   Home
 } from "lucide-react";
+
+// Declare fbq for TypeScript
+declare global {
+  interface Window {
+    fbq: (action: string, event: string, params?: any) => void;
+  }
+}
 
 function HeaderSection() {
   return (
@@ -163,6 +171,13 @@ function CTASection() {
 }
 
 export default function MetaLanding() {
+  // Track ViewContent event when page loads
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'ViewContent');
+    }
+  }, []);
+
   return (
     <Layout>
       <main>
