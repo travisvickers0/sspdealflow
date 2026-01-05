@@ -23,30 +23,39 @@ import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm
 
 function HeroSection() {
   return (
-    <section className="bg-[#faf9f7] py-14 lg:py-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">
+    <section className="relative bg-[#faf9f7] py-20 lg:py-28 overflow-hidden">
+      {/* Subtle background image/texture */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <img 
+          src={airbnbHero} 
+          alt="background texture" 
+          className="w-full h-full object-cover grayscale"
+        />
+      </div>
+      
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl relative z-10">
         <div className="text-center">
-          <p className="text-sm font-medium text-slate-500 mb-4 uppercase tracking-wide">
+          <p className="text-sm font-bold text-primary mb-6 uppercase tracking-[0.2em]">
             Investor Partnership Model
           </p>
 
-          <h1 className="text-4xl font-bold tracking-tight mb-6 text-gray-900 leading-tight">
-            How SSP partners with investors
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 text-gray-900 leading-[1.1]">
+            Institutional-Grade Foreclosures <br className="hidden md:block" />
+            <span className="text-primary/90">for Private Investors</span>
           </h1>
 
-          <p className="text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
             Deal-by-deal, first-position joint venture partnerships on residential foreclosure and REO properties. No fees. No pooled capital. Profits split at&nbsp;sale.
           </p>
 
           <Link href="/properties">
             <Button 
               size="lg"
-              variant="outline"
-              className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-8 h-12 bg-white"
+              className="rounded-full bg-primary hover:bg-primary/90 text-white font-bold px-10 h-14 shadow-xl hover:shadow-2xl transition-all active:scale-95"
               data-testid="button-explore-properties"
             >
-              Explore properties
-              <ArrowRight className="ml-2 h-4 w-4" />
+              Explore live deals
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>
@@ -158,30 +167,122 @@ function ComparisonSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {comparisons.map((item, idx) => (
             <div 
               key={idx}
-              className={`bg-white rounded-2xl shadow-sm border p-6 relative ${
-                item.featured ? 'border-green-300 ring-2 ring-green-100' : 'border-slate-100'
+              className={`bg-white rounded-2xl p-8 relative transition-all duration-300 ${
+                item.featured 
+                  ? 'border-2 border-emerald-400 shadow-[0_20px_50px_-12px_rgba(16,185,129,0.15)] scale-105 z-10' 
+                  : 'border border-slate-100 shadow-sm opacity-90'
               }`}
               data-testid={`card-comparison-${idx}`}
             >
               {item.featured && (
-                <div className="absolute -top-3 left-6 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                  Featured
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-[11px] font-bold px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider">
+                  Best Value
                 </div>
               )}
-              <h3 className="text-xl font-semibold text-gray-900 mb-2 mt-2">{item.title}</h3>
-              <p className="text-sm text-gray-600 mb-4">{item.description}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2 mt-2">{item.title}</h3>
+              <p className="text-sm text-gray-600 mb-4 font-medium">{item.description}</p>
               <ul className="space-y-3">
                 {item.bullets.map((bullet, bIdx) => (
                   <li key={bIdx} className="flex items-start gap-2">
-                    <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${item.featured ? 'text-green-500' : 'text-gray-400'}`} />
-                    <span className="text-slate-600 text-sm">{bullet}</span>
+                    <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${item.featured ? 'text-green-600' : 'text-gray-400'}`} />
+                    <span className="text-slate-600 text-sm font-medium">{bullet}</span>
                   </li>
                 ))}
               </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RecentlyFundedSection() {
+  const fundedDeals = [
+    {
+      image: "/uploads/photos/1764873312461-952360767.webp",
+      address: "807 Redbud Dr",
+      city: "Paola",
+      state: "KS",
+      purchasePrice: 224999,
+      profit: 80001
+    },
+    {
+      image: "/uploads/photos/1764873336713-601806450.jpeg",
+      address: "15215 Westburn Loch Dr",
+      city: "Humble",
+      state: "TX",
+      purchasePrice: 262000,
+      profit: 113000
+    },
+    {
+      image: "/uploads/photos/1764873354390-350658599.webp",
+      address: "87 Banks Blvd",
+      city: "Byhalia",
+      state: "MS",
+      purchasePrice: 198000,
+      profit: 77000
+    },
+    {
+      image: "/uploads/photos/1764873385641-316395001.jpg",
+      address: "1314 E Brent Ct",
+      city: "Casa Grande",
+      state: "AZ",
+      purchasePrice: 212795,
+      profit: 85235
+    }
+  ];
+
+  return (
+    <section className="py-16 lg:py-24 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+            Recently funded deals
+          </h2>
+          <p className="text-gray-600 text-lg font-medium">
+            Real properties funded by our network of 250+ private JV partners.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {fundedDeals.map((deal, idx) => (
+            <div 
+              key={idx}
+              className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-all group"
+              data-testid={`card-funded-deal-${idx}`}
+            >
+              <div className="relative h-48 bg-gray-200 overflow-hidden">
+                <img 
+                  src={deal.image} 
+                  alt={deal.address}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/></svg>';
+                  }}
+                />
+                <div className="absolute top-0 right-0 overflow-hidden w-24 h-24">
+                  <div className="absolute top-4 right-[-32px] bg-primary text-white text-[10px] font-bold py-1 w-[120px] text-center transform rotate-45 shadow-lg uppercase tracking-widest">
+                    Funded
+                  </div>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-gray-900 text-sm">{deal.address}</h3>
+                <p className="text-xs text-gray-600 mb-3">{deal.city}, {deal.state}</p>
+                <div className="flex justify-between items-center border-t pt-3">
+                  <span className="text-xs font-semibold text-gray-500 tracking-wider uppercase">Purchase</span>
+                  <span className="text-sm font-bold text-gray-900">${(deal.purchasePrice / 1000).toFixed(0)}k</span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs font-semibold text-emerald-600 tracking-wider uppercase">Equity</span>
+                  <span className="text-sm font-extrabold text-emerald-600">+${(deal.profit / 1000).toFixed(0)}k</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -345,16 +446,16 @@ function TimelineSection() {
         </div>
 
         <div className="hidden md:block relative px-2">
-          <div className="absolute left-2 right-2 top-12 h-1 bg-gradient-to-r from-slate-200 via-primary to-slate-200" />
+          <div className="absolute left-2 right-2 top-12 h-1.5 bg-gradient-to-r from-slate-200 via-primary to-slate-200" />
           
           <div className="grid grid-cols-4 gap-4 relative z-10">
             {timeline.map((item, idx) => (
               <div key={idx} className="flex flex-col items-center" data-testid={`timeline-step-${idx}`}>
-                <div className="w-6 h-6 rounded-full bg-primary border-4 border-white shadow-md mb-8" />
-                <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 w-full h-full flex flex-col">
-                  <span className="text-xs font-semibold text-primary uppercase tracking-widest">{item.day}</span>
-                  <h3 className="text-sm font-semibold text-gray-900 mt-3 mb-3 leading-tight line-clamp-2">{item.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed flex-grow">{item.description}</p>
+                <div className="w-8 h-8 rounded-full bg-primary border-[6px] border-white shadow-lg mb-8 ring-1 ring-primary/20" />
+                <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 w-full h-full flex flex-col group hover:border-primary/30 transition-colors">
+                  <span className="text-xs font-bold text-primary uppercase tracking-[0.2em]">{item.day}</span>
+                  <h3 className="text-sm font-bold text-gray-900 mt-3 mb-3 leading-tight line-clamp-2">{item.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed flex-grow font-medium">{item.description}</p>
                 </div>
               </div>
             ))}
