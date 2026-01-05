@@ -1149,22 +1149,6 @@ export default function PropertyDetail() {
                       </p>
                     </div>
                   )}
-
-                  {/* Comps Map - Second placement for mobile ordering after status/calculator */}
-                  {(property.comps as any[])?.length > 0 && (
-                    <div className="space-y-6 lg:hidden mt-6">
-                      <h2 className="text-xl font-semibold text-gray-900">Location & Comps Map</h2>
-                      <div className="rounded-xl overflow-hidden h-80 shadow-sm border border-gray-200">
-                        <CompsMap
-                          subjectAddress={property.address}
-                          subjectCity={property.city}
-                          subjectState={property.state}
-                          subjectZip={property.zip}
-                          comps={property.comps as any[]}
-                        />
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
 

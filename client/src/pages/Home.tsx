@@ -201,42 +201,43 @@ export default function Home() {
                   )}
                   
                   {/* Card 1 - Front */}
-                  <div 
-                    onClick={() => {
-                      if (isAuthenticated) {
-                        setLocation(`/property/${heroStackProperties[0]?.slug || heroStackProperties[0]?.id}`);
-                      } else {
-                        setLocation('/signin');
-                      }
-                    }}
-                    className="absolute left-0 top-0 w-[320px] bg-white rounded-xl shadow-2xl overflow-hidden z-30 cursor-pointer"
-                  >
-                      <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                        {getPropertyImage(heroStackProperties[0]) && (
-                          <img 
-                            src={getPropertyImage(heroStackProperties[0])}
-                            alt={heroStackProperties[0].address}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        )}
-                        <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold">
-                          ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                  {heroStackProperties[0] && (
+                    <div 
+                      onClick={() => {
+                        if (isAuthenticated) {
+                          setLocation(`/property/${heroStackProperties[0]?.slug || heroStackProperties[0]?.id}`);
+                        } else {
+                          setLocation('/signin');
+                        }
+                      }}
+                      className="absolute left-0 top-0 w-[320px] bg-white rounded-xl shadow-2xl overflow-hidden z-30 cursor-pointer"
+                    >
+                        <div className="aspect-[16/10] bg-gradient-to-br from-gray-100 to-gray-200 relative">
+                          {getPropertyImage(heroStackProperties[0]) && (
+                            <img 
+                              src={getPropertyImage(heroStackProperties[0])}
+                              alt={heroStackProperties[0].address}
+                              className="w-full h-full object-cover"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          )}
+                          <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1.5 rounded-full text-xs font-semibold">
+                            ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                          </div>
+                        </div>
+                        <div className="p-5">
+                          <h3 className="font-semibold text-gray-900 mb-1 text-base">{heroStackProperties[0]?.address}</h3>
+                          <p className="text-sm text-gray-600 mb-3">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-emerald-600 font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                            <span className="text-gray-600">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="p-5">
-                        <h3 className="font-semibold text-gray-900 mb-1 text-base">{heroStackProperties[0]?.address}</h3>
-                        <p className="text-sm text-gray-600 mb-3">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-emerald-600 font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
-                          <span className="text-gray-600">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : null}
-            </div>
+                    )}
+                  </>
+                ) : null}
+              </div>
 
             {/* Desktop Stacked Property Cards */}
             <div className="hidden lg:block relative h-[600px]">
