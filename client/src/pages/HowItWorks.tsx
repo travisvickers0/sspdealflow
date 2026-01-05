@@ -24,7 +24,6 @@ import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm
 function HeroSection() {
   return (
     <section className="relative bg-[#faf9f7] py-20 lg:py-28 overflow-hidden">
-      {/* Subtle background image/texture */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
         <img 
           src={airbnbHero} 
@@ -200,7 +199,6 @@ function ComparisonSection() {
     </section>
   );
 }
-
 
 function InvestmentModelSection() {
   return (
@@ -393,6 +391,88 @@ function TimelineSection() {
   );
 }
 
+function RecentlyFundedSection() {
+  const fundedDeals = [
+    {
+      image: "/uploads/photos/1764873312461-952360767.webp",
+      address: "807 Redbud Dr",
+      city: "Paola",
+      state: "KS",
+      purchasePrice: 224999,
+      profit: 80001
+    },
+    {
+      image: "/uploads/photos/1764873336713-601806450.jpeg",
+      address: "15215 Westburn Loch Dr",
+      city: "Humble",
+      state: "TX",
+      purchasePrice: 262000,
+      profit: 113000
+    },
+    {
+      image: "/uploads/photos/1764873354390-350658599.webp",
+      address: "87 Banks Blvd",
+      city: "Byhalia",
+      state: "MS",
+      purchasePrice: 198000,
+      profit: 77000
+    },
+    {
+      image: "/uploads/photos/1764873385641-316395001.jpg",
+      address: "1314 E Brent Ct",
+      city: "Casa Grande",
+      state: "AZ",
+      purchasePrice: 212795,
+      profit: 85235
+    }
+  ];
+
+  return (
+    <section className="py-16 lg:py-24 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+            Recently funded deals
+          </h2>
+          <p className="text-gray-600 text-lg font-medium">
+            Real properties funded by our network of 250+ private JV partners.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {fundedDeals.map((deal, idx) => (
+            <div 
+              key={idx}
+              className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-all group"
+              data-testid={`card-funded-deal-${idx}`}
+            >
+              <div className="relative h-48 bg-gray-200 overflow-hidden">
+                <img 
+                  src={deal.image} 
+                  alt={deal.address}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/></svg>';
+                  }}
+                />
+                <div className="absolute top-0 right-0 overflow-hidden w-24 h-24">
+                  <div className="absolute top-4 right-[-32px] bg-primary text-white text-[10px] font-bold py-1 w-[120px] text-center transform rotate-45 shadow-lg uppercase tracking-widest">
+                    Funded
+                  </div>
+                </div>
+              </div>
+              <div className="p-5">
+                <h3 className="font-bold text-gray-900 text-sm">{deal.address}</h3>
+                <p className="text-xs text-gray-600 mb-3">{deal.city}, {deal.state}</p>
+                <div className="flex justify-between items-center border-t pt-3">
+                  <span className="text-xs font-semibold text-gray-500 tracking-wider uppercase">Purchase</span>
+                  <span className="text-sm font-bold text-gray-900">${(deal.purchasePrice / 1000).toFixed(0)}k</span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs font-semibold text-emerald-600 tracking-wider uppercase">Equity</span>
+                  <span className="text-sm font-extrabold text-emerald-600">+${(deal.profit / 1000).toFixed(0)}k</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
