@@ -91,22 +91,22 @@ export default function Home() {
             </div>
 
             {/* Stats Row */}
-            <div className="flex flex-wrap gap-6 sm:gap-8 p-5 sm:p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-fit mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-8 gap-y-6 sm:gap-8 p-5 sm:p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-full sm:w-fit mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               <div className="flex flex-col">
                 <span className="text-2xl font-extrabold text-gray-900">29</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Deals Closed</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Deals Closed</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-extrabold text-gray-900">94d</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Avg Hold</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Avg Hold</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-extrabold text-primary">{formatMoney(totalEquity)}</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Total Equity</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Total Equity</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-extrabold text-gray-900">250+</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Active Investors</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Active Investors</span>
               </div>
             </div>
 
