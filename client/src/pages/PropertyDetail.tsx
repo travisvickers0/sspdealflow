@@ -3,7 +3,7 @@ import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRoute, Link } from "wouter";
-import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images, Check, Download } from "lucide-react";
+import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images, Check, Download, Shield, ArrowDown, Building2, Wallet, Lock, CheckCircle2, Landmark, Home, Coins, ArrowUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
@@ -85,16 +85,51 @@ export default function PropertyDetail() {
   const totalEquity = isSold && property.totalProjectProfit !== null && property.totalProjectProfit !== undefined
     ? property.totalProjectProfit
     : property?.estimatedEquity || 0;
-  const investorProfitShare = isSold && property.investorProfit !== null && property.investorProfit !== undefined
-    ? property.investorProfit
-    : totalEquity * 0.5; // 50% of equity goes to investor
-  const sspProfitShare = isSold && property.sponsorProfit !== null && property.sponsorProfit !== undefined
-    ? property.sponsorProfit
-    : totalEquity * 0.5; // 50% of equity goes to SSP
-  const investorTotalReturn = (property?.purchasePrice || 0) + investorProfitShare;
-  const returnPercentage = isSold && property.realizedROI !== null && property.realizedROI !== undefined
-    ? property.realizedROI
-    : property?.purchasePrice > 0 ? (investorProfitShare / property.purchasePrice) * 100 : 0;
+  
+  const purchasePrice = property?.purchasePrice || 0;
+  
+  // For sold deals, use actual values
+  let investorProfitShare: number;
+  let sspProfitShare: number;
+  let returnPercentage: number;
+  let usesGuaranteedMinimum = false;
+  
+  if (isSold && property.investorProfit !== null && property.investorProfit !== undefined) {
+    // Use actual sold values
+    investorProfitShare = property.investorProfit;
+    sspProfitShare = property.sponsorProfit !== null && property.sponsorProfit !== undefined 
+      ? property.sponsorProfit 
+      : totalEquity - investorProfitShare;
+    returnPercentage = property.realizedROI !== null && property.realizedROI !== undefined
+      ? property.realizedROI
+      : purchasePrice > 0 ? (investorProfitShare / purchasePrice) * 100 : 0;
+  } else {
+    // Calculate for available/funded deals
+    // Step 1: Calculate 50/50 profit split
+    const profitSplit50_50 = totalEquity * 0.5;
+    
+    // Step 2: Calculate guaranteed minimum return (1% per month, minimum 8% total)
+    // Estimate hold period: use actual if available, otherwise estimate 3 months (typical 60-120 days)
+    const holdPeriodMonths = property?.holdPeriodMonths || 3;
+    const monthlyReturnPercent = 1; // 1% per month
+    const minimumTotalReturnPercent = 8; // Minimum 8% total
+    const calculatedMonthlyReturn = monthlyReturnPercent * holdPeriodMonths;
+    const guaranteedReturnPercent = Math.max(calculatedMonthlyReturn, minimumTotalReturnPercent);
+    const guaranteedMinimumProfit = (purchasePrice * guaranteedReturnPercent) / 100;
+    
+    // Step 3: Investor gets whichever is higher: 50/50 split OR guaranteed minimum
+    investorProfitShare = Math.max(profitSplit50_50, guaranteedMinimumProfit);
+    usesGuaranteedMinimum = profitSplit50_50 < guaranteedMinimumProfit;
+    
+    // Step 4: SSP profit is the remainder (may be negative if guaranteed minimum exceeds 50% split)
+    // SSP covers the shortfall per the agreement
+    sspProfitShare = Math.max(0, totalEquity - investorProfitShare);
+    
+    // Step 5: Calculate ROI
+    returnPercentage = purchasePrice > 0 ? (investorProfitShare / purchasePrice) * 100 : 0;
+  }
+  
+  const investorTotalReturn = purchasePrice + investorProfitShare;
 
   const handlePreviousImage = () => {
     setSelectedImage((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
@@ -336,6 +371,177 @@ export default function PropertyDetail() {
                 </CardContent>
               </Card>
 
+              {/* First-Position Structure Callout */}
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                      <Shield className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">First-Position Joint Venture Structure</h3>
+                      <div className="text-gray-700 leading-relaxed space-y-2 text-sm">
+                        <p>
+                          This opportunity is structured as a first-position joint venture.
+                        </p>
+                        <p>
+                          Investor capital funds the purchase price and is wired directly to the licensed title company or closing attorney at closing. Southern Specialty Properties LLC holds title and advances all renovation and holding costs.
+                        </p>
+                        <p>
+                          SSP is subordinated and earns only after investor capital is returned and profits are realized.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Capital Flow Summary */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-xl">Capital Flow Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Top: Investor Capital + SSP Capital (Funnel Top) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Investor Capital - Hero (Green) */}
+                      <div className="relative p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-300 shadow-md">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 p-2.5 bg-green-200 rounded-lg">
+                            <Landmark className="w-5 h-5 text-green-800" strokeWidth={1.5} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <p className="text-sm font-bold text-gray-900">Investor Capital</p>
+                              <div className="flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white rounded-full text-[10px] font-bold shadow-sm">
+                                <Lock className="w-3 h-3" />
+                                <span>1st Lien Position (Secured)</span>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-600">Purchase price funding</p>
+                          </div>
+                        </div>
+                        {/* Thick green gradient arrow pointing down and converging */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                          <div className="relative">
+                            <div className="w-2 h-10 bg-gradient-to-b from-green-500 via-green-400 to-amber-400 rounded-full"></div>
+                            {/* Arrowhead */}
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                              <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-amber-400"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* SSP Capital - Subordinated (Gray) */}
+                      <div className="relative p-4 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl border border-slate-300 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 p-2.5 bg-slate-200 rounded-lg">
+                            <DollarSign className="w-5 h-5 text-slate-700" strokeWidth={1.5} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <p className="text-sm font-semibold text-gray-900">SSP Capital</p>
+                              <span className="text-xs font-semibold px-2 py-1 bg-slate-300 text-slate-800 rounded-full">Subordinated</span>
+                            </div>
+                            <p className="text-xs text-gray-600">Renovation & holding costs</p>
+                          </div>
+                        </div>
+                        {/* Thick gray gradient arrow pointing down and converging */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                          <div className="relative">
+                            <div className="w-2 h-10 bg-gradient-to-b from-slate-500 via-slate-400 to-amber-400 rounded-full"></div>
+                            {/* Arrowhead */}
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                              <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-amber-400"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Middle: Title Company - Safety Valve (Gold/Shield) - Funnel Narrow Point */}
+                    <div className="relative -mt-2">
+                      <div className="flex justify-center">
+                        <div className="p-6 bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-50 rounded-2xl border-2 border-amber-400 shadow-xl max-w-sm mx-auto relative z-10">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="p-3.5 bg-gradient-to-br from-amber-200 to-amber-300 rounded-full shadow-md">
+                              <Shield className="w-7 h-7 text-amber-900" strokeWidth={2} />
+                            </div>
+                            <div className="text-center">
+                              <p className="text-lg font-bold text-gray-900 mb-1">Title Company</p>
+                              <p className="text-xs text-gray-600 font-medium">Licensed escrow & closing</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Thick gradient arrow down from Title Company with more spacing */}
+                      <div className="flex justify-center mt-8">
+                        <div className="relative">
+                          <div className="w-2 h-20 bg-gradient-to-b from-amber-500 via-amber-400 to-gray-400 rounded-full shadow-sm"></div>
+                          {/* Arrowhead */}
+                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                            <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-400"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Property Acquisition - Same width as Title Company */}
+                    <div className="flex justify-center">
+                      <div className="flex items-center justify-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-300 shadow-sm max-w-sm w-full">
+                        <Home className="w-5 h-5 text-gray-700" strokeWidth={1.5} />
+                        <span className="text-sm font-bold text-gray-900">Property Acquisition</span>
+                      </div>
+                    </div>
+
+                    {/* Arrow Down to Sale Proceeds */}
+                    <div className="flex justify-center mt-3">
+                      <div className="relative">
+                        <div className="w-2 h-12 bg-gradient-to-b from-gray-500 via-gray-400 to-green-500 rounded-full shadow-sm"></div>
+                        {/* Arrowhead */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                          <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-green-500"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom: Sale Proceeds - Happy Ending (Light Background, Strong Border) */}
+                    <div className="p-5 bg-[rgba(240,253,244,0.08)] rounded-xl border-2 border-green-500 shadow-lg">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="p-2 bg-green-100 rounded-lg">
+                          <Coins className="w-5 h-5 text-green-700" strokeWidth={1.5} />
+                        </div>
+                        <span className="text-base font-bold text-gray-900">Sale Proceeds</span>
+                      </div>
+                      <div className="space-y-3 ml-2">
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <span className="text-sm font-medium text-gray-900">Title Company receives proceeds</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <span className="text-sm font-medium text-gray-900">Investor capital returned</span>
+                        </div>
+                        <div className="flex items-center gap-3 pt-2 border-t border-green-200">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <span className="text-sm font-bold text-green-700">50/50 Profit Distribution</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footnote */}
+                    <div className="pt-4 mt-4 border-t border-gray-200">
+                      <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                        <Shield className="w-3.5 h-3.5 text-gray-400" />
+                        All funds move through the title company. Investor capital is never pooled.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* About this Property / Deal Summary */}
               <Card className="border-0 shadow-sm">
                 <CardHeader>
@@ -375,6 +581,52 @@ export default function PropertyDetail() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Why First-Position Matters */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-gray-900">Why First-Position Matters</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="p-6">
+                        <div className="flex items-start gap-3 mb-3">
+                        <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                          <ArrowUp className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Capital in First Position</h3>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        Investor capital sits at the top of the capital structure through the joint venture agreement, providing priority protection relative to other project capital.
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                          <Shield className="w-5 h-5 text-primary" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Title Company Control</h3>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        Investor funds are wired directly to the licensed title company or closing attorney and are not held in SSP operating accounts.
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-0 shadow-sm">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+                          <Target className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Aligned Incentives</h3>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed">
+                        SSP advances renovation and holding costs and is compensated only after investor capital is returned and profits are realized.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
 
               {/* Optional Timeline Section - Only for SOLD */}
               {isSold && (
@@ -644,10 +896,10 @@ export default function PropertyDetail() {
                     
                     <div className="flex justify-between items-center py-2.5">
                       <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-green-600" />
+                        <TrendingUp className="w-4 h-4 text-green-500" />
                         <span className="text-sm text-gray-600">Est. Profit</span>
                       </div>
-                      <span className="text-sm font-semibold text-green-600">
+                      <span className="text-sm font-medium text-green-500">
                         ${(property.estimatedEquity || 0).toLocaleString()}
                       </span>
                     </div>
@@ -759,25 +1011,55 @@ export default function PropertyDetail() {
                     </p>
                   </div>
 
-                  {/* 50/50 Split Visualization */}
+                  {/* Profit Split Visualization */}
                   <div className="space-y-3">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profit Split</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profit Distribution</p>
+                      {usesGuaranteedMinimum && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
+                          Guaranteed Minimum Applied
+                        </span>
+                      )}
+                    </div>
                     
                     {/* Visual Split Bar */}
-                    <div className="h-4 rounded-full overflow-hidden flex">
-                      <div className="w-1/2 bg-green-500 flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white">YOU 50%</span>
+                    {totalEquity > 0 ? (
+                      <div className="h-4 rounded-full overflow-hidden flex relative">
+                        {usesGuaranteedMinimum ? (
+                          <>
+                            <div 
+                              className="bg-green-500 flex items-center justify-center"
+                              style={{ width: `${(investorProfitShare / totalEquity) * 100}%` }}
+                            >
+                              <span className="text-[10px] font-bold text-white px-1">YOU</span>
+                            </div>
+                            <div className="bg-gray-400 flex items-center justify-center flex-1">
+                              <span className="text-[10px] font-bold text-white px-1">SSP</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-1/2 bg-green-500 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-white">YOU 50%</span>
+                            </div>
+                            <div className="w-1/2 bg-gray-400 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-white">SSP 50%</span>
+                            </div>
+                          </>
+                        )}
                       </div>
-                      <div className="w-1/2 bg-gray-400 flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white">SSP 50%</span>
-                      </div>
-                    </div>
+                    ) : (
+                      <div className="h-4 rounded-full bg-gray-200"></div>
+                    )}
 
                     {/* Split Details */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
                         <p className="text-xs text-gray-600 mb-1">{isSold ? "Investor Share" : "Your Share"}</p>
                         <p className="text-lg font-bold text-green-600">${investorProfitShare.toLocaleString()}</p>
+                        {usesGuaranteedMinimum && (
+                          <p className="text-[10px] text-amber-600 mt-1">(Guaranteed Min)</p>
+                        )}
                       </div>
                       <div className="p-3 bg-gray-100 rounded-lg border border-gray-200 text-center">
                         <p className="text-xs text-gray-600 mb-1">{isSold ? "Sponsor Share" : "SSP Share"}</p>
@@ -801,11 +1083,33 @@ export default function PropertyDetail() {
                       <span className="text-xs font-medium text-gray-600">
                         {isSold ? "Realized ROI" : "Estimated ROI"}
                       </span>
-                      <span className="text-lg font-bold text-green-700">
-                        +{typeof returnPercentage === 'number' ? returnPercentage.toFixed(1) : returnPercentage}%
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {usesGuaranteedMinimum && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">
+                            MIN
+                          </span>
+                        )}
+                        <span className="text-lg font-bold text-green-700">
+                          +{typeof returnPercentage === 'number' ? returnPercentage.toFixed(1) : returnPercentage}%
+                        </span>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Guaranteed Minimum Info (only show for non-sold deals) */}
+                  {!isSold && usesGuaranteedMinimum && (
+                    <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                      <div className="flex items-start gap-2">
+                        <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-xs font-semibold text-amber-900 mb-1">Protected by Guaranteed Minimum</p>
+                          <p className="text-xs text-amber-700 leading-relaxed">
+                            Your return is protected by our guaranteed minimum (1% per month, minimum 8% total). You receive whichever is higher: 50% of profit or the guaranteed minimum.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* How It Works Note / Final Numbers Helper */}
                   {isSold ? (
@@ -816,7 +1120,10 @@ export default function PropertyDetail() {
                   ) : (
                     <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
                       <p className="font-semibold text-gray-700 mb-1">How it works:</p>
-                      <p>You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus 50% of the profit.</p>
+                      <p className="mb-2">You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus your profit share.</p>
+                      <p className="text-gray-600">
+                        <strong>Your return:</strong> Whichever is higher — 50% of net profit or guaranteed minimum (1% per month, minimum 8% total).
+                      </p>
                     </div>
                   )}
                 </CardContent>
