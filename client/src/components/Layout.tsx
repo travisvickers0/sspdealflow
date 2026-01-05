@@ -15,15 +15,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md pt-[env(safe-area-inset-top)]">
         <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">
           <div className="flex items-center gap-4 sm:gap-8">
-            <Link href="/" className="flex flex-col">
-              <div className="flex items-center gap-2 font-bold text-lg sm:text-xl tracking-tight leading-none">
-                <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                <span className="hidden xs:inline">SSP Deal Flow</span>
-                <span className="xs:hidden">SSP</span>
-              </div>
-              <span className="text-[9px] sm:text-[10px] text-muted-foreground font-medium mt-0.5 ml-7 hidden sm:block">
-                By: Southern Specialty Properties LLC
-              </span>
+            <Link href="/" className="flex items-center gap-2 font-bold text-lg sm:text-xl tracking-tight">
+              <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <span className="hidden xs:inline">SSP Deal Flow</span>
+              <span className="xs:hidden">SSP</span>
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link href="/properties" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/properties" ? "text-foreground" : "text-muted-foreground"}`}>
