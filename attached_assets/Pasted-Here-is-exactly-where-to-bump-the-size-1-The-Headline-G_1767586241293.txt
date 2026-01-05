@@ -1,0 +1,47 @@
+Here is exactly where to bump the size:
+
+1. The Headline (Go Massive)
+Currently, your headline is polite. You want it to be confident.
+
+The Change: Increase the font size of "Real Estate Opportunities" and "Built for Investors."
+
+Why: In modern high-end web design, the headline often takes up 50% of the screen width. It anchors the page.
+
+Tailwind Tweak:
+
+JavaScript
+
+{/* Current looks like text-4xl or 5xl */}
+<h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 leading-tight">
+  Real Estate Opportunities <br/>
+  <span className="text-red-600">Built for Investors</span>
+</h1>
+Note: Adding tracking-tight (letter-spacing) often makes huge text look more premium.
+
+2. The Stat Numbers (The "Hero" Data)
+Your stats container looks great, but the numbers (29, 94d, $3.4M) are the main reason someone will trust you. They should be unmissable.
+
+The Change: Bump the numbers up one or two steps.
+
+Tailwind Tweak: Change them from text-3xl (or 4xl) to text-5xl.
+
+JavaScript
+
+<p className="text-5xl font-extrabold text-gray-900">29</p>
+3. The Feature List (Checkmarks)
+The text next to the checkmarks ("10+ Years Verified Exits", etc.) is a little too small to read comfortably at a glance.
+
+The Change: Bump these from text-sm (approx 14px) to text-base (16px) or text-lg (18px).
+
+Why: These are your key selling points. You don't want users to squint to read them.
+
+Summary Checklist for "Pop"
+[ ] Headline: text-6xl or text-7xl (Make it huge).
+
+[ ] Stat Numbers: text-5xl (Make them dominant).
+
+[ ] Stat Labels: Keep them small (text-xs), but make them bolder (font-bold) so they are legible without stealing attention from the numbers.
+
+[ ] Primary Button: Make the text inside "Explore Properties" slightly larger (text-lg) so the button feels more substantial.
+
+One final tiny polish: On your "Accredited Investors Only" pill, try adding tracking-widest to the class list. Spacing out the letters (K E R N I N G) on small uppercase text is a classic designer trick to make it look expensive.
