@@ -167,6 +167,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
+        <div className="container mx-auto px-4 sm:px-8 mt-12 pt-8 border-t text-center">
+          <p className="text-sm text-muted-foreground font-medium italic">
+            "Deal-by-deal joint venture partnerships. Not a Fund. No pooled capital"
+          </p>
+        </div>
       </footer>
     </div>
   );
