@@ -36,9 +36,9 @@ export default function Home() {
   return (
     <Layout>
       {/* Airbnb-Style Modern Hero Section */}
-      <div className="relative min-h-screen lg:min-h-[90vh] w-full overflow-hidden bg-gradient-to-b from-amber-50 via-white to-white">
+      <div className="relative min-h-screen lg:min-h-[90vh] w-full overflow-hidden bg-gradient-to-br from-primary/5 via-white to-amber-50/30">
         {/* Background Image */}
-        <div className="absolute inset-0 opacity-50">
+        <div className="absolute inset-0 opacity-30">
           <img 
             src={airbnbHero}
             alt="background"
@@ -47,8 +47,8 @@ export default function Home() {
         </div>
         
         {/* Subtle Animated Accents */}
-        <div className="hidden sm:block absolute top-32 right-32 w-72 h-72 bg-primary/5 rounded-full filter blur-3xl animate-pulse" />
-        <div className="hidden sm:block absolute bottom-20 left-20 w-64 h-64 bg-orange-200/10 rounded-full filter blur-3xl animate-pulse delay-1000" />
+        <div className="hidden sm:block absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/5 rounded-full filter blur-[120px] animate-pulse" />
+        <div className="hidden sm:block absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-200/10 rounded-full filter blur-[100px] animate-pulse delay-1000" />
         
         {/* Content */}
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full py-12 sm:py-16 lg:py-20 flex items-center">
