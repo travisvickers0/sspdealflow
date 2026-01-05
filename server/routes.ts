@@ -12,6 +12,7 @@ import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { sendFacebookPixelEvent, type FacebookPixelEvent, createLeadEvent } from "./services/facebookPixel";
 import { sendQualificationConfirmation } from "./services/resend";
+import { appendLeadToSheet } from "./lib/googleSheets";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -103,14 +104,98 @@ export async function registerRoutes(
     res.json({ message: "API routes are working" });
   });
 
+  // GET /api/test-sheets - Test Google Sheets connection (admin only)
+  app.get("/api/test-sheets", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const credentialsJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+      const sheetId = process.env.GOOGLE_SHEET_ID;
+
+      // Check if environment variables are set
+      const hasCredentials = !!credentialsJson;
+      const hasSheetId = !!sheetId;
+      
+      if (!hasCredentials || !hasSheetId) {
+        return res.status(400).json({
+          error: "Google Sheets not configured",
+          message: "Missing environment variables",
+          details: {
+            GOOGLE_SERVICE_ACCOUNT_JSON: hasCredentials ? "SET" : "NOT SET",
+            GOOGLE_SHEET_ID: hasSheetId ? "SET" : "NOT SET",
+          },
+          note: "If you just added secrets, you may need to restart the server for them to take effect.",
+        });
+      }
+
+      // Validate JSON format
+      let credentials;
+      try {
+        credentials = typeof credentialsJson === 'string' 
+          ? JSON.parse(credentialsJson) 
+          : credentialsJson;
+      } catch (parseError: any) {
+        return res.status(400).json({
+          error: "Invalid JSON in GOOGLE_SERVICE_ACCOUNT_JSON",
+          message: parseError.message,
+        });
+      }
+
+      // Check required fields
+      if (!credentials.client_email || !credentials.private_key) {
+        return res.status(400).json({
+          error: "Invalid service account credentials",
+          message: "Missing client_email or private_key in credentials",
+        });
+      }
+
+      // Try to append a test row
+      await appendLeadToSheet({
+        name: "Test User",
+        email: "test@example.com",
+        phone: "555-1234",
+        accredited: true,
+        capitalRange: "$150,000 – $200,000",
+        timeline: "1–3 months",
+        interest: "All of the above",
+      });
+
+      res.json({
+        success: true,
+        message: "Google Sheets connection successful! Test row added to sheet.",
+        serviceAccountEmail: credentials.client_email,
+        sheetId: sheetId.substring(0, 10) + "...",
+      });
+    } catch (error: any) {
+      console.error("Google Sheets test error:", error);
+      const errorStatus = error?.response?.status;
+      const errorCode = error?.code;
+      
+      let errorMessage = error.message || "Unknown error";
+      if (errorStatus === 401 || errorStatus === 403) {
+        errorMessage = "Authentication failed. Make sure the service account email has Editor access to the sheet.";
+      } else if (errorStatus === 404) {
+        errorMessage = "Sheet not found. Check that the Sheet ID is correct and the 'Leads' tab exists.";
+      }
+      
+      res.status(500).json({
+        error: "Google Sheets test failed",
+        message: errorMessage,
+        status: errorStatus,
+        code: errorCode,
+      });
+    }
+  });
+
   // POST /api/qualify - Investor qualification form submission
   app.post("/api/qualify", async (req: Request, res: Response) => {
     try {
       const { fullName, email, phone, isAccredited, capitalRange, investmentTimeline, primaryInterest } = req.body;
 
       // Validate required fields
-      if (!fullName || !email || !phone || !isAccredited || !capitalRange || !investmentTimeline || !primaryInterest) {
-        return res.status(400).json({ error: "All fields are required" });
+      if (!fullName || !email || !phone || isAccredited === undefined || !capitalRange || !investmentTimeline || !primaryInterest) {
+        return res.status(400).json({ 
+          error: "All fields are required",
+          received: { fullName: !!fullName, email: !!email, phone: !!phone, isAccredited, capitalRange: !!capitalRange, investmentTimeline: !!investmentTimeline, primaryInterest: !!primaryInterest }
+        });
       }
 
       // Validate email format
@@ -124,15 +209,24 @@ export async function registerRoutes(
       }
 
       // Save lead to database
-      const lead = await storage.createLead({
-        fullName,
-        email,
-        phone,
-        isAccredited: true,
-        capitalRange,
-        investmentTimeline,
-        primaryInterest,
-      });
+      let lead;
+      try {
+        lead = await storage.createLead({
+          fullName: String(fullName).trim(),
+          email: String(email).trim(),
+          phone: String(phone).trim(),
+          isAccredited: true,
+          capitalRange: String(capitalRange),
+          investmentTimeline: String(investmentTimeline),
+          primaryInterest: String(primaryInterest),
+        });
+      } catch (dbError: any) {
+        console.error("Database error creating lead:", dbError);
+        return res.status(500).json({ 
+          error: "Failed to save lead to database",
+          message: dbError.message || "Database error"
+        });
+      }
 
       // Fire Meta Pixel Lead event with correct domain
       try {
@@ -164,6 +258,45 @@ export async function registerRoutes(
         // Don't fail the request if email fails
       }
 
+      // Append lead to Google Sheets (non-blocking with timeout)
+      // Use Promise.race to add a timeout so it doesn't hang forever
+      const sheetsPromise = appendLeadToSheet({
+        name: fullName,
+        email,
+        phone,
+        accredited: true,
+        capitalRange,
+        timeline: investmentTimeline,
+        interest: primaryInterest,
+      });
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Google Sheets operation timed out after 10 seconds')), 10000)
+      );
+
+      Promise.race([sheetsPromise, timeoutPromise])
+        .then(() => {
+          console.log("Successfully appended lead to Google Sheets");
+        })
+        .catch((sheetsError: any) => {
+          // Log error without exposing sensitive information
+          const errorMessage = sheetsError instanceof Error ? sheetsError.message : 'Unknown error';
+          const errorCode = sheetsError?.code || 'NO_CODE';
+          const errorStatus = sheetsError?.response?.status || 'NO_STATUS';
+          
+          console.error("Error appending to Google Sheets:", {
+            message: errorMessage,
+            code: errorCode,
+            status: errorStatus,
+            // Common issues:
+            // - 401/403: Service account doesn't have access or credentials are wrong
+            // - 404: Sheet ID is wrong or sheet doesn't exist
+            // - ENOTFOUND: Network/API issue
+            // - Timeout: API call took too long
+          });
+          // Don't fail the request if Sheets fails
+        });
+
       res.json({
         success: true,
         leadId: lead.id,
@@ -171,10 +304,14 @@ export async function registerRoutes(
       });
     } catch (error: any) {
       console.error("Error processing qualification form:", error);
-      res.status(500).json({
-        error: "Failed to process qualification form",
-        message: error.message,
-      });
+      // Ensure we always return JSON, not HTML
+      if (!res.headersSent) {
+        res.status(500).json({
+          error: "Failed to process qualification form",
+          message: error.message || "An unexpected error occurred",
+          details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        });
+      }
     }
   });
 

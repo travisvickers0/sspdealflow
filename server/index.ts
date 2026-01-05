@@ -63,6 +63,26 @@ app.use((req, res, next) => {
   try {
     log(`Starting server in ${process.env.NODE_ENV || "development"} mode`);
     
+    // Diagnostic: Check if Google Sheets secrets are available (supports both approaches)
+    const hasFullJson = !!process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+    const hasSeparateParts = !!(process.env.GOOGLE_SHEETS_CLIENT_EMAIL && process.env.GOOGLE_SHEETS_PRIVATE_KEY);
+    const hasSheetId = !!process.env.GOOGLE_SHEET_ID || !!process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+    
+    if ((hasFullJson || hasSeparateParts) && hasSheetId) {
+      log("✓ Google Sheets secrets detected");
+      if (hasFullJson) {
+        log("  Using full JSON approach (GOOGLE_SERVICE_ACCOUNT_JSON)");
+      } else {
+        log("  Using separate secrets approach (GOOGLE_SHEETS_CLIENT_EMAIL + PRIVATE_KEY)");
+      }
+    } else {
+      log("⚠ Google Sheets secrets not found - check your Replit Secrets tab");
+      log(`  GOOGLE_SERVICE_ACCOUNT_JSON: ${hasFullJson ? 'SET' : 'NOT SET'}`);
+      log(`  GOOGLE_SHEETS_CLIENT_EMAIL: ${process.env.GOOGLE_SHEETS_CLIENT_EMAIL ? 'SET' : 'NOT SET'}`);
+      log(`  GOOGLE_SHEETS_PRIVATE_KEY: ${process.env.GOOGLE_SHEETS_PRIVATE_KEY ? 'SET' : 'NOT SET'}`);
+      log(`  GOOGLE_SHEET_ID / GOOGLE_SHEETS_SPREADSHEET_ID: ${hasSheetId ? 'SET' : 'NOT SET'}`);
+    }
+    
     await registerRoutes(httpServer, app);
     log("Routes registered successfully");
 

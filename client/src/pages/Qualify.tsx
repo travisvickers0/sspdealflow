@@ -90,16 +90,27 @@ export default function Qualify() {
         }),
       });
 
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text.substring(0, 200));
+        throw new Error("Server returned an invalid response. Please try again.");
+      }
+
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to submit form");
+        throw new Error(error.error || error.message || "Failed to submit form");
       }
 
       const result = await response.json();
 
       // Redirect to Calendly immediately after successful submission
       // Use replace to prevent back button from returning to form
-      window.location.replace("https://calendly.com/sspdealflow/30min");
+      // The redirect_url parameter will send users to /thank-you after booking
+      const baseUrl = window.location.origin;
+      const redirectUrl = encodeURIComponent(`${baseUrl}/thank-you`);
+      window.location.replace(`https://calendly.com/sspdealflow/30min?redirect_url=${redirectUrl}`);
     } catch (error: any) {
       console.error("Error submitting form:", error);
       setErrors({ submit: error.message || "An error occurred. Please try again." });

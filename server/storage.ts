@@ -178,8 +178,13 @@ export class DatabaseStorage implements IStorage {
   // Leads
   async createLead(lead: InsertLead): Promise<Lead> {
     const [newLead] = await db.insert(leads).values({
-      ...lead,
+      fullName: lead.fullName,
+      email: lead.email,
+      phone: lead.phone,
       isAccredited: lead.isAccredited ? "true" : "false",
+      capitalRange: lead.capitalRange,
+      investmentTimeline: lead.investmentTimeline,
+      primaryInterest: lead.primaryInterest,
     }).returning();
     return newLead;
   }
