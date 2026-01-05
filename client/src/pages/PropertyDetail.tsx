@@ -162,7 +162,23 @@ export default function PropertyDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             {/* Left Column - Images & Content */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-8 order-last lg:order-first">
+              
+              {/* Comps Map - Moved to top of left column for mobile ordering */}
+              {(property.comps as any[])?.length > 0 && (
+                <div className="space-y-6 lg:hidden">
+                  <h2 className="text-xl font-semibold text-gray-900">Location & Comps Map</h2>
+                  <div className="rounded-xl overflow-hidden h-80 shadow-sm border border-gray-200">
+                    <CompsMap
+                      subjectAddress={property.address}
+                      subjectCity={property.city}
+                      subjectState={property.state}
+                      subjectZip={property.zip}
+                      comps={property.comps as any[]}
+                    />
+                  </div>
+                </div>
+              )}
               
               {/* Address Header - Above Gallery */}
               <div className="flex flex-col gap-4">
@@ -691,7 +707,7 @@ export default function PropertyDetail() {
 
               {/* Location & Comps Map */}
               {(property.comps as any[])?.length > 0 && (
-                <div className="space-y-6">
+                <div className="space-y-6 hidden lg:block">
                   <h2 className="text-xl font-semibold text-gray-900">Location & Comps Map</h2>
                   
                   {/* Interactive Map Container */}
@@ -735,7 +751,7 @@ export default function PropertyDetail() {
             </div>
 
             {/* Right Column - Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 order-first lg:order-last">
               <div className="sticky top-6 space-y-6">
               
               {/* Investment Status Card / Deal Outcome Card */}
@@ -1131,6 +1147,22 @@ export default function PropertyDetail() {
                       <p className="text-gray-600">
                         <strong>Your return:</strong> Whichever is higher — 50% of net profit or guaranteed minimum (1% per month, minimum 8% total).
                       </p>
+                    </div>
+                  )}
+
+                  {/* Comps Map - Second placement for mobile ordering after status/calculator */}
+                  {(property.comps as any[])?.length > 0 && (
+                    <div className="space-y-6 lg:hidden mt-6">
+                      <h2 className="text-xl font-semibold text-gray-900">Location & Comps Map</h2>
+                      <div className="rounded-xl overflow-hidden h-80 shadow-sm border border-gray-200">
+                        <CompsMap
+                          subjectAddress={property.address}
+                          subjectCity={property.city}
+                          subjectState={property.state}
+                          subjectZip={property.zip}
+                          comps={property.comps as any[]}
+                        />
+                      </div>
                     </div>
                   )}
                 </CardContent>
