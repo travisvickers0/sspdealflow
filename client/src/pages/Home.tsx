@@ -111,7 +111,7 @@ export default function Home() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
               <a href="/properties" className="w-full sm:w-auto">
                 <Button 
                   size="lg"
@@ -132,8 +132,8 @@ export default function Home() {
               </a>
             </div>
 
-            {/* Security Badge */}
-            <div className="flex items-center gap-2 text-gray-600 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400 whitespace-nowrap overflow-visible">
+            {/* Security Badge - Centered under buttons */}
+            <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-600 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400 whitespace-nowrap overflow-visible mb-6">
               <ShieldCheck className="h-4 w-4 text-gray-500 flex-shrink-0" />
               <span className="text-[13px] sm:text-sm">Secured by First-Position Lien Structure</span>
             </div>
