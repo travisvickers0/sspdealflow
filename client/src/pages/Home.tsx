@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
-import { ArrowRight, TrendingUp, Lock, Zap, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle, FileText, Clock, TrendingUp, Users, ShieldCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -56,69 +56,104 @@ export default function Home() {
             {/* Left Side - Text & CTAs */}
             <div className="max-w-2xl">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-6 sm:mb-8 px-3 sm:px-4 py-2 bg-white/60 backdrop-blur border border-gray-200/50 rounded-full animate-in fade-in slide-in-from-top duration-700 shadow-sm text-xs sm:text-sm">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="font-medium text-gray-700">Exclusively for Accredited Investors</span>
+            <div className="inline-flex items-center mb-6 sm:mb-8 px-4 py-2 bg-primary/10 rounded-lg animate-in fade-in slide-in-from-top duration-700">
+              <span className="text-xs font-bold text-primary uppercase tracking-wider">Accredited Investors Only</span>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-4 sm:mb-6 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 sm:mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
               Real Estate Opportunities<br />
               <span className="text-primary">
                 Built for Investors
               </span>
             </h1>
 
-            {/* Subheading */}
-            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-xl mb-8 sm:mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 font-light">
-              Discover curated real estate deals with transparent structures, real-time dashboards, and institutional returns. All in one place.
-            </p>
+            {/* Checkmark Features Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm text-gray-700">10+ Years Verified Exits</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm text-gray-700">Deal-by-Deal JV Structure</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm text-gray-700">No Fees · 100% Transparent</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm text-gray-700">50/50 Profit Split at Sale</span>
+              </div>
+            </div>
 
-            {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              <div className="p-3 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="h-3 sm:h-4 w-3 sm:w-4 text-primary" />
-                  <span className="text-lg sm:text-2xl font-bold text-gray-900">{formatMoney(totalEquity)}</span>
+            {/* Stats Grid - 2x2 */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <FileText className="h-4 w-4 text-gray-600" />
                 </div>
-                <p className="text-xs text-gray-600">Total Equity</p>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">29</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Deals Closed</p>
+                </div>
               </div>
-              <div className="p-3 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md">
-                <div className="flex items-center gap-2 mb-2">
-                  <Lock className="h-3 sm:h-4 w-3 sm:w-4 text-primary" />
-                  <span className="text-lg sm:text-2xl font-bold text-gray-900">$15M+</span>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <Clock className="h-4 w-4 text-gray-600" />
                 </div>
-                <p className="text-xs text-gray-600">Deployed</p>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">94d</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Avg Hold</p>
+                </div>
               </div>
-              <div className="p-3 sm:p-4 bg-white/70 backdrop-blur border border-gray-200/50 rounded-lg sm:rounded-xl hover:bg-white/90 transition-all shadow-sm hover:shadow-md hidden sm:block">
-                <div className="flex items-center gap-2 mb-2">
-                  <Zap className="h-3 sm:h-4 w-3 sm:w-4 text-primary" />
-                  <span className="text-lg sm:text-2xl font-bold text-gray-900">250+</span>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-gray-600" />
                 </div>
-                <p className="text-xs text-gray-600">Active Investors</p>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{formatMoney(totalEquity)}</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Total Equity</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <Users className="h-4 w-4 text-gray-600" />
+                </div>
+                <div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900">250+</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Active Investors</p>
+                </div>
               </div>
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
               <a href="/properties" className="w-full sm:w-auto">
                 <Button 
-                  size="sm"
-                  className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 h-10 sm:h-12 border-0 shadow-lg hover:shadow-xl transition-all w-full text-sm sm:text-base cursor-pointer"
+                  size="lg"
+                  className="rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold px-6 h-12 border-0 shadow-lg hover:shadow-xl transition-all w-full text-sm cursor-pointer"
                 >
                   Explore Properties
-                  <ArrowRight className="ml-2 h-3 sm:h-4 w-3 sm:w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </a>
               <a href="/how-it-works" className="w-full sm:w-auto">
                 <Button 
-                  size="sm"
+                  size="lg"
                   variant="outline" 
-                  className="rounded-full border-gray-300 text-gray-900 hover:bg-gray-50 font-semibold px-6 sm:px-8 h-10 sm:h-12 bg-white/60 backdrop-blur-sm w-full sm:w-auto text-sm sm:text-base cursor-pointer"
+                  className="rounded-lg border-primary text-primary hover:bg-primary/5 font-semibold px-6 h-12 bg-white w-full sm:w-auto text-sm cursor-pointer"
                 >
-                  How It Works
+                  View Partnership Structure
                 </Button>
               </a>
+            </div>
+
+            {/* Security Badge */}
+            <div className="flex items-center gap-2 text-gray-600 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+              <ShieldCheck className="h-4 w-4 text-gray-500" />
+              <span className="text-sm">Secured by First-Position Lien Structure</span>
             </div>
             </div>
 
