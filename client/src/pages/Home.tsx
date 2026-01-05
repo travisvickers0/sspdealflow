@@ -337,11 +337,7 @@ export default function Home() {
                     </div>
                     <div className="p-5">
                       <h3 className="font-semibold text-gray-900 mb-2 text-lg">{heroStackProperties[0]?.address}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-emerald-600 font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
-                        <span className="text-gray-600">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
-                      </div>
+                      <p className="text-sm text-gray-600">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
                     </div>
                   </div>
                 </>
