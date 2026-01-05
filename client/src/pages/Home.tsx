@@ -159,6 +159,9 @@ export default function Home() {
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
+                        <div className="absolute top-3 left-3 bg-primary/80 text-white px-2 py-1 rounded-full text-[10px] font-semibold">
+                          ${(heroStackProperties[2]?.estimatedEquity / 1000).toFixed(0)}k Equity
+                        </div>
                       </div>
                     </div>
                   )}
@@ -175,6 +178,9 @@ export default function Home() {
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
+                        <div className="absolute top-3 left-3 bg-primary/80 text-white px-2 py-1 rounded-full text-[10px] font-semibold">
+                          ${(heroStackProperties[1]?.estimatedEquity / 1000).toFixed(0)}k Equity
+                        </div>
                       </div>
                     </div>
                   )}
@@ -235,8 +241,8 @@ export default function Home() {
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
-                        <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                          ${(heroStackProperties[2]?.purchasePrice / 1000).toFixed(0)}k
+                        <div className="absolute top-4 left-4 bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                          ${(heroStackProperties[2]?.estimatedEquity / 1000).toFixed(0)}k Equity
                         </div>
                       </div>
                       <div className="p-5">
@@ -264,8 +270,8 @@ export default function Home() {
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
-                        <div className="absolute top-4 left-4 bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
-                          ${(heroStackProperties[1]?.purchasePrice / 1000).toFixed(0)}k
+                        <div className="absolute top-4 left-4 bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                          ${(heroStackProperties[1]?.estimatedEquity / 1000).toFixed(0)}k Equity
                         </div>
                       </div>
                       <div className="p-5">
