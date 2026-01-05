@@ -57,7 +57,7 @@ export default function Home() {
             <div className="max-w-2xl">
             {/* Badge */}
             <div className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-top duration-700">
-              <span className="bg-gray-50/50 border border-primary/10 text-primary tracking-wider px-3 py-1 rounded-full text-[10px] font-bold uppercase shadow-sm opacity-80 select-none">
+              <span className="bg-emerald-50/50 border border-emerald-200 text-emerald-700 tracking-wider px-3 py-1 rounded-full text-[10px] font-bold uppercase shadow-sm select-none">
                 Accredited Investors Only
               </span>
             </div>
@@ -101,7 +101,7 @@ export default function Home() {
                 <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Avg Hold</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-extrabold text-primary">{formatMoney(totalEquity)}</span>
+                <span className="text-2xl font-extrabold text-emerald-600">{formatMoney(totalEquity)}</span>
                 <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Total Equity</span>
               </div>
               <div className="flex flex-col">
