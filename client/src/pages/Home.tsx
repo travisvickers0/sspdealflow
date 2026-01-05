@@ -93,7 +93,7 @@ export default function Home() {
             {/* Stats Row */}
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-12 gap-y-8 sm:gap-12 p-6 sm:p-8 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-full sm:w-fit mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               <div className="flex flex-col">
-                <span className="text-3xl lg:text-4xl font-extrabold text-gray-900">29</span>
+                <span className="text-3xl lg:text-4xl font-extrabold text-gray-900">119</span>
                 <span className="text-[11px] uppercase tracking-wider text-gray-500 font-bold whitespace-nowrap">Deals Closed</span>
               </div>
               <div className="flex flex-col">
