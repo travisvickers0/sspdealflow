@@ -65,7 +65,7 @@ export default function Home() {
               </div>
 
               {/* TIER 1: THE POSITIONING STATEMENT */}
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+              <h1 className="text-[28px] sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
                 <span className="text-gray-900">Real Estate Opportunities</span><br className="hidden sm:block" />
                 <span className="text-primary"> Built for Investors</span>
               </h1>
