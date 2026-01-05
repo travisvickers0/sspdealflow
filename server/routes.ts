@@ -10,6 +10,8 @@ import { extractBPOData } from "./services/openai";
 import { geocodeComps } from "./services/geocoding";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
+import { sendFacebookPixelEvent, type FacebookPixelEvent, createLeadEvent } from "./services/facebookPixel";
+import { sendQualificationConfirmation } from "./services/resend";
 
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
@@ -99,6 +101,143 @@ export async function registerRoutes(
   // Test endpoint to verify routing works
   app.get("/api/test", (req: Request, res: Response) => {
     res.json({ message: "API routes are working" });
+  });
+
+  // POST /api/qualify - Investor qualification form submission
+  app.post("/api/qualify", async (req: Request, res: Response) => {
+    try {
+      const { fullName, email, phone, isAccredited, capitalRange, investmentTimeline, primaryInterest } = req.body;
+
+      // Validate required fields
+      if (!fullName || !email || !phone || !isAccredited || !capitalRange || !investmentTimeline || !primaryInterest) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+
+      // Validate email format
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+
+      // Block if accreditation is not confirmed
+      if (!isAccredited) {
+        return res.status(400).json({ error: "Accredited investor confirmation is required" });
+      }
+
+      // Save lead to database
+      const lead = await storage.createLead({
+        fullName,
+        email,
+        phone,
+        isAccredited: true,
+        capitalRange,
+        investmentTimeline,
+        primaryInterest,
+      });
+
+      // Fire Meta Pixel Lead event with correct domain
+      try {
+        // Use production domain or environment variable, fallback to request host
+        const baseUrl = process.env.SITE_URL || process.env.PRODUCTION_URL || 'https://sspdealflow.com';
+        const eventSourceUrl = `${baseUrl}/qualify`;
+
+        await sendFacebookPixelEvent({
+          events: [
+            createLeadEvent(eventSourceUrl, undefined, {
+              email,
+              firstName: fullName.split(' ')[0],
+              lastName: fullName.split(' ').slice(1).join(' '),
+              phone,
+            }),
+          ],
+          testEventCode: process.env.FACEBOOK_TEST_EVENT_CODE,
+        });
+      } catch (pixelError) {
+        console.error("Error sending Facebook Pixel event:", pixelError);
+        // Don't fail the request if pixel fails
+      }
+
+      // Send confirmation email via Resend
+      try {
+        await sendQualificationConfirmation(email, fullName);
+      } catch (emailError) {
+        console.error("Error sending confirmation email:", emailError);
+        // Don't fail the request if email fails
+      }
+
+      res.json({
+        success: true,
+        leadId: lead.id,
+        message: "Qualification form submitted successfully",
+      });
+    } catch (error: any) {
+      console.error("Error processing qualification form:", error);
+      res.status(500).json({
+        error: "Failed to process qualification form",
+        message: error.message,
+      });
+    }
+  });
+
+  // POST /api/facebook-pixel/events - Send server-side events to Facebook Conversions API
+  app.post("/api/facebook-pixel/events", async (req: Request, res: Response) => {
+    try {
+      const { events, testEventCode } = req.body;
+
+      if (!events || !Array.isArray(events) || events.length === 0) {
+        return res.status(400).json({ error: "Events array is required" });
+      }
+
+      // Normalize event source URL to use production domain
+      const normalizeEventSourceUrl = (url: string | undefined): string | undefined => {
+        if (!url) return undefined;
+        const baseUrl = process.env.SITE_URL || process.env.PRODUCTION_URL || 'https://sspdealflow.com';
+        try {
+          const urlObj = new URL(url);
+          // If URL is from Replit domain, replace with production domain
+          if (urlObj.hostname.includes('replit') || urlObj.hostname.includes('repl.co') || urlObj.hostname.includes('.replit.dev')) {
+            return `${baseUrl}${urlObj.pathname}${urlObj.search}`;
+          }
+          // If URL is already from production domain, use as-is
+          if (urlObj.hostname.includes('sspdealflow.com')) {
+            return url;
+          }
+          // Otherwise, use production domain with the path from the original URL
+          return `${baseUrl}${urlObj.pathname}${urlObj.search}`;
+        } catch {
+          // If URL parsing fails, return production domain with the path
+          return `${baseUrl}${url.startsWith('/') ? url : '/' + url}`;
+        }
+      };
+
+      // Validate events structure
+      const validatedEvents: FacebookPixelEvent[] = events.map((event: any) => ({
+        eventName: event.eventName || event.event_name,
+        eventTime: event.eventTime || event.event_time || Math.floor(Date.now() / 1000),
+        eventSourceUrl: normalizeEventSourceUrl(event.eventSourceUrl || event.event_source_url),
+        userData: event.userData || event.user_data,
+        customData: event.customData || event.custom_data,
+        eventId: event.eventId || event.event_id,
+        actionSource: event.actionSource || event.action_source || 'website',
+      }));
+
+      // Send events to Facebook Conversions API
+      const result = await sendFacebookPixelEvent({
+        events: validatedEvents,
+        testEventCode: testEventCode || process.env.FACEBOOK_TEST_EVENT_CODE || undefined,
+      });
+
+      res.json({
+        success: true,
+        events_received: result.events_received,
+        test_mode: !!testEventCode,
+      });
+    } catch (error: any) {
+      console.error("Error sending Facebook Pixel event:", error);
+      res.status(500).json({
+        error: "Failed to send Facebook Pixel event",
+        message: error.message,
+      });
+    }
   });
   
   // Serve uploaded files from local filesystem (legacy - for documents)

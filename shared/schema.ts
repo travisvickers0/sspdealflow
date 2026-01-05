@@ -157,3 +157,29 @@ export const compSchema = z.object({
 });
 
 export type PropertyComp = z.infer<typeof compSchema>;
+
+// Leads table for investor qualification form
+export const leads = pgTable("leads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fullName: text("full_name").notNull(),
+  email: varchar("email").notNull(),
+  phone: varchar("phone").notNull(),
+  isAccredited: text("is_accredited").notNull(), // "true" or "false" as text
+  capitalRange: text("capital_range").notNull(),
+  investmentTimeline: text("investment_timeline").notNull(),
+  primaryInterest: text("primary_interest").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertLeadSchema = z.object({
+  fullName: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  isAccredited: z.boolean(),
+  capitalRange: z.string(),
+  investmentTimeline: z.string(),
+  primaryInterest: z.string(),
+});
+
+export type InsertLead = z.infer<typeof insertLeadSchema>;
+export type Lead = typeof leads.$inferSelect;
