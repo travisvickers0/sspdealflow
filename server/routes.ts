@@ -1,14 +1,13 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, updatePropertySchema, insertLeadSchema } from "@shared/schema";
+import { insertPropertySchema, updatePropertySchema } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { extractBPOData } from "./services/openai";
 import { geocodeComps } from "./services/geocoding";
-import { sendConfirmationEmail } from "./services/email";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 
@@ -288,78 +287,6 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching property photos:", error);
       res.status(500).json({ error: "Failed to fetch property photos" });
-    }
-  });
-
-  // GET /api/docs/:filename - Serve documentation files
-  app.get("/api/docs/:filename", (req: Request, res: Response) => {
-    try {
-      const filename = req.params.filename;
-      const docsPath = path.join(process.cwd(), "docs", filename);
-      
-      if (!fs.existsSync(docsPath)) {
-        return res.status(404).json({ error: "Document not found" });
-      }
-      
-      // Set appropriate content type
-      if (filename.endsWith('.md')) {
-        res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      } else if (filename.endsWith('.pdf')) {
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      }
-      
-      res.sendFile(docsPath);
-    } catch (error) {
-      console.error("Error serving document:", error);
-      res.status(500).json({ error: "Failed to serve document" });
-    }
-  });
-
-  // POST /api/leads - Create a new lead (investor qualification)
-  app.post("/api/leads", async (req: Request, res: Response) => {
-    try {
-      const validatedData = insertLeadSchema.parse(req.body);
-      
-      // Create lead in database
-      const lead = await storage.createLead(validatedData);
-      
-      // Generate Calendly link with pre-filled info
-      const calendlyBaseUrl = "https://calendly.com/sspdealflow/30min";
-      const calendlyParams = new URLSearchParams({
-        name: validatedData.name,
-        email: validatedData.email,
-      });
-      const calendlyLink = `${calendlyBaseUrl}?${calendlyParams.toString()}`;
-      
-      // Send confirmation email via Resend
-      try {
-        await sendConfirmationEmail({
-          to: validatedData.email,
-          name: validatedData.name,
-          calendlyLink,
-        });
-      } catch (emailError) {
-        // Log email error but don't fail the request
-        console.error("Failed to send confirmation email:", emailError);
-        // Continue - lead is still created in database
-      }
-      
-      res.json({
-        id: lead.id,
-        calendlyLink,
-        message: "Lead created successfully",
-      });
-    } catch (error) {
-      console.error("Error creating lead:", error);
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ 
-          error: "Validation error", 
-          message: error.errors[0]?.message || "Invalid form data" 
-        });
-      }
-      res.status(500).json({ error: "Failed to create lead" });
     }
   });
 

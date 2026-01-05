@@ -279,11 +279,6 @@ function CapitalProtectionSection() {
       icon: Shield,
       title: "Focused risk management",
       description: "Conservative renovation budgets, vetted local contractors, and clear exit strategies reduce downside exposure."
-    },
-    {
-      icon: Handshake,
-      title: "Downside Alignment",
-      description: "SSP invests its own capital into each project through sourcing, underwriting, project management, and execution. We are compensated only after capital is returned and profits are realized."
     }
   ];
 
@@ -299,7 +294,7 @@ function CapitalProtectionSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {protections.map((item, idx) => (
             <div 
               key={idx}
@@ -397,14 +392,11 @@ function ReturnCalculatorSection() {
   const [projectedDealProfit, setProjectedDealProfit] = useState(80000);
   const [holdPeriodMonths, setHoldPeriodMonths] = useState(3);
 
-  // Calculate results using SSP's profit split model:
-  // Projected Deal Profit = Net profit after all costs (purchase, rehab, closing)
-  // This is the amount that gets split 50/50 after investor capital is returned
-  // Example: If deal profit is $80k, investor gets $40k (50% of $80k)
-  // Total return = $250k (capital) + $40k (profit) = $290k
-  const investorProfit = Math.max(projectedDealProfit * 0.5, 0);
-  const roiPercent = investmentAmount > 0 ? (investorProfit / investmentAmount) * 100 : 0;
-  const annualizedReturn = roiPercent * (12 / Math.max(holdPeriodMonths, 0.1));
+  // Calculate results using the exact formula
+  const remainingProfit = Math.max(projectedDealProfit - investmentAmount, 0);
+  const investorProfit = remainingProfit * 0.5;
+  const roiPercent = (investorProfit / investmentAmount) * 100;
+  const annualizedReturn = roiPercent * (12 / holdPeriodMonths);
   const totalReturn = investmentAmount + investorProfit;
 
   const formatCurrency = (value: number) => {
@@ -429,82 +421,82 @@ function ReturnCalculatorSection() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div className="flex flex-col">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Investment Amount
               </label>
-              <p className="text-xs text-gray-600 mb-3 min-h-[2.5rem]">The amount you contribute to the deal at closing.</p>
-              <div className="relative mt-auto">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
+              <p className="text-xs text-gray-600 mb-3">The amount you contribute to the deal at closing.</p>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input
                   type="number"
                   value={investmentAmount}
                   onChange={(e) => setInvestmentAmount(Math.max(0, Number(e.target.value)))}
-                  className="w-full h-12 pl-8 pr-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
+                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
                   data-testid="input-investment-amount"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col">
+            <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Projected Deal Profit
               </label>
-              <p className="text-xs text-gray-600 mb-3 min-h-[2.5rem]">Net profit after all costs (purchase, rehab, closing). This profit is split 50/50 after your capital is returned.</p>
-              <div className="relative mt-auto">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
+              <p className="text-xs text-gray-600 mb-3">Total estimated profit after renovation and sale before the profit split.</p>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input
                   type="number"
                   value={projectedDealProfit}
                   onChange={(e) => setProjectedDealProfit(Math.max(0, Number(e.target.value)))}
-                  className="w-full h-12 pl-8 pr-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
+                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
                   data-testid="input-projected-profit"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col">
+            <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Expected Hold Period
               </label>
-              <p className="text-xs text-gray-600 mb-3 min-h-[2.5rem]">Typical SSP deals range from 60 to 120 days.</p>
-              <div className="relative mt-auto">
+              <p className="text-xs text-gray-600 mb-3">Typical SSP deals range from 60 to 120 days.</p>
+              <div className="relative">
                 <input
                   type="number"
                   value={holdPeriodMonths}
                   onChange={(e) => setHoldPeriodMonths(Math.max(0.1, Number(e.target.value)))}
-                  className="w-full h-12 px-4 pr-16 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
                   data-testid="input-hold-period"
                   step="0.1"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">months</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">months</span>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-8 border-t border-gray-200">
-            <div className="text-center p-5 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3 leading-tight">Investor Profit</p>
-              <p className="text-2xl font-bold text-green-600 leading-none" data-testid="text-investor-profit">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-8 border-t border-gray-200">
+            <div className="text-center p-4 bg-slate-50 rounded-xl">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Investor Profit</p>
+              <p className="text-2xl font-bold text-green-600" data-testid="text-investor-profit">
                 {formatCurrency(investorProfit)}
               </p>
             </div>
-            <div className="text-center p-5 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3 leading-tight">Return on Investment</p>
-              <p className="text-2xl font-bold text-gray-900 leading-none" data-testid="text-roi">
+            <div className="text-center p-4 bg-slate-50 rounded-xl">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Return on Investment</p>
+              <p className="text-2xl font-bold text-gray-900" data-testid="text-roi">
                 {roiPercent.toFixed(1)}%
               </p>
             </div>
-            <div className="text-center p-5 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3 leading-tight">Annualized Return</p>
-              <p className="text-2xl font-bold text-gray-900 leading-none" data-testid="text-annualized-return">
+            <div className="text-center p-4 bg-slate-50 rounded-xl">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Annualized Return</p>
+              <p className="text-2xl font-bold text-gray-900" data-testid="text-annualized-return">
                 {annualizedReturn.toFixed(1)}%
               </p>
             </div>
-            <div className="text-center p-5 bg-primary/10 rounded-xl border border-primary/20">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3 leading-tight">Total Return at Exit</p>
-              <p className="text-2xl font-bold text-green-600 leading-none" data-testid="text-total-return">
+            <div className="text-center p-4 bg-primary/10 rounded-xl">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Total Return at Exit</p>
+              <p className="text-2xl font-bold text-green-600" data-testid="text-total-return">
                 {formatCurrency(totalReturn)}
               </p>
             </div>
@@ -512,9 +504,6 @@ function ReturnCalculatorSection() {
 
           <p className="text-xs text-gray-500 text-center mt-6 leading-relaxed">
             Your capital is returned first. Remaining profit is split 50/50 between you and SSP.
-          </p>
-          <p className="text-xs text-gray-400 text-center mt-2 italic">
-            Returns are projections only. Actual results vary by execution and market conditions.
           </p>
         </div>
       </div>
@@ -530,10 +519,7 @@ function RecentlyFundedSection() {
       city: "Paola",
       state: "KS",
       purchasePrice: 224999,
-      profit: 80001,
-      closedDate: "2024-01-15",
-      holdDuration: 82,
-      investorNetProfit: 40000
+      profit: 80001
     },
     {
       image: "/uploads/photos/1764873336713-601806450.jpeg",
@@ -541,10 +527,7 @@ function RecentlyFundedSection() {
       city: "Humble",
       state: "TX",
       purchasePrice: 262000,
-      profit: 113000,
-      closedDate: "2024-02-20",
-      holdDuration: 94,
-      investorNetProfit: 56500
+      profit: 113000
     },
     {
       image: "/uploads/photos/1764873354390-350658599.webp",
@@ -552,10 +535,7 @@ function RecentlyFundedSection() {
       city: "Byhalia",
       state: "MS",
       purchasePrice: 198000,
-      profit: 77000,
-      closedDate: "2024-01-28",
-      holdDuration: 76,
-      investorNetProfit: 38500
+      profit: 77000
     },
     {
       image: "/uploads/photos/1764873385641-316395001.jpg",
@@ -563,10 +543,7 @@ function RecentlyFundedSection() {
       city: "Casa Grande",
       state: "AZ",
       purchasePrice: 212795,
-      profit: 85235,
-      closedDate: "2024-03-10",
-      holdDuration: 105,
-      investorNetProfit: 42617
+      profit: 85235
     }
   ];
 
@@ -606,16 +583,11 @@ function RecentlyFundedSection() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-gray-900 text-sm mb-1">{deal.address}</h3>
+                <h3 className="font-semibold text-gray-900 text-sm">{deal.address}</h3>
                 <p className="text-xs text-gray-600 mb-3">{deal.city}, {deal.state}</p>
-                <div className="space-y-2 mb-3">
-                  <p className="text-xs text-gray-500">
-                    Closed {new Date(deal.closedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · {deal.holdDuration} days
-                  </p>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">${(deal.purchasePrice / 1000).toFixed(0)}k</span>
-                  <span className="text-sm font-semibold text-green-600">Investor Net: ${deal.investorNetProfit.toLocaleString()}</span>
+                  <span className="text-sm font-semibold text-green-600">+${(deal.profit / 1000).toFixed(0)}k equity</span>
                 </div>
               </div>
             </div>
@@ -629,36 +601,24 @@ function RecentlyFundedSection() {
 function FAQSection() {
   const faqs = [
     {
-      question: "Is this a fund or pooled capital?",
-      answer: "No. SSP structures deal-by-deal joint ventures. Each property is a separate partnership. Your capital funds one specific property, not a pool. This is not a fund, syndication, or pooled investment vehicle."
+      question: "Who can invest with SSP?",
+      answer: "SSP opportunities are available to accredited investors as defined by SEC regulations. This typically includes individuals with a net worth exceeding $1 million (excluding primary residence) or annual income exceeding $200,000 ($300,000 with spouse) for the past two years."
     },
     {
-      question: "What if the property doesn't sell?",
-      answer: "Standard market risk applies. Properties are held until sale. SSP covers holding costs during extended periods. We use conservative ARV estimates and light rehab scope to minimize hold time, but market conditions can vary. Your capital remains secured by the real estate asset."
+      question: "How long is my capital typically deployed?",
+      answer: "Most deals have a target hold period of 60 to 120 days, from acquisition through sale. This short-term deployment allows for multiple investment cycles per year and provides more liquidity compared to traditional real estate investments."
     },
     {
-      question: "How is my capital protected?",
-      answer: "Your capital is secured in first position via joint venture agreement. All funds flow through a licensed title company at closing. SSP capital is subordinated. Title company holds funds in escrow. No direct transfers to SSP operating accounts."
+      question: "How do I track my deals?",
+      answer: "All investors have access to the SSP Deal Flow dashboard where you can monitor your active investments, view property updates, track renovation progress, and see detailed financial breakdowns for each deal."
     },
     {
-      question: "What are the fees?",
-      answer: "No fees. 50/50 profit split only. Your capital goes to purchase. SSP advances rehab and holding costs. We split profit at sale. No management fees, no preferred returns, no hidden costs."
+      question: "What happens if a deal doesn't perform as expected?",
+      answer: "SSP structures deals with built-in protections. Your capital is returned first before any profit splits. In slower deals, our minimum return guarantee ensures you still receive a baseline return on your investment."
     },
     {
-      question: "What if SSP goes out of business?",
-      answer: "Title company holds funds in escrow. Your capital is secured by the real estate asset and first-position lien structure. Joint venture agreements are independent legal entities. Property ownership and capital protection remain intact regardless of SSP's operational status."
-    },
-    {
-      question: "How long until I see returns?",
-      answer: "Typical hold period is 3-6 months from purchase to sale. This includes 4-8 weeks for renovation and 30-60 days for listing and sale. Timeline varies by market conditions and property specifics. Returns are distributed at sale closing."
-    },
-    {
-      question: "Can I invest in multiple deals?",
-      answer: "Yes. Each deal is independent. You can invest in one property or multiple properties. Each partnership is separate with its own capital deployment, timeline, and profit distribution."
-    },
-    {
-      question: "What's the minimum investment?",
-      answer: "Full purchase price per property. Typical range is $175k-$220k per deal. You fund the entire purchase price. SSP advances rehab and holding costs. There is no partial investment or fractional ownership per property."
+      question: "How are profits distributed?",
+      answer: "Upon sale of the property, proceeds flow through the title company. Your original capital is returned first, followed by your share of the profits (typically 50% of net profit or guaranteed minimum, whichever is greater)."
     }
   ];
 
@@ -739,9 +699,9 @@ export default function HowItWorks() {
       <main>
         <HeroSection />
         <StepsSection />
-        <CapitalProtectionSection />
         <ComparisonSection />
         <InvestmentModelSection />
+        <CapitalProtectionSection />
         <TimelineSection />
         <ReturnCalculatorSection />
         <RecentlyFundedSection />

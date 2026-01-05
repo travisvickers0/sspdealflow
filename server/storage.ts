@@ -1,9 +1,8 @@
 import { 
-  users, properties, activityLogs, leads,
+  users, properties, activityLogs,
   type User, type UpsertUser,
   type Property, type InsertProperty, type UpdateProperty,
   type ActivityLog, type InsertActivityLog,
-  type Lead, type InsertLead,
   generatePropertySlug
 } from "@shared/schema";
 import { db } from "./db";
@@ -28,11 +27,6 @@ export interface IStorage {
   // Activity Logs
   createActivityLog(log: InsertActivityLog): Promise<ActivityLog>;
   getActivityLogs(limit?: number): Promise<ActivityLog[]>;
-  
-  // Leads
-  createLead(lead: InsertLead): Promise<Lead>;
-  getLead(id: string): Promise<Lead | undefined>;
-  getAllLeads(): Promise<Lead[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -173,24 +167,6 @@ export class DatabaseStorage implements IStorage {
       .from(activityLogs)
       .orderBy(desc(activityLogs.createdAt))
       .limit(limit);
-  }
-
-  // Lead methods
-  async createLead(lead: InsertLead): Promise<Lead> {
-    const [newLead] = await db.insert(leads).values({
-      ...lead,
-      accreditedConfirmed: lead.accreditedConfirmed ? 1 : 0,
-    }).returning();
-    return newLead;
-  }
-
-  async getLead(id: string): Promise<Lead | undefined> {
-    const [lead] = await db.select().from(leads).where(eq(leads.id, id));
-    return lead || undefined;
-  }
-
-  async getAllLeads(): Promise<Lead[]> {
-    return await db.select().from(leads).orderBy(desc(leads.createdAt));
   }
 }
 

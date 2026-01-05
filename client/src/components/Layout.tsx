@@ -11,38 +11,58 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground overflow-x-hidden">
-      {/* Header with dark gray background */}
-      <header className="sticky top-0 z-50 w-full bg-[#2C2C2C] pt-[env(safe-area-inset-top)]">
-        <nav className="px-8 py-4 flex items-center justify-between">
-          <div className="logo text-white font-bold text-2xl">SSP</div>
-          <div className="nav-links hidden md:flex items-center gap-6 text-white text-base font-normal">
-            <Link href="/properties" className="hover:opacity-80 transition-opacity">
-              Marketplace
+      {/* Header with iOS safe area for notch/Dynamic Island */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md pt-[env(safe-area-inset-top)]">
+        <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">
+          <div className="flex items-center gap-4 sm:gap-8">
+            <Link href="/" className="flex items-center gap-2 font-bold text-lg sm:text-xl tracking-tight">
+              <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <span className="hidden xs:inline">SSP Deal Flow</span>
+              <span className="xs:hidden">SSP</span>
             </Link>
-            <Link href="/how-it-works" className="hover:opacity-80 transition-opacity">
-              How It Works
-            </Link>
+            <nav className="hidden md:flex items-center gap-6">
+              <Link href="/properties" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/properties" ? "text-foreground" : "text-muted-foreground"}`}>
+                Marketplace
+              </Link>
+              <Link href="/how-it-works" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/how-it-works" ? "text-foreground" : "text-muted-foreground"}`}>
+                How It Works
+              </Link>
+              {isAdmin && (
+                <Link href="/admin" className={`text-sm font-medium transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-foreground" : "text-muted-foreground"}`}>
+                  Admin
+                </Link>
+              )}
+            </nav>
           </div>
-          <div className="user-actions flex items-center gap-4 text-white text-sm font-normal">
+          <div className="flex items-center gap-2 sm:gap-4">
             {!isLoading && (
               isAuthenticated ? (
                 <>
-                  {isAdmin && (
-                    <Link href="/admin" className="hidden sm:block hover:opacity-80 transition-opacity">
-                      Admin
-                    </Link>
+                  {user?.profileImageUrl && (
+                    <img 
+                      src={user.profileImageUrl} 
+                      alt="Profile" 
+                      className="w-8 h-8 rounded-full object-cover hidden sm:block"
+                    />
                   )}
-                  <a href="/api/logout" className="hidden sm:block hover:opacity-80 transition-opacity cursor-pointer">
-                    Log out
+                  <a href="/api/logout">
+                    <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer gap-2">
+                      <LogOut className="h-4 w-4" />
+                      Log out
+                    </Button>
                   </a>
                 </>
               ) : (
-                <div className="hidden sm:flex gap-2">
-                  <a href="/signin" className="hover:opacity-80 transition-opacity">
-                    Sign in
+                <div className="hidden sm:flex gap-2 sm:gap-3">
+                  <a href="/signin">
+                    <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform">
+                      Sign in
+                    </Button>
                   </a>
-                  <a href="/signup" className="hover:opacity-80 transition-opacity">
-                    Sign up
+                  <a href="/signup">
+                    <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform bg-white/90 hover:bg-white text-primary border-2 border-primary">
+                      Sign up
+                    </Button>
                   </a>
                 </div>
               )
@@ -51,29 +71,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="md:hidden h-9 w-9 text-white hover:bg-white/10 cursor-pointer active:scale-95"
+              className="md:hidden h-9 w-9 cursor-pointer active:scale-95"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu className="h-5 w-5" />
             </Button>
           </div>
-        </nav>
+        </div>
         
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/20 bg-[#2C2C2C] animate-in slide-in-from-top-2 duration-200">
-            <nav className="px-4 py-4 flex flex-col gap-2">
+          <div className="md:hidden border-t bg-background/95 backdrop-blur-lg animate-in slide-in-from-top-2 duration-200">
+            <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
               <Link 
                 href="/properties" 
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-white text-sm font-normal py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/properties" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
               >
                 Marketplace
               </Link>
               <Link 
                 href="/how-it-works" 
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-white text-sm font-normal py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/how-it-works" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
               >
                 How It Works
               </Link>
@@ -81,15 +101,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link 
                   href="/admin" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-white text-sm font-normal py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
+                  className={`text-sm font-medium py-3 px-4 rounded-lg transition-colors active:scale-98 ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}
                 >
                   Admin
                 </Link>
               )}
-              <div className="border-t border-white/20 my-2" />
+              <div className="border-t my-2" />
               {isAuthenticated ? (
                 <a href="/api/logout" className="w-full">
-                  <Button variant="outline" className="w-full justify-center cursor-pointer active:scale-95 gap-2 text-white border-white/20 hover:bg-white/10">
+                  <Button variant="outline" className="w-full justify-center cursor-pointer active:scale-95 gap-2">
                     <LogOut className="h-4 w-4" />
                     Log out
                   </Button>
@@ -116,39 +136,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <footer className="border-t py-12 bg-gray-50 dark:bg-gray-900/50">
-        <div className="container mx-auto px-4 sm:px-8">
-          <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 font-bold text-lg mb-4">
-                <ShieldCheck className="h-5 w-5 text-primary" />
-                <span>SSP Deal Flow</span>
-              </div>
-              <p className="text-sm text-muted-foreground max-w-xs">
-                Premium real estate investment opportunities for accredited investors.
-              </p>
+        <div className="container mx-auto px-4 sm:px-8 flex flex-col md:flex-row justify-between gap-8">
+          <div>
+            <div className="flex items-center gap-2 font-bold text-lg mb-4">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              <span>SSP Deal Flow</span>
             </div>
-            <div className="flex gap-12 text-sm text-muted-foreground">
-              <div className="flex flex-col gap-3">
-                <span className="font-semibold text-foreground">Platform</span>
-                <a href="#" className="hover:text-primary">Browse Properties</a>
-                <a href="#" className="hover:text-primary">How it Works</a>
-                <a href="#" className="hover:text-primary">Pricing</a>
-              </div>
-              <div className="flex flex-col gap-3">
-                <span className="font-semibold text-foreground">Company</span>
-                <a href="#" className="hover:text-primary">About Us</a>
-                <a href="#" className="hover:text-primary">Contact</a>
-                <a href="#" className="hover:text-primary">Terms</a>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Premium real estate investment opportunities for accredited investors.
+            </p>
           </div>
-          <div className="border-t pt-6">
-            <p className="text-xs text-muted-foreground text-center max-w-4xl mx-auto mb-3">
-              SSP Deal Flow facilitates private, deal-by-deal joint venture partnerships. This is not a fund, syndication, or pooled investment vehicle.
-            </p>
-            <p className="text-xs text-muted-foreground text-center max-w-4xl mx-auto">
-              Securities offered through [broker-dealer if applicable]. Not a solicitation. Accredited investors only. Past performance does not guarantee future results. Investments involve risk of loss.
-            </p>
+          <div className="flex gap-12 text-sm text-muted-foreground">
+            <div className="flex flex-col gap-3">
+              <span className="font-semibold text-foreground">Platform</span>
+              <a href="#" className="hover:text-primary">Browse Properties</a>
+              <a href="#" className="hover:text-primary">How it Works</a>
+              <a href="#" className="hover:text-primary">Pricing</a>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="font-semibold text-foreground">Company</span>
+              <a href="#" className="hover:text-primary">About Us</a>
+              <a href="#" className="hover:text-primary">Contact</a>
+              <a href="#" className="hover:text-primary">Terms</a>
+            </div>
           </div>
         </div>
       </footer>

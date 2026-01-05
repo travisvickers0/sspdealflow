@@ -122,37 +122,6 @@ export const insertActivityLogSchema = createInsertSchema(activityLogs).omit({
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
 export type ActivityLog = typeof activityLogs.$inferSelect;
 
-// Leads table for investor qualification
-export const leads = pgTable("leads", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  phone: text("phone").notNull(),
-  accreditedConfirmed: integer("accredited_confirmed").notNull().default(0), // 0 = false, 1 = true (PostgreSQL boolean handling)
-  capitalRange: text("capital_range").notNull(),
-  investmentTimeline: text("investment_timeline").notNull(),
-  primaryInterest: text("primary_interest").notNull(),
-  status: text("status").default("new"), // new, qualified, called, converted, disqualified
-  calendlyLink: text("calendly_link"),
-  callOutcome: text("call_outcome"),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertLeadSchema = createInsertSchema(leads).omit({
-  id: true,
-  status: true,
-  calendlyLink: true,
-  callOutcome: true,
-  notes: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type InsertLead = z.infer<typeof insertLeadSchema>;
-export type Lead = typeof leads.$inferSelect;
-
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   activityLogs: many(activityLogs),
