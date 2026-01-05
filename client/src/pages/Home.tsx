@@ -57,13 +57,13 @@ export default function Home() {
             <div className="max-w-2xl">
             {/* Badge */}
             <div className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-top duration-700">
-              <span className="bg-gray-50 border border-primary/20 text-primary tracking-widest px-3 py-1.5 rounded-full text-[10px] font-bold uppercase shadow-sm">
+              <span className="bg-gray-50 border border-primary/20 text-primary tracking-wider px-3 py-1.5 rounded-full text-[10px] font-bold uppercase shadow-sm">
                 Accredited Investors Only
               </span>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 sm:mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 sm:mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
               Real Estate Opportunities<br />
               <span className="text-primary">
                 Built for Investors
@@ -74,39 +74,39 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-base text-gray-700">10+ Years Verified Exits</span>
+                <span className="text-sm text-gray-700">10+ Years Verified Exits</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-base text-gray-700">Deal-by-Deal JV Structure</span>
+                <span className="text-sm text-gray-700">Deal-by-Deal JV Structure</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-base text-gray-700">No Fees · 100% Transparent</span>
+                <span className="text-sm text-gray-700">No Fees · 100% Transparent</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-base text-gray-700">50/50 Profit Split at Sale</span>
+                <span className="text-sm text-gray-700">50/50 Profit Split at Sale</span>
               </div>
             </div>
 
             {/* Stats Row */}
             <div className="flex flex-wrap gap-6 sm:gap-8 p-5 sm:p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-fit mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               <div className="flex flex-col">
-                <span className="text-3xl sm:text-5xl font-extrabold text-gray-900">29</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-bold">Deals Closed</span>
+                <span className="text-2xl font-extrabold text-gray-900">29</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Deals Closed</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-3xl sm:text-5xl font-extrabold text-gray-900">94d</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-bold">Avg Hold</span>
+                <span className="text-2xl font-extrabold text-gray-900">94d</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Avg Hold</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-3xl sm:text-5xl font-extrabold text-primary">{formatMoney(totalEquity)}</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-bold">Total Equity</span>
+                <span className="text-2xl font-extrabold text-primary">{formatMoney(totalEquity)}</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Total Equity</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-3xl sm:text-5xl font-extrabold text-gray-900">250+</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-bold">Active Investors</span>
+                <span className="text-2xl font-extrabold text-gray-900">250+</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Active Investors</span>
               </div>
             </div>
 
@@ -115,10 +115,10 @@ export default function Home() {
               <a href="/properties" className="w-full sm:w-auto">
                 <Button 
                   size="lg"
-                  className="rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold px-6 h-12 border-0 shadow-lg hover:shadow-xl transition-all w-full text-lg cursor-pointer"
+                  className="rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold px-6 h-12 border-0 shadow-lg hover:shadow-xl transition-all w-full text-sm cursor-pointer"
                 >
                   Explore Properties
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </a>
               <a href="/how-it-works" className="w-full sm:w-auto">
