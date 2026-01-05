@@ -57,7 +57,7 @@ export default function Home() {
             <div className="max-w-2xl">
             {/* Badge */}
             <div className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-top duration-700">
-              <span className="bg-gray-50 border border-primary/20 text-primary tracking-wider px-3 py-1.5 rounded-full text-[10px] font-bold uppercase shadow-sm">
+              <span className="bg-gray-50/50 border border-primary/10 text-primary tracking-wider px-3 py-1 rounded-full text-[10px] font-bold uppercase shadow-sm opacity-80 select-none">
                 Accredited Investors Only
               </span>
             </div>
@@ -111,7 +111,7 @@ export default function Home() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 mt-4 sm:mt-6 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
               <a href="/properties" className="w-full sm:w-auto">
                 <Button 
                   size="lg"
