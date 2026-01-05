@@ -74,25 +74,25 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 mt-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
                 <div className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-base text-slate-700 font-medium">
+                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
                     <span className="font-bold">10+ Years</span> Verified Exits
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-base text-slate-700 font-medium">
-                    <span className="font-bold">Deal-by-Deal</span> Joint Ventures
+                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
+                    <span className="font-bold">Deal-by-Deal</span> JV Structure
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-base text-slate-700 font-medium">
-                    <span className="font-bold">No Fees</span> (100% Transparent)
+                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
+                    <span className="font-bold">No Fees</span> · 100% Transparent
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-base text-slate-700 font-medium">
+                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
                     <span className="font-bold">50/50</span> Profit Split at Sale
                   </p>
                 </div>
