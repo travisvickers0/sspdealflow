@@ -9,16 +9,10 @@ import {
   Shield, 
   TrendingUp, 
   Home, 
-  Clock, 
-  DollarSign,
-  ChevronDown,
   Building2,
   Users,
-  CheckCircle2,
-  Calendar,
-  Banknote
+  CheckCircle2
 } from "lucide-react";
-import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -41,8 +35,7 @@ function HeroSection() {
           </h1>
 
           <p className="text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
-            SSP sources undervalued residential deals, structures transparent partnerships, 
-            and delivers institutional-style returns. We handle the work. You share in the profits.
+            Deal-by-deal, first-position joint venture partnerships on residential foreclosure and REO properties. No fees. No pooled capital. Profits split at&nbsp;sale.
           </p>
 
           <Link href="/properties">
@@ -68,19 +61,19 @@ function StepsSection() {
       step: "Step 1",
       icon: Search,
       title: "We source undervalued deals",
-      description: "Using BPOs, market data, and local partners, we identify properties with significant equity at purchase. Every deal is vetted before it reaches investors."
+      description: "Using BPOs, market data, and local partners, SSP identifies residential foreclosure and REO properties with meaningful equity at purchase. Only vetted opportunities are shared with investors."
     },
     {
       step: "Step 2",
       icon: Handshake,
       title: "We structure the partnership",
-      description: "SSP creates a simple deal structure where you provide capital and we handle acquisition, rehab, and exit. Returns are aligned through a transparent profit split."
+      description: "Each opportunity is structured as a first-position joint venture. Investors fund the purchase price directly through a licensed title company or closing attorney. SSP advances rehab and holding costs and is subordinated to investor capital. SSP does not take custody of investor funds at any point."
     },
     {
       step: "Step 3",
       icon: Hammer,
       title: "We execute and manage the project",
-      description: "SSP manages renovations, timelines, and the sale. You receive regular updates and a detailed payout summary at exit."
+      description: "SSP manages renovations, timelines, and the sale of the property. At closing, investor capital is returned first, then profits are distributed per the joint venture agreement."
     }
   ];
 
@@ -144,9 +137,10 @@ function ComparisonSection() {
       title: "SSP Deal Flow",
       description: "Partner directly on vetted deals",
       bullets: [
-        "Deal-by-deal transparency",
-        "Short projected hold periods (60-120 days)",
-        "Aligned incentives with simple profit splits"
+        "Partner directly on individual properties",
+        "First-position joint venture structure",
+        "Short projected hold periods",
+        "No fees. No pooled capital. No carry"
       ],
       featured: true
     }
@@ -202,7 +196,7 @@ function InvestmentModelSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-            Our investment model
+            Our partnership model
           </h2>
           <p className="text-gray-600">
             Simple, transparent, and aligned with investors.
@@ -246,7 +240,7 @@ function InvestmentModelSection() {
               {[
                 "Review live deals on the SSP platform",
                 "Choose which opportunities to fund",
-                "Provide capital at closing through title company",
+                "Fund the full purchase price by wiring directly to the closing attorney or title company",
                 "Monitor progress through the investor dashboard",
                 "Receive profit share at exit"
               ].map((item, idx) => (
@@ -268,17 +262,17 @@ function CapitalProtectionSection() {
     {
       icon: Home,
       title: "Real assets as collateral",
-      description: "Every deal is backed by titled real estate at conservative valuations. Your investment has tangible security."
+      description: "Each partnership is backed by titled residential real estate acquired at conservative valuations. Investor capital is positioned in first position through the joint venture agreement."
     },
     {
       icon: TrendingUp,
       title: "Aligned profit structure",
-      description: "SSP earns only when the project performs. No management fees, no layers of carry. We succeed together."
+      description: "SSP earns only after investor capital is returned and profits are realized. There are no management fees, preferred returns, or layers of carry."
     },
     {
       icon: Shield,
       title: "Focused risk management",
-      description: "Conservative renovation budgets, vetted local contractors, and clear exit strategies reduce downside exposure."
+      description: "Conservative rehab scopes, margin buffers, and defined exit strategies are used to manage downside risk and protect capital."
     }
   ];
 
@@ -319,7 +313,7 @@ function TimelineSection() {
     {
       day: "Day 1",
       title: "Capital committed and property purchased",
-      description: "Investor funds are wired to close and SSP takes ownership of the property."
+      description: "Investor funds are wired to close and SSP takes ownership of the property. Funds are wired directly to the title company at closing."
     },
     {
       day: "Days 30-60",
@@ -381,130 +375,6 @@ function TimelineSection() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ReturnCalculatorSection() {
-  const [investmentAmount, setInvestmentAmount] = useState(250000);
-  const [projectedDealProfit, setProjectedDealProfit] = useState(80000);
-  const [holdPeriodMonths, setHoldPeriodMonths] = useState(3);
-
-  // Calculate results using the exact formula
-  const remainingProfit = Math.max(projectedDealProfit - investmentAmount, 0);
-  const investorProfit = remainingProfit * 0.5;
-  const roiPercent = (investorProfit / investmentAmount) * 100;
-  const annualizedReturn = roiPercent * (12 / holdPeriodMonths);
-  const totalReturn = investmentAmount + investorProfit;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  return (
-    <section className="py-16 lg:py-24 bg-gradient-to-br from-slate-800 to-slate-900">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
-              Estimate your potential return
-            </h2>
-            <p className="text-gray-600">
-              See how your investment could perform on a typical SSP deal.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Investment Amount
-              </label>
-              <p className="text-xs text-gray-600 mb-3">The amount you contribute to the deal at closing.</p>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                <input
-                  type="number"
-                  value={investmentAmount}
-                  onChange={(e) => setInvestmentAmount(Math.max(0, Number(e.target.value)))}
-                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
-                  data-testid="input-investment-amount"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Projected Deal Profit
-              </label>
-              <p className="text-xs text-gray-600 mb-3">Total estimated profit after renovation and sale before the profit split.</p>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                <input
-                  type="number"
-                  value={projectedDealProfit}
-                  onChange={(e) => setProjectedDealProfit(Math.max(0, Number(e.target.value)))}
-                  className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
-                  data-testid="input-projected-profit"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
-                Expected Hold Period
-              </label>
-              <p className="text-xs text-gray-600 mb-3">Typical SSP deals range from 60 to 120 days.</p>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={holdPeriodMonths}
-                  onChange={(e) => setHoldPeriodMonths(Math.max(0.1, Number(e.target.value)))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
-                  data-testid="input-hold-period"
-                  step="0.1"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">months</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-8 border-t border-gray-200">
-            <div className="text-center p-4 bg-slate-50 rounded-xl">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Investor Profit</p>
-              <p className="text-2xl font-bold text-green-600" data-testid="text-investor-profit">
-                {formatCurrency(investorProfit)}
-              </p>
-            </div>
-            <div className="text-center p-4 bg-slate-50 rounded-xl">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Return on Investment</p>
-              <p className="text-2xl font-bold text-gray-900" data-testid="text-roi">
-                {roiPercent.toFixed(1)}%
-              </p>
-            </div>
-            <div className="text-center p-4 bg-slate-50 rounded-xl">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Annualized Return</p>
-              <p className="text-2xl font-bold text-gray-900" data-testid="text-annualized-return">
-                {annualizedReturn.toFixed(1)}%
-              </p>
-            </div>
-            <div className="text-center p-4 bg-primary/10 rounded-xl">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Total Return at Exit</p>
-              <p className="text-2xl font-bold text-green-600" data-testid="text-total-return">
-                {formatCurrency(totalReturn)}
-              </p>
-            </div>
-          </div>
-
-          <p className="text-xs text-gray-500 text-center mt-6 leading-relaxed">
-            Your capital is returned first. Remaining profit is split 50/50 between you and SSP.
-          </p>
         </div>
       </div>
     </section>
@@ -584,7 +454,8 @@ function RecentlyFundedSection() {
               </div>
               <div className="p-4">
                 <h3 className="font-semibold text-gray-900 text-sm">{deal.address}</h3>
-                <p className="text-xs text-gray-600 mb-3">{deal.city}, {deal.state}</p>
+                <p className="text-xs text-gray-600 mb-2">{deal.city}, {deal.state}</p>
+                <p className="text-xs text-gray-500 mb-3">Deal-by-deal results available in the partnership overview</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">${(deal.purchasePrice / 1000).toFixed(0)}k</span>
                   <span className="text-sm font-semibold text-green-600">+${(deal.profit / 1000).toFixed(0)}k equity</span>
@@ -600,6 +471,14 @@ function RecentlyFundedSection() {
 
 function FAQSection() {
   const faqs = [
+    {
+      question: "Who holds title to the property?",
+      answer: "Properties are acquired and held by Southern Specialty Properties LLC. Investor capital is protected through a first-position joint venture structure."
+    },
+    {
+      question: "Where does my money go at closing?",
+      answer: "Investor funds are wired directly to the licensed title company or closing attorney, not to SSP operating accounts."
+    },
     {
       question: "Who can invest with SSP?",
       answer: "SSP opportunities are available to accredited investors as defined by SEC regulations. This typically includes individuals with a net worth exceeding $1 million (excluding primary residence) or annual income exceeding $200,000 ($300,000 with spouse) for the past two years."
@@ -673,7 +552,7 @@ function FinalCTASection() {
               className="rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-10 h-14 shadow-lg hover:shadow-xl transition-all text-base"
               data-testid="button-browse-properties"
             >
-              Browse Properties
+              View Live Opportunities
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -684,7 +563,7 @@ function FinalCTASection() {
               className="rounded-full border-gray-300 text-gray-900 hover:bg-white font-semibold px-10 h-14 bg-white/60 backdrop-blur-sm text-base cursor-pointer"
               data-testid="button-schedule-call"
             >
-              Schedule an intro call
+              Schedule Intro Call
             </Button>
           </a>
         </div>
@@ -699,11 +578,10 @@ export default function HowItWorks() {
       <main>
         <HeroSection />
         <StepsSection />
+        <CapitalProtectionSection />
         <ComparisonSection />
         <InvestmentModelSection />
-        <CapitalProtectionSection />
         <TimelineSection />
-        <ReturnCalculatorSection />
         <RecentlyFundedSection />
         <FAQSection />
         <FinalCTASection />

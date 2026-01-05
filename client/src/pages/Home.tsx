@@ -133,9 +133,9 @@ export default function Home() {
             </div>
 
             {/* Security Badge */}
-            <div className="flex items-center gap-2 text-gray-600 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
-              <ShieldCheck className="h-4 w-4 text-gray-500" />
-              <span className="text-sm">Secured by First-Position Lien Structure</span>
+            <div className="flex items-center gap-2 text-gray-600 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400 whitespace-nowrap overflow-visible">
+              <ShieldCheck className="h-4 w-4 text-gray-500 flex-shrink-0" />
+              <span className="text-[13px] sm:text-sm">Secured by First-Position Lien Structure</span>
             </div>
             </div>
 
