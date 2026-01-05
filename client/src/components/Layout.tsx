@@ -138,12 +138,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <footer className="border-t py-12 bg-gray-50 dark:bg-gray-900/50">
         <div className="container mx-auto px-4 sm:px-8 flex flex-col md:flex-row justify-between gap-8">
           <div>
-            <div className="flex items-center gap-2 font-bold text-lg mb-4">
+            <div className="flex items-center gap-2 font-bold text-lg mb-2">
               <ShieldCheck className="h-5 w-5 text-primary" />
               <span>SSP Deal Flow</span>
             </div>
-            <p className="text-sm text-muted-foreground max-w-xs">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-4">
+              A Division of Southern Specialty Properties
+            </p>
+            <p className="text-sm text-muted-foreground max-w-xs mb-4">
               Premium real estate investment opportunities for accredited investors.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              © 2026 Southern Specialty Properties. All Rights Reserved.
             </p>
           </div>
           <div className="flex gap-12 text-sm text-muted-foreground">
