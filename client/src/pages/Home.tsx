@@ -253,7 +253,7 @@ export default function Home() {
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
-                        <div className="absolute top-0 left-0 z-10 scale-75 origin-top-left">
+                        <div className="absolute top-0 left-0 z-10">
                           <div className="relative">
                             <div className="absolute top-4 -left-1 bg-emerald-600/90 text-white px-4 py-2 shadow-lg transform -rotate-1 flex items-center gap-2 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-900/40 after:border-l-4 after:border-l-transparent">
                               <span className="text-base font-bold tracking-tight">
@@ -289,7 +289,7 @@ export default function Home() {
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         )}
-                        <div className="absolute top-0 left-0 z-10 scale-75 origin-top-left">
+                        <div className="absolute top-0 left-0 z-10">
                           <div className="relative">
                             <div className="absolute top-4 -left-1 bg-emerald-600/90 text-white px-4 py-2 shadow-lg transform -rotate-1 flex items-center gap-2 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-900/40 after:border-l-4 after:border-l-transparent">
                               <span className="text-base font-bold tracking-tight">
