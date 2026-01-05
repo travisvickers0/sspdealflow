@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
-import { ArrowRight, CheckCircle, FileText, Clock, TrendingUp, Users, ShieldCheck, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle, TrendingUp, ShieldCheck, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -56,8 +56,10 @@ export default function Home() {
             {/* Left Side - Text & CTAs */}
             <div className="max-w-2xl">
             {/* Badge */}
-            <div className="inline-flex items-center mb-6 sm:mb-8 px-4 py-2 bg-primary/10 rounded-lg animate-in fade-in slide-in-from-top duration-700">
-              <span className="text-xs font-bold text-primary uppercase tracking-wider">Accredited Investors Only</span>
+            <div className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-top duration-700">
+              <span className="bg-gray-50 border border-primary/20 text-primary tracking-wider px-3 py-1.5 rounded-full text-[10px] font-bold uppercase shadow-sm">
+                Accredited Investors Only
+              </span>
             </div>
 
             {/* Main Heading */}
@@ -88,43 +90,23 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Stats Grid - 2x2 */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <FileText className="h-4 w-4 text-gray-600" />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">29</p>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Deals Closed</p>
-                </div>
+            {/* Stats Row */}
+            <div className="flex flex-wrap gap-6 sm:gap-8 p-5 sm:p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-fit mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+              <div className="flex flex-col">
+                <span className="text-2xl font-extrabold text-gray-900">29</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Deals Closed</span>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Clock className="h-4 w-4 text-gray-600" />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">94d</p>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Avg Hold</p>
-                </div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-extrabold text-gray-900">94d</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Avg Hold</span>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-gray-600" />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{formatMoney(totalEquity)}</p>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Total Equity</p>
-                </div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-extrabold text-primary">{formatMoney(totalEquity)}</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Total Equity</span>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                  <Users className="h-4 w-4 text-gray-600" />
-                </div>
-                <div>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">250+</p>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Active Investors</p>
-                </div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-extrabold text-gray-900">250+</span>
+                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Active Investors</span>
               </div>
             </div>
 
@@ -217,7 +199,7 @@ export default function Home() {
                         <h3 className="font-semibold text-gray-900 mb-1 text-sm">{heroStackProperties[0]?.address}</h3>
                         <p className="text-xs text-gray-600 mb-2">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
                         <div className="flex justify-between text-xs">
-                          <span className="text-primary font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                          <span className="text-emerald-600 font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
                           <span className="text-gray-600">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
                         </div>
                       </div>
@@ -318,7 +300,7 @@ export default function Home() {
                       <h3 className="font-semibold text-gray-900 mb-2 text-lg">{heroStackProperties[0]?.address}</h3>
                       <p className="text-sm text-gray-600 mb-4">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
                       <div className="flex justify-between text-sm">
-                        <span className="text-primary font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span className="text-emerald-600 font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
                         <span className="text-gray-600">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
                       </div>
                     </div>

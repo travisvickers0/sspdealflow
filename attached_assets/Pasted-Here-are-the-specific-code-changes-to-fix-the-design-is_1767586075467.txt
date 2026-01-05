@@ -1,0 +1,93 @@
+Here are the specific code changes to fix the design issues we discussed. I'm assuming you are using Tailwind CSS based on the look, but the logic applies to standard CSS too.
+
+1. Fix the "Accredited Investors" Pill (Make it exclusive, not an error)
+Current: Looks like an alert. Fix: Use a subtle background with red text.
+
+JavaScript
+
+{/* OLD */}
+{/* <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">ACCREDITED INVESTORS ONLY</span> */}
+
+{/* NEW FIX */}
+<span className="bg-gray-50 border border-red-100 text-red-700 tracking-wider px-3 py-1 rounded-full text-[10px] font-bold uppercase shadow-sm">
+  Accredited Investors Only
+</span>
+2. Fix the "Equity" Color (The "Financial Traffic Light" Rule)
+Current: Red text implies loss/debt. Fix: Green text implies profit.
+
+JavaScript
+
+{/* Inside your Property Card Component */}
+<div className="mt-2">
+  <p className="text-gray-900 font-bold text-lg">11416 Caswell Springs Way</p>
+  <p className="text-gray-500 text-sm">Louisville, KY</p>
+  
+  {/* NEW FIX: Changed text-red-500 to text-emerald-600 */}
+  <p className="text-emerald-600 font-bold mt-1">
+    $93k Equity
+  </p>
+</div>
+3. Fix the Button Hierarchy (Prioritize Sign Up)
+Current: "Sign In" is the primary button. Fix: "Sign Up" should be the primary (solid) button to drive conversions.
+
+JavaScript
+
+{/* Navigation Bar Buttons */}
+<div className="flex items-center gap-4">
+  {/* Sign In becomes Secondary (Ghost/Text) */}
+  <button className="text-gray-600 hover:text-red-600 font-medium transition-colors">
+    Sign in
+  </button>
+  
+  {/* Sign Up becomes Primary (Solid Red) */}
+  <button className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-md hover:shadow-lg">
+    Sign up
+  </button>
+</div>
+4. Fix the Stats Row (Make numbers pop)
+Current: Labels and numbers are similar size. Fix: Make numbers massive, labels subtle.
+
+JavaScript
+
+{/* Stats Container - Add a background to group them */}
+<div className="flex gap-8 mt-12 p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-fit">
+  
+  {/* Stat Item 1 */}
+  <div className="flex flex-col">
+    {/* Icon (Optional) */}
+    <span className="text-2xl font-extrabold text-gray-900">29</span>
+    <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Deals Closed</span>
+  </div>
+
+  {/* Stat Item 2 */}
+  <div className="flex flex-col">
+    <span className="text-2xl font-extrabold text-gray-900">94d</span>
+    <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Avg Hold</span>
+  </div>
+
+  {/* Stat Item 3 */}
+  <div className="flex flex-col">
+    {/* Use your Brand Red for the money stat if you want, or stick to dark gray */}
+    <span className="text-2xl font-extrabold text-red-600">$3.4M</span>
+    <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">Total Equity</span>
+  </div>
+
+</div>
+5. Fix the Card Stack Depth
+Current: Looks a bit flat. Fix: Add backdrop-blur and a stronger shadow to the front card.
+
+JavaScript
+
+{/* The Card Container */}
+<div className="relative z-10">
+  {/* The Card Image */}
+  <img src="/house.jpg" className="rounded-t-xl w-full object-cover h-48" />
+  
+  {/* The Content */}
+  <div className="bg-white p-4 rounded-b-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-gray-100">
+     {/* Card text content... */}
+  </div>
+</div>
+
+{/* The Card Behind (CSS for the stacked look) */}
+<div className="absolute top-4 -right-4 w-full h-full bg-white rounded-xl shadow-sm border border-gray-100 -z-10 scale-95 opacity-60"></div>
