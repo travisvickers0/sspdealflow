@@ -11,58 +11,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground overflow-x-hidden">
-      {/* Header with iOS safe area for notch/Dynamic Island */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md pt-[env(safe-area-inset-top)]">
-        <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">
-          <div className="flex items-center gap-4 sm:gap-8">
-            <Link href="/" className="flex items-center gap-2 font-bold text-lg sm:text-xl tracking-tight">
-              <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              <span className="hidden xs:inline">SSP Deal Flow</span>
-              <span className="xs:hidden">SSP</span>
+      {/* Header with dark gray background */}
+      <header className="sticky top-0 z-50 w-full bg-[#2C2C2C] pt-[env(safe-area-inset-top)]">
+        <nav className="px-8 py-4 flex items-center justify-between">
+          <div className="logo text-white font-bold text-2xl">SSP</div>
+          <div className="nav-links hidden md:flex items-center gap-6 text-white text-base font-normal">
+            <Link href="/properties" className="hover:opacity-80 transition-opacity">
+              Marketplace
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/properties" className={`text-sm font-bold transition-colors hover:text-primary ${location === "/properties" ? "text-black" : "text-black"}`}>
-                Marketplace
-              </Link>
-              <Link href="/how-it-works" className={`text-sm font-bold transition-colors hover:text-primary ${location === "/how-it-works" ? "text-black" : "text-black"}`}>
-                How It Works
-              </Link>
-              {isAdmin && (
-                <Link href="/admin" className={`text-sm font-bold transition-colors hover:text-primary ${location.startsWith("/admin") ? "text-black" : "text-black"}`}>
-                  Admin
-                </Link>
-              )}
-            </nav>
+            <Link href="/how-it-works" className="hover:opacity-80 transition-opacity">
+              How It Works
+            </Link>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="user-actions flex items-center gap-4 text-white text-sm font-normal">
             {!isLoading && (
               isAuthenticated ? (
                 <>
-                  {user?.profileImageUrl && (
-                    <img 
-                      src={user.profileImageUrl} 
-                      alt="Profile" 
-                      className="w-8 h-8 rounded-full object-cover hidden sm:block"
-                    />
+                  {isAdmin && (
+                    <Link href="/admin" className="hidden sm:block hover:opacity-80 transition-opacity">
+                      Admin
+                    </Link>
                   )}
-                  <a href="/api/logout">
-                    <Button variant="ghost" size="sm" className="hidden sm:flex cursor-pointer gap-2">
-                      <LogOut className="h-4 w-4" />
-                      Log out
-                    </Button>
+                  <a href="/api/logout" className="hidden sm:block hover:opacity-80 transition-opacity cursor-pointer">
+                    Log out
                   </a>
                 </>
               ) : (
-                <div className="hidden sm:flex gap-2 sm:gap-3">
-                  <a href="/signin">
-                    <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform">
-                      Sign in
-                    </Button>
+                <div className="hidden sm:flex gap-2">
+                  <a href="/signin" className="hover:opacity-80 transition-opacity">
+                    Sign in
                   </a>
-                  <a href="/signup">
-                    <Button size="sm" className="rounded-full px-4 sm:px-6 font-semibold shadow-sm cursor-pointer active:scale-95 transition-transform bg-white/90 hover:bg-white text-primary border-2 border-primary">
-                      Sign up
-                    </Button>
+                  <a href="/signup" className="hover:opacity-80 transition-opacity">
+                    Sign up
                   </a>
                 </div>
               )
@@ -71,29 +51,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="md:hidden h-9 w-9 cursor-pointer active:scale-95"
+              className="md:hidden h-9 w-9 text-white hover:bg-white/10 cursor-pointer active:scale-95"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu className="h-5 w-5" />
             </Button>
           </div>
-        </div>
+        </nav>
         
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t bg-background/95 backdrop-blur-lg animate-in slide-in-from-top-2 duration-200">
-            <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
+          <div className="md:hidden border-t border-white/20 bg-[#2C2C2C] animate-in slide-in-from-top-2 duration-200">
+            <nav className="px-4 py-4 flex flex-col gap-2">
               <Link 
                 href="/properties" 
                 onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-bold py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/properties" ? "bg-primary/10 text-primary" : "text-black hover:bg-muted"}`}
+                className="text-white text-sm font-normal py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
               >
                 Marketplace
               </Link>
               <Link 
                 href="/how-it-works" 
                 onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-bold py-3 px-4 rounded-lg transition-colors active:scale-98 ${location === "/how-it-works" ? "bg-primary/10 text-primary" : "text-black hover:bg-muted"}`}
+                className="text-white text-sm font-normal py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
               >
                 How It Works
               </Link>
@@ -101,15 +81,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link 
                   href="/admin" 
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`text-sm font-bold py-3 px-4 rounded-lg transition-colors active:scale-98 ${location.startsWith("/admin") ? "bg-primary/10 text-primary" : "text-black hover:bg-muted"}`}
+                  className="text-white text-sm font-normal py-3 px-4 rounded-lg hover:bg-white/10 transition-colors"
                 >
                   Admin
                 </Link>
               )}
-              <div className="border-t my-2" />
+              <div className="border-t border-white/20 my-2" />
               {isAuthenticated ? (
                 <a href="/api/logout" className="w-full">
-                  <Button variant="outline" className="w-full justify-center cursor-pointer active:scale-95 gap-2">
+                  <Button variant="outline" className="w-full justify-center cursor-pointer active:scale-95 gap-2 text-white border-white/20 hover:bg-white/10">
                     <LogOut className="h-4 w-4" />
                     Log out
                   </Button>

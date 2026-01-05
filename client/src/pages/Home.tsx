@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
-import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
-import { ArrowRight, Check, Loader2, ShieldCheck, TrendingUp, Zap } from "lucide-react";
+import { ArrowRight, Loader2, FileText, BarChart3, Users } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -28,18 +27,6 @@ export default function Home() {
   // Calculate total equity from all properties
   const totalEquity = properties?.reduce((sum, p) => sum + (p.estimatedEquity || 0), 0) || 0;
   
-  // Calculate deals closed (SOLD status properties)
-  const dealsClosed = properties?.filter(p => {
-    const normalizedStatus = p.status === "funded" || p.status === "archived" ? "FUNDED" : p.status;
-    return normalizedStatus === "SOLD" || normalizedStatus === "FUNDED";
-  }).length || 0;
-  
-  // Calculate average hold period from SOLD properties with holdPeriodMonths (convert to days)
-  const soldProperties = properties?.filter(p => p.status === "SOLD" && p.holdPeriodMonths) || [];
-  const averageHoldPeriod = soldProperties.length > 0
-    ? Math.round((soldProperties.reduce((sum, p) => sum + (p.holdPeriodMonths || 0), 0) / soldProperties.length) * 30.44)
-    : 94; // Default fallback (94 days ≈ 3 months)
-  
   const formatMoney = (amount: number) => {
     if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
     if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}k`;
@@ -48,253 +35,273 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* High-End Minimalist Hero Section */}
-      <div className="relative min-h-[95vh] lg:min-h-[90vh] w-full overflow-hidden bg-white border-b border-gray-100">
-        {/* Subtle Blurred Orb - Top Left Background */}
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#FFE4E6] opacity-50 rounded-full filter blur-[120px] pointer-events-none" />
-        
-        {/* Content */}
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full py-8 sm:py-12 lg:py-12 flex items-center">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 w-full items-center">
-            {/* Left Side - Positioning & Proof */}
-            <div className="max-w-2xl">
-              {/* TIER 0: SUBTLE ANNOUNCEMENT */}
-              <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 bg-red-50 border border-red-200/50 rounded-full animate-in fade-in slide-in-from-top duration-700">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-                <span className="text-xs font-bold text-red-600 uppercase tracking-[0.15em]">Accredited Investors Only</span>
-              </div>
+      {/* Hero Section */}
+      <section className="hero-section bg-[#F8F4F1] py-16 px-8 lg:px-32 flex flex-col lg:flex-row items-center justify-between gap-16">
+        {/* Left Column */}
+        <div className="left-column flex-1 max-w-2xl">
+          {/* Accredited Investors Tag */}
+          <span className="tag inline-flex items-center gap-2 bg-white text-[#333333] px-4 py-2 rounded-full text-sm font-normal border border-gray-200 mb-6">
+            <span className="w-2 h-2 bg-primary rounded-full"></span>
+            Exclusively for Accredited Investors
+          </span>
 
-              {/* TIER 1: THE POSITIONING STATEMENT */}
-              <h1 className="text-[28px] sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
-                <span className="text-gray-900">Real Estate Opportunities</span><br className="hidden sm:block" />
-                <span className="text-primary"> Built for Investors</span>
-              </h1>
+          {/* Headings */}
+          <h1 className="text-4xl lg:text-5xl font-extrabold text-[#333333] mb-4 leading-tight">
+            Real Estate Opportunities<br />
+            <span className="text-primary">Built for Investors</span>
+          </h1>
 
-              {/* TIER 2: FEATURE GRID */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 mt-4 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-                <div className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
-                    <span className="font-bold">10+ Years</span> Verified Exits
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
-                    <span className="font-bold">Deal-by-Deal</span> JV Structure
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
-                    <span className="font-bold">No Fees</span> · 100% Transparent
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-[#E11D48] flex-shrink-0" />
-                  <p className="text-sm sm:text-base text-slate-700 font-medium whitespace-nowrap">
-                    <span className="font-bold">50/50</span> Profit Split at Sale
-                  </p>
-                </div>
-              </div>
+          {/* Description */}
+          <p className="text-[#666666] text-base lg:text-lg leading-relaxed mb-8 max-w-xl">
+            Discover curated real estate deals with transparent structures, real-time dashboards, and institutional returns. All in one place.
+          </p>
 
-              {/* TIER 3: THE METRICS BAR */}
-              <div className="flex flex-wrap items-center gap-x-12 gap-y-6 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 ml-0">
-                {[
-                  { label: 'Deals Closed', value: dealsClosed },
-                  { label: 'Avg Hold', value: `${averageHoldPeriod}d` },
-                  { label: 'Total Equity', value: formatMoney(totalEquity) },
-                  { label: 'Active Investors', value: '250+' },
-                ].map((stat, i) => (
-                  <div key={i} className="flex flex-col border-l border-gray-200 pl-6 first:border-l-0 first:pl-0">
-                    <span className="text-xl font-bold tracking-tight tabular-nums leading-none text-gray-800">{stat.value}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.12em] mt-3 leading-none text-gray-400">{stat.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* TIER 4: ACTION ZONE */}
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 relative z-10">
-                <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                  <a href="/properties" className="w-full sm:w-auto">
-                    <Button 
-                      size="lg"
-                      className="group rounded-full bg-primary hover:bg-primary/90 text-white font-semibold px-8 h-14 border-0 shadow-lg shadow-primary/20 hover:shadow-xl transition-all w-full text-base cursor-pointer"
-                    >
-                      Explore Properties
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </a>
-                  <a href="/how-it-works" className="w-full sm:w-auto">
-                    <Button 
-                      size="lg"
-                      variant="outline" 
-                      className="rounded-full border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-8 h-14 bg-white w-full sm:w-auto text-base cursor-pointer transition-all"
-                    >
-                      View Partnership Structure
-                    </Button>
-                  </a>
-                </div>
-                
-                {/* Trust Indicator */}
-                <div className="flex items-center gap-2 mt-4">
-                  <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                  <p className="text-sm font-medium text-gray-500">
-                    Secured by First-Position Lien Structure
-                  </p>
+          {/* Stats Section - 3 Column Grid */}
+          <div className="stats-grid grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+            <div className="stat-card bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                <div className="flex flex-col">
+                  <span className="number text-3xl font-bold text-[#333333] leading-none">{formatMoney(totalEquity)}</span>
+                  <span className="label text-sm font-normal text-[#666666] mt-2">Total Equity</span>
                 </div>
               </div>
             </div>
-
-            {/* Mobile Card Stack */}
-            <div className="lg:hidden relative mt-16 pb-12">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary/30" />
+            <div className="stat-card bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-start gap-3">
+                <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                <div className="flex flex-col">
+                  <span className="number text-3xl font-bold text-[#333333] leading-none">$15M+</span>
+                  <span className="label text-sm font-normal text-[#666666] mt-2">Deployed</span>
                 </div>
-              ) : heroStackProperties.length > 0 ? (
-                <div className="relative h-[320px] mx-auto max-w-[320px]">
-                  {/* Card 3 - Back */}
-                  {heroStackProperties[2] && (
-                    <div className="absolute left-6 top-10 w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform -rotate-6 opacity-30 z-10">
-                      <div className="aspect-[16/10] bg-gray-100 relative">
-                        {getPropertyImage(heroStackProperties[2]) && (
-                          <img 
-                            src={getPropertyImage(heroStackProperties[2])}
-                            alt={heroStackProperties[2].address}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Card 2 - Middle */}
-                  {heroStackProperties[1] && (
-                    <div className="absolute left-3 top-5 w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform rotate-2 opacity-80 z-20 transition-all duration-500">
-                      <div className="aspect-[16/10] bg-gray-100 relative">
-                        {getPropertyImage(heroStackProperties[1]) && (
-                          <img 
-                            src={getPropertyImage(heroStackProperties[1])}
-                            alt={heroStackProperties[1].address}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Card 1 - Front */}
-                  <a href={`/property/${heroStackProperties[0]?.id}`} className="block relative z-30">
-                    <div className="absolute left-0 top-0 w-[280px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden group">
-                      <div className="aspect-[16/10] bg-gray-100 relative overflow-hidden">
-                        {getPropertyImage(heroStackProperties[0]) && (
-                          <img 
-                            src={getPropertyImage(heroStackProperties[0])}
-                            alt={heroStackProperties[0].address}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        )}
-                        <div className="absolute top-3 left-3 bg-primary/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider">
-                          ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-bold text-gray-900 mb-0.5 text-sm truncate">{heroStackProperties[0]?.address}</h3>
-                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-3">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
-                        <div className="flex justify-between items-center text-[10px]">
-                          <span className="text-primary font-bold uppercase tracking-wider">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
-                          <span className="text-gray-400 font-medium">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} SF</span>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              ) : null}
+              </div>
             </div>
-
-            {/* Desktop Stacked Property Cards */}
-            <div className="hidden lg:flex relative h-full items-center justify-end">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-full w-full">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary/30" />
+            <div className="stat-card bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                <div className="flex flex-col">
+                  <span className="number text-3xl font-bold text-[#333333] leading-none">250+</span>
+                  <span className="label text-sm font-normal text-[#666666] mt-2">Active Investors</span>
                 </div>
-              ) : heroStackProperties.length > 0 ? (
-                <div className="relative w-[420px] h-[500px]">
-                  {/* Card 2 - Middle (Back) */}
-                  {heroStackProperties[1] && (
-                    <div 
-                      className={`absolute right-8 top-12 w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer ${
-                        hoveredCard === 1 ? 'z-50 scale-[1.02] opacity-100 rotate-0 translate-x-[-10px] translate-y-[-10px]' : 'z-20 rotate-3 opacity-40 translate-x-2 translate-y-4'
-                      }`}
-                      onMouseEnter={() => setHoveredCard(1)}
-                      onMouseLeave={() => setHoveredCard(null)}
-                    >
-                      <div className="aspect-[4/3] bg-gray-100 relative">
-                        {getPropertyImage(heroStackProperties[1]) && (
-                          <img 
-                            src={getPropertyImage(heroStackProperties[1])}
-                            alt={heroStackProperties[1].address}
-                            className="w-full h-full object-cover"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        )}
-                        <div className="absolute top-4 left-4 bg-primary/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs font-bold tracking-wider">
-                          ${(heroStackProperties[1]?.purchasePrice / 1000).toFixed(0)}k
-                        </div>
-                      </div>
-                      <div className="p-5">
-                        <h3 className="font-bold text-gray-900 mb-1">{heroStackProperties[1]?.address}</h3>
-                        <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{heroStackProperties[1]?.city}, {heroStackProperties[1]?.state}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Card 1 - Front */}
-                  <a href={`/property/${heroStackProperties[0]?.id}`} className="block relative z-30">
-                    <div 
-                      className={`absolute right-0 top-0 w-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform transition-all duration-500 ease-out cursor-pointer group ${
-                        hoveredCard === 0 ? 'z-50 scale-[1.02]' : hoveredCard !== null ? 'z-30 opacity-90' : 'z-30'
-                      }`}
-                      onMouseEnter={() => setHoveredCard(0)}
-                      onMouseLeave={() => setHoveredCard(null)}
-                    >
-                      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
-                        {getPropertyImage(heroStackProperties[0]) && (
-                          <img 
-                            src={getPropertyImage(heroStackProperties[0])}
-                            alt={heroStackProperties[0].address}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                          />
-                        )}
-                        <div className="absolute top-4 left-4 bg-primary/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider">
-                          ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
-                        </div>
-                      </div>
-                      <div className="p-5">
-                        <h3 className="font-bold text-gray-900 mb-0.5 text-lg truncate">{heroStackProperties[0]?.address}</h3>
-                        <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider mb-4">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</p>
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-primary font-bold uppercase tracking-wider">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
-                          <span className="text-gray-400 font-medium">{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} SF</span>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  <p>No properties available</p>
-                </div>
-              )}
+              </div>
             </div>
           </div>
+
+          {/* Buttons */}
+          <div className="buttons flex flex-col sm:flex-row gap-4">
+            <a href="/properties" className="primary-button inline-flex items-center justify-center bg-primary text-white px-8 py-3.5 rounded-lg text-base font-semibold hover:bg-primary/90 transition-colors cursor-pointer">
+              Explore Properties
+            </a>
+            <a href="/how-it-works" className="secondary-button inline-flex items-center justify-center bg-white border-2 border-gray-300 text-[#333333] px-8 py-3.5 rounded-lg text-base font-normal hover:border-gray-400 transition-all cursor-pointer">
+              View Partnership Structure
+            </a>
+          </div>
         </div>
-      </div>
+
+        {/* Right Column - Card Stack */}
+        <div className="right-column hidden lg:block relative w-full max-w-[450px] h-[520px]">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : heroStackProperties.length > 0 ? (
+            <div className="card-stack relative w-full h-full">
+              {/* Card 3 - Back */}
+              {heroStackProperties[2] && (
+                <div className="property-card absolute top-0 left-0 w-full bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.25)] overflow-hidden transform translate-x-8 translate-y-8 rotate-[3deg] scale-95 z-10 transition-all">
+                  <div className="relative h-48 overflow-hidden">
+                    {getPropertyImage(heroStackProperties[2]) ? (
+                      <img 
+                        src={getPropertyImage(heroStackProperties[2])}
+                        alt={heroStackProperties[2].address}
+                        className="w-full h-full object-cover rounded-t-2xl"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200" />
+                    )}
+                  </div>
+                  <div className="card-content p-5">
+                    <h3 className="text-lg font-bold text-[#333333] mb-2 truncate">{heroStackProperties[2]?.address}</h3>
+                    <div className="card-details flex flex-col gap-1 text-sm text-[#666666] font-normal">
+                      <span className="text-[#333333]">{heroStackProperties[2]?.city}, {heroStackProperties[2]?.state}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-primary font-semibold">${(heroStackProperties[2]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span>{(heroStackProperties[2]?.squareFeet || 0).toLocaleString()} sf</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Card 2 - Middle */}
+              {heroStackProperties[1] && (
+                <div className="property-card absolute top-0 left-0 w-full bg-white rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.2)] overflow-hidden transform translate-x-4 translate-y-4 rotate-[1.5deg] scale-[0.97] z-20 transition-all">
+                  <div className="relative h-48 overflow-hidden">
+                    {getPropertyImage(heroStackProperties[1]) ? (
+                      <img 
+                        src={getPropertyImage(heroStackProperties[1])}
+                        alt={heroStackProperties[1].address}
+                        className="w-full h-full object-cover rounded-t-2xl"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200" />
+                    )}
+                  </div>
+                  <div className="card-content p-5">
+                    <h3 className="text-lg font-bold text-[#333333] mb-2 truncate">{heroStackProperties[1]?.address}</h3>
+                    <div className="card-details flex flex-col gap-1 text-sm text-[#666666] font-normal">
+                      <span className="text-[#333333]">{heroStackProperties[1]?.city}, {heroStackProperties[1]?.state}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-primary font-semibold">${(heroStackProperties[1]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span>{(heroStackProperties[1]?.squareFeet || 0).toLocaleString()} sf</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Card 1 - Front */}
+              {heroStackProperties[0] && (
+                <a href={`/property/${heroStackProperties[0]?.id}`} className="property-card block absolute top-0 left-0 w-full bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] overflow-hidden z-30 hover:scale-[1.03] hover:shadow-[0_16px_50px_rgba(0,0,0,0.2)] transition-all duration-300 cursor-pointer">
+                  <div className="relative h-48 overflow-hidden">
+                    {getPropertyImage(heroStackProperties[0]) ? (
+                      <img 
+                        src={getPropertyImage(heroStackProperties[0])}
+                        alt={heroStackProperties[0].address}
+                        className="w-full h-full object-cover rounded-t-2xl"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200" />
+                    )}
+                    <div className="price-tag absolute top-3 left-3 bg-primary text-white px-5 py-2 rounded-lg text-base font-bold transform -rotate-[12deg] shadow-lg">
+                      ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                    </div>
+                  </div>
+                  <div className="card-content p-5">
+                    <h3 className="text-lg font-bold text-[#333333] mb-2 truncate">{heroStackProperties[0]?.address}</h3>
+                    <div className="card-details flex flex-col gap-1 text-sm text-[#666666] font-normal">
+                      <span className="text-[#333333]">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-primary font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span>{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-[#666666]">
+              <p>No properties available</p>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Card Stack */}
+        <div className="lg:hidden relative w-full max-w-[380px] h-[450px] mt-8 mx-auto">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : heroStackProperties.length > 0 ? (
+            <div className="card-stack relative w-full h-full">
+              {/* Card 3 - Back */}
+              {heroStackProperties[2] && (
+                <div className="property-card absolute top-0 left-0 w-full bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.25)] overflow-hidden transform translate-x-8 translate-y-8 rotate-[3deg] scale-95 z-10 transition-all">
+                  <div className="relative h-44 overflow-hidden">
+                    {getPropertyImage(heroStackProperties[2]) ? (
+                      <img 
+                        src={getPropertyImage(heroStackProperties[2])}
+                        alt={heroStackProperties[2].address}
+                        className="w-full h-full object-cover rounded-t-2xl"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200" />
+                    )}
+                  </div>
+                  <div className="card-content p-4">
+                    <h3 className="text-base font-bold text-[#333333] mb-2 truncate">{heroStackProperties[2]?.address}</h3>
+                    <div className="card-details flex flex-col gap-1 text-xs text-[#666666] font-normal">
+                      <span className="text-[#333333]">{heroStackProperties[2]?.city}, {heroStackProperties[2]?.state}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary font-semibold">${(heroStackProperties[2]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span>{(heroStackProperties[2]?.squareFeet || 0).toLocaleString()} sf</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Card 2 - Middle */}
+              {heroStackProperties[1] && (
+                <div className="property-card absolute top-0 left-0 w-full bg-white rounded-2xl shadow-[0_16px_48px_rgba(0,0,0,0.2)] overflow-hidden transform translate-x-4 translate-y-4 rotate-[1.5deg] scale-[0.97] z-20 transition-all">
+                  <div className="relative h-44 overflow-hidden">
+                    {getPropertyImage(heroStackProperties[1]) ? (
+                      <img 
+                        src={getPropertyImage(heroStackProperties[1])}
+                        alt={heroStackProperties[1].address}
+                        className="w-full h-full object-cover rounded-t-2xl"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200" />
+                    )}
+                  </div>
+                  <div className="card-content p-4">
+                    <h3 className="text-base font-bold text-[#333333] mb-2 truncate">{heroStackProperties[1]?.address}</h3>
+                    <div className="card-details flex flex-col gap-1 text-xs text-[#666666] font-normal">
+                      <span className="text-[#333333]">{heroStackProperties[1]?.city}, {heroStackProperties[1]?.state}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary font-semibold">${(heroStackProperties[1]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span>{(heroStackProperties[1]?.squareFeet || 0).toLocaleString()} sf</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Card 1 - Front */}
+              {heroStackProperties[0] && (
+                <a href={`/property/${heroStackProperties[0]?.id}`} className="property-card block absolute top-0 left-0 w-full bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] overflow-hidden z-30 hover:scale-[1.03] hover:shadow-[0_16px_50px_rgba(0,0,0,0.2)] transition-all duration-300 cursor-pointer">
+                  <div className="relative h-44 overflow-hidden">
+                    {getPropertyImage(heroStackProperties[0]) ? (
+                      <img 
+                        src={getPropertyImage(heroStackProperties[0])}
+                        alt={heroStackProperties[0].address}
+                        className="w-full h-full object-cover rounded-t-2xl"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200" />
+                    )}
+                    <div className="price-tag absolute top-2.5 left-2.5 bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold transform -rotate-[12deg] shadow-lg">
+                      ${(heroStackProperties[0]?.purchasePrice / 1000).toFixed(0)}k
+                    </div>
+                  </div>
+                  <div className="card-content p-4">
+                    <h3 className="text-base font-bold text-[#333333] mb-2 truncate">{heroStackProperties[0]?.address}</h3>
+                    <div className="card-details flex flex-col gap-1 text-xs text-[#666666] font-normal">
+                      <span className="text-[#333333]">{heroStackProperties[0]?.city}, {heroStackProperties[0]?.state}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-primary font-semibold">${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k Equity</span>
+                        <span>{(heroStackProperties[0]?.squareFeet || 0).toLocaleString()} sf</span>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-[#666666]">
+              <p>No properties available</p>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Featured Opportunities Section */}
       <section className="py-24 sm:py-32 bg-white">
