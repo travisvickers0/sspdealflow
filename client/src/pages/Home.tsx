@@ -255,11 +255,11 @@ export default function Home() {
                         )}
                         <div className="absolute top-0 left-0 z-10 scale-75 origin-top-left">
                           <div className="relative">
-                            <div className="absolute top-4 -left-1 bg-emerald-600/90 text-white px-3 py-1.5 shadow-lg transform -rotate-1 flex items-center gap-1.5 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-900/40 after:border-l-4 after:border-l-transparent">
-                              <span className="text-sm font-bold tracking-tight">
+                            <div className="absolute top-4 -left-1 bg-emerald-600/90 text-white px-4 py-2 shadow-lg transform -rotate-1 flex items-center gap-2 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-900/40 after:border-l-4 after:border-l-transparent">
+                              <span className="text-base font-bold tracking-tight">
                                 ${(heroStackProperties[2]?.estimatedEquity / 1000).toFixed(0)}k
                               </span>
-                              <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">Equity</span>
+                              <span className="text-[11px] font-bold uppercase tracking-wider opacity-90">Equity</span>
                             </div>
                           </div>
                         </div>
@@ -291,11 +291,11 @@ export default function Home() {
                         )}
                         <div className="absolute top-0 left-0 z-10 scale-75 origin-top-left">
                           <div className="relative">
-                            <div className="absolute top-4 -left-1 bg-emerald-600/90 text-white px-3 py-1.5 shadow-lg transform -rotate-1 flex items-center gap-1.5 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-900/40 after:border-l-4 after:border-l-transparent">
-                              <span className="text-sm font-bold tracking-tight">
+                            <div className="absolute top-4 -left-1 bg-emerald-600/90 text-white px-4 py-2 shadow-lg transform -rotate-1 flex items-center gap-2 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-900/40 after:border-l-4 after:border-l-transparent">
+                              <span className="text-base font-bold tracking-tight">
                                 ${(heroStackProperties[1]?.estimatedEquity / 1000).toFixed(0)}k
                               </span>
-                              <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">Equity</span>
+                              <span className="text-[11px] font-bold uppercase tracking-wider opacity-90">Equity</span>
                             </div>
                           </div>
                         </div>
@@ -326,11 +326,11 @@ export default function Home() {
                       )}
                       <div className="absolute top-0 left-0 z-10">
                         <div className="relative">
-                          <div className="absolute top-4 -left-1 bg-emerald-600 text-white px-3 py-1.5 shadow-lg transform -rotate-1 origin-top-left flex items-center gap-1.5 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-800 after:border-l-4 after:border-l-transparent">
-                            <span className="text-sm font-bold tracking-tight">
+                          <div className="absolute top-4 -left-1 bg-emerald-600 text-white px-4 py-2 shadow-lg transform -rotate-1 origin-top-left flex items-center gap-2 after:content-[''] after:absolute after:top-full after:left-0 after:border-t-4 after:border-t-emerald-800 after:border-l-4 after:border-l-transparent">
+                            <span className="text-base font-bold tracking-tight">
                               ${(heroStackProperties[0]?.estimatedEquity / 1000).toFixed(0)}k
                             </span>
-                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">Equity</span>
+                            <span className="text-[11px] font-bold uppercase tracking-wider opacity-90">Equity</span>
                           </div>
                         </div>
                       </div>
