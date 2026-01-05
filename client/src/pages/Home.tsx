@@ -54,7 +54,7 @@ export default function Home() {
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full py-12 sm:py-16 lg:py-20 flex items-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 w-full items-center">
             {/* Left Side - Text & CTAs */}
-            <div className="max-w-2xl">
+            <div className="lg:col-span-1 pr-0 lg:pr-8">
             {/* Badge */}
             <div className="mb-6 sm:mb-8 animate-in fade-in slide-in-from-top duration-700">
               <span className="bg-emerald-50/50 border border-emerald-200 text-emerald-700 tracking-wider px-3 py-1 rounded-full text-[10px] font-bold uppercase shadow-sm select-none">
@@ -63,7 +63,7 @@ export default function Home() {
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 sm:mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-6 sm:mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
               Real Estate Opportunities<br />
               <span className="text-primary">
                 Built for Investors
@@ -71,42 +71,42 @@ export default function Home() {
             </h1>
 
             {/* Checkmark Features Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm text-gray-700">10+ Years Verified Exits</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-base lg:text-lg text-gray-700 font-medium">10+ Years Verified Exits</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm text-gray-700">Deal-by-Deal JV Structure</span>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-base lg:text-lg text-gray-700 font-medium">Deal-by-Deal JV Structure</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm text-gray-700">No Fees · 100% Transparent</span>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-base lg:text-lg text-gray-700 font-medium">No Fees · 100% Transparent</span>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm text-gray-700">50/50 Profit Split at Sale</span>
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                <span className="text-base lg:text-lg text-gray-700 font-medium">50/50 Profit Split at Sale</span>
               </div>
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-8 gap-y-6 sm:gap-8 p-5 sm:p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-full sm:w-fit mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-12 gap-y-8 sm:gap-12 p-6 sm:p-8 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-full sm:w-fit mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               <div className="flex flex-col">
-                <span className="text-2xl font-extrabold text-gray-900">29</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Deals Closed</span>
+                <span className="text-3xl lg:text-4xl font-extrabold text-gray-900">29</span>
+                <span className="text-[11px] uppercase tracking-wider text-gray-500 font-bold whitespace-nowrap">Deals Closed</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-extrabold text-gray-900">94d</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Avg Hold</span>
+                <span className="text-3xl lg:text-4xl font-extrabold text-gray-900">94d</span>
+                <span className="text-[11px] uppercase tracking-wider text-gray-500 font-bold whitespace-nowrap">Avg Hold</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-extrabold text-emerald-600">{formatMoney(totalEquity)}</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Total Equity</span>
+                <span className="text-3xl lg:text-4xl font-extrabold text-emerald-600">{formatMoney(totalEquity)}</span>
+                <span className="text-[11px] uppercase tracking-wider text-gray-500 font-bold whitespace-nowrap">Total Equity</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl font-extrabold text-gray-900">250+</span>
-                <span className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold whitespace-nowrap">Active Investors</span>
+                <span className="text-3xl lg:text-4xl font-extrabold text-gray-900">250+</span>
+                <span className="text-[11px] uppercase tracking-wider text-gray-500 font-bold whitespace-nowrap">Active Investors</span>
               </div>
             </div>
 
