@@ -54,7 +54,7 @@ export default function Home() {
         <div className="hidden sm:block absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-200/10 rounded-full filter blur-[100px] animate-pulse delay-1000" />
         
         {/* Content */}
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full py-12 sm:py-16 lg:py-20 flex items-center">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full pt-6 sm:pt-8 lg:pt-12 pb-12 sm:pb-16 lg:pb-20 flex items-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 w-full items-center">
             {/* Left Side - Text & CTAs */}
             <div className="lg:col-span-1 pr-0 lg:pr-8">
@@ -66,8 +66,9 @@ export default function Home() {
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight mb-6 sm:mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
-              Real Estate Opportunities<br />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 sm:mb-8 text-gray-900 animate-in fade-in slide-in-from-bottom-4 duration-700 leading-tight">
+              Real Estate<br />
+              Opportunities<br />
               <span className="text-primary">
                 Built for Investors
               </span>
@@ -94,7 +95,7 @@ export default function Home() {
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-12 gap-y-8 sm:gap-12 p-6 sm:p-8 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-full sm:w-fit mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <div className="grid grid-cols-2 sm:flex sm:flex-nowrap gap-x-12 gap-y-8 sm:gap-12 p-6 sm:p-8 bg-white/50 backdrop-blur-sm rounded-2xl border border-gray-100 w-full sm:w-fit mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
               <div className="flex flex-col">
                 <span className="text-3xl lg:text-4xl font-extrabold text-gray-900">119</span>
                 <span className="text-[11px] uppercase tracking-wider text-gray-500 font-bold whitespace-nowrap">Deals Closed</span>
@@ -235,9 +236,9 @@ export default function Home() {
                         </div>
                       </div>
                     )}
-                  </>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
+            </div>
 
             {/* Desktop Stacked Property Cards */}
             <div className="hidden lg:block relative h-[600px]">

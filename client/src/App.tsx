@@ -35,6 +35,10 @@ function AdminRoute() {
   return <Admin />;
 }
 
+function InvestorIntroRedirect() {
+  return <Redirect to="/investors" />;
+}
+
 function Router() {
   return (
     <Switch>
@@ -43,7 +47,8 @@ function Router() {
       <Route path="/signup" component={SignUp} />
       <Route path="/properties" component={Properties} />
       <Route path="/how-it-works" component={HowItWorks} />
-      <Route path="/investor-intro" component={MetaLanding} />
+      <Route path="/investor-intro" component={InvestorIntroRedirect} />
+      <Route path="/investors" component={MetaLanding} />
       <Route path="/qualify" component={Qualify} />
       <Route path="/thank-you" component={ThankYou} />
       <Route path="/property/:slug" component={PropertyDetail} />
