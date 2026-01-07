@@ -379,35 +379,10 @@ export async function registerRoutes(
   
   // Serve uploaded files from local filesystem (legacy - for documents)
   app.use("/uploads", (req, res, next) => {
-    // Basic path traversal protection
-    const sanitizedPath = req.path.replace(/\.\.\//g, "");
-    const filePath = path.join(uploadDir, sanitizedPath);
-    
+    const filePath = path.join(uploadDir, req.path);
     if (fs.existsSync(filePath)) {
       res.sendFile(filePath);
     } else {
-      // If not in local uploads, check if it's in public/uploads (sometimes used for defaults)
-      const publicPath = path.join(process.cwd(), "client", "public", "uploads", sanitizedPath);
-      if (fs.existsSync(publicPath)) {
-        return res.sendFile(publicPath);
-      }
-      
-      // Finally, check object storage if it's a photo or document we moved there
-      // We only do this if it looks like a standard upload path
-      next();
-    }
-  }, async (req, res) => {
-    // If we reached here, the file wasn't on disk. 
-    // It might be in object storage but using a legacy /uploads/ path
-    const objectStorageService = new ObjectStorageService();
-    const relPath = req.path.startsWith("/") ? req.path.slice(1) : req.path;
-    
-    try {
-      if (await objectStorageService.objectExists(relPath)) {
-        return await objectStorageService.downloadObject(relPath, res);
-      }
-      res.status(404).json({ error: "File not found" });
-    } catch (error) {
       res.status(404).json({ error: "File not found" });
     }
   });
