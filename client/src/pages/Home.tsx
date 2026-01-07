@@ -54,7 +54,7 @@ export default function Home() {
         <div className="hidden sm:block absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-200/10 rounded-full filter blur-[100px] animate-pulse delay-1000" />
         
         {/* Content */}
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full pt-6 sm:pt-8 lg:pt-12 pb-12 sm:pb-16 lg:pb-20 flex items-center">
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 h-full pt-16 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 lg:pb-20 flex items-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 w-full items-center">
             {/* Left Side - Text & CTAs */}
             <div className="lg:col-span-1 pr-0 lg:pr-8">
