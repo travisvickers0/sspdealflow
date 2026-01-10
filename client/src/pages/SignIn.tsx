@@ -1,15 +1,44 @@
 import { Button } from "@/components/ui/button";
-import { Github, Mail, Apple } from "lucide-react";
+import { Github, Mail, Apple, Eye, EyeOff } from "lucide-react";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
 import { useState } from "react";
 import { Link } from "wouter";
 
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSignIn = () => {
     setIsLoading(true);
     window.location.href = "/api/login";
+  };
+
+  const handleSimpleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      const response = await fetch("/api/login/simple", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (response.ok) {
+        window.location.href = "/";
+      } else {
+        const data = await response.json();
+        setError(data.message || "Invalid email or password");
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,16 +76,50 @@ export default function SignIn() {
 
           {/* Sign In Card */}
           <div className="p-6 sm:p-8 bg-white/70 backdrop-blur border border-gray-200/50 rounded-2xl shadow-lg space-y-6">
-            {/* Email/Password Sign In */}
-            <button
-              onClick={handleSignIn}
-              disabled={isLoading}
-              data-testid="button-signin-email"
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-full transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Mail className="h-5 w-5" />
-              <span>Continue with Email</span>
-            </button>
+            {/* Simple Email/Password Form */}
+            <form onSubmit={handleSimpleLogin} className="space-y-4">
+              <div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email address"
+                  data-testid="input-email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/80"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  data-testid="input-password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/80 pr-12"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+              {error && (
+                <p className="text-red-500 text-sm text-center">{error}</p>
+              )}
+              <button
+                type="submit"
+                disabled={isLoading}
+                data-testid="button-signin-submit"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-full transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Mail className="h-5 w-5" />
+                <span>Sign In</span>
+              </button>
+            </form>
 
             {/* Divider */}
             <div className="relative">
@@ -64,7 +127,7 @@ export default function SignIn() {
                 <div className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white/70 backdrop-blur text-gray-600">or</span>
+                <span className="px-3 bg-white/70 backdrop-blur text-gray-600">or continue with</span>
               </div>
             </div>
 

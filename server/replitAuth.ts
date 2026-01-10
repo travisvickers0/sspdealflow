@@ -126,6 +126,51 @@ export async function setupAuth(app: Express) {
       );
     });
   });
+
+  // Simple test login for demo accounts
+  app.post("/api/login/simple", async (req, res) => {
+    const { email, password } = req.body;
+    
+    const testEmail = process.env.TEST_LOGIN_EMAIL || "test@ssp.com";
+    const testPassword = process.env.TEST_LOGIN_PASSWORD || "houses";
+    
+    if (email === testEmail && password === testPassword) {
+      // Create a test user session
+      const testUserId = "test-user-demo";
+      const testUser = {
+        claims: {
+          sub: testUserId,
+          email: testEmail,
+          first_name: "Test",
+          last_name: "Investor",
+          profile_image_url: null,
+          exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60), // 1 week
+        },
+        access_token: "test-token",
+        refresh_token: null,
+        expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
+      };
+      
+      // Upsert the test user
+      await storage.upsertUser({
+        id: testUserId,
+        email: testEmail,
+        firstName: "Test",
+        lastName: "Investor",
+        profileImageUrl: null,
+      });
+      
+      // Log in the user
+      req.login(testUser, (err) => {
+        if (err) {
+          return res.status(500).json({ message: "Login failed" });
+        }
+        return res.json({ success: true, redirect: "/" });
+      });
+    } else {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+  });
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
