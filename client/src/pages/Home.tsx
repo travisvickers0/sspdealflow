@@ -14,16 +14,20 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   
-  // Filter for properties that need funding and sort by most recently added
-  const needsFundingProperties = (properties?.filter(p => p.status === 'needs_funding') || [])
+  // Sort all properties by most recently added (regardless of status)
+  const sortedProperties = (properties || [])
+    .slice() // Create a copy to avoid mutating original
     .sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA; // Newest first
     });
   
-  // Hero stack shows the 3 most recently added needs_funding properties
-  const heroStackProperties = needsFundingProperties.slice(0, 3);
+  // Hero stack shows the 3 most recently added properties (any status)
+  const heroStackProperties = sortedProperties.slice(0, 3);
+  
+  // Filter for properties that need funding (for Featured section)
+  const needsFundingProperties = sortedProperties.filter(p => p.status === 'needs_funding');
   
   // Helper to get image URL - use mainPhotoUrl or fallback to first gallery photo
   const getPropertyImage = (property: any) => {
