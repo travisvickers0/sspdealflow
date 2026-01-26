@@ -863,52 +863,6 @@ export default function PropertyDetail() {
                 </div>
               )}
 
-              {/* Why First-Position Matters */}
-              <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-gray-900">Why First-Position Matters</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="border-0 shadow-sm">
-                    <CardContent className="p-6">
-                        <div className="flex items-start gap-3 mb-3">
-                        <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
-                          <ArrowUp className="w-5 h-5 text-primary" strokeWidth={1.5} />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">Capital in First Position</h3>
-                      </div>
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        Investor capital sits at the top of the capital structure through the joint venture agreement, providing priority protection relative to other project capital.
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-0 shadow-sm">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
-                          <Shield className="w-5 h-5 text-primary" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">Title Company Control</h3>
-                      </div>
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        Investor funds are wired directly to the licensed title company or closing attorney and are not held in SSP operating accounts.
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-0 shadow-sm">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
-                          <Target className="w-5 h-5 text-primary" strokeWidth={1.5} />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">Aligned Incentives</h3>
-                      </div>
-                      <p className="text-sm text-gray-700 leading-relaxed">
-                        SSP advances renovation and holding costs and is compensated only after investor capital is returned and profits are realized.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-
               {/* Optional Timeline Section - Only for SOLD */}
               {isSold && (
                 <Card className="border-0 shadow-sm">
