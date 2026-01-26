@@ -779,177 +779,6 @@ export default function PropertyDetail() {
                 </Card>
               </div>
 
-              {/* First-Position Structure Callout */}
-              <Card className="border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
-                      <Shield className="w-5 h-5 text-primary" strokeWidth={1.5} />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">First-Position Joint Venture Structure</h3>
-                      <div className="text-gray-700 leading-relaxed space-y-2 text-sm">
-                        <p>
-                          This opportunity is structured as a first-position joint venture.
-                        </p>
-                        <p>
-                          Investor capital funds the purchase price and is wired directly to the licensed title company or closing attorney at closing. Southern Specialty Properties LLC holds title and advances all renovation and holding costs.
-                        </p>
-                        <p>
-                          SSP is subordinated and earns only after investor capital is returned and profits are realized.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Capital Flow Summary */}
-              <Card className="border-0 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl">Capital Flow Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {/* Top: Investor Capital + SSP Capital (Funnel Top) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Investor Capital - Hero (Green) */}
-                      <div className="relative p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-300 shadow-md">
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 p-2.5 bg-green-200 rounded-lg">
-                            <Landmark className="w-5 h-5 text-green-800" strokeWidth={1.5} />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <p className="text-sm font-bold text-gray-900">Investor Capital</p>
-                              <div className="flex items-center gap-1 px-2.5 py-1 bg-emerald-600 text-white rounded-full text-[10px] font-bold shadow-sm">
-                                <Lock className="w-3 h-3" />
-                                <span>1st Lien Position (Secured)</span>
-                              </div>
-                            </div>
-                            <p className="text-xs text-gray-600">Purchase price funding</p>
-                          </div>
-                        </div>
-                        {/* Thick green gradient arrow pointing down and converging */}
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                          <div className="relative">
-                            <div className="w-2 h-10 bg-gradient-to-b from-green-500 via-green-400 to-amber-400 rounded-full"></div>
-                            {/* Arrowhead */}
-                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                              <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-amber-400"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* SSP Capital - Subordinated (Gray) */}
-                      <div className="relative p-4 bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl border border-slate-300 shadow-sm">
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 p-2.5 bg-slate-200 rounded-lg">
-                            <DollarSign className="w-5 h-5 text-slate-700" strokeWidth={1.5} />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <p className="text-sm font-semibold text-gray-900">SSP Capital</p>
-                              <span className="text-xs font-semibold px-2 py-1 bg-slate-300 text-slate-800 rounded-full">Subordinated</span>
-                            </div>
-                            <p className="text-xs text-gray-600">Renovation & holding costs</p>
-                          </div>
-                        </div>
-                        {/* Thick gray gradient arrow pointing down and converging */}
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                          <div className="relative">
-                            <div className="w-2 h-10 bg-gradient-to-b from-slate-500 via-slate-400 to-amber-400 rounded-full"></div>
-                            {/* Arrowhead */}
-                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                              <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-amber-400"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Middle: Title Company - Safety Valve (Gold/Shield) - Funnel Narrow Point */}
-                    <div className="relative -mt-2">
-                      <div className="flex justify-center">
-                        <div className="p-6 bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-50 rounded-2xl border-2 border-amber-400 shadow-xl max-w-sm mx-auto relative z-10">
-                          <div className="flex flex-col items-center gap-3">
-                            <div className="p-3.5 bg-gradient-to-br from-amber-200 to-amber-300 rounded-full shadow-md">
-                              <Shield className="w-7 h-7 text-amber-900" strokeWidth={2} />
-                            </div>
-                            <div className="text-center">
-                              <p className="text-lg font-bold text-gray-900 mb-1">Title Company</p>
-                              <p className="text-xs text-gray-600 font-medium">Licensed escrow & closing</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      {/* Thick gradient arrow down from Title Company with more spacing */}
-                      <div className="flex justify-center mt-8">
-                        <div className="relative">
-                          <div className="w-2 h-20 bg-gradient-to-b from-amber-500 via-amber-400 to-gray-400 rounded-full shadow-sm"></div>
-                          {/* Arrowhead */}
-                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                            <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-400"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Property Acquisition - Same width as Title Company */}
-                    <div className="flex justify-center">
-                      <div className="flex items-center justify-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-300 shadow-sm max-w-sm w-full">
-                        <Home className="w-5 h-5 text-gray-700" strokeWidth={1.5} />
-                        <span className="text-sm font-bold text-gray-900">Property Acquisition</span>
-                      </div>
-                    </div>
-
-                    {/* Arrow Down to Sale Proceeds */}
-                    <div className="flex justify-center mt-3">
-                      <div className="relative">
-                        <div className="w-2 h-12 bg-gradient-to-b from-gray-500 via-gray-400 to-green-500 rounded-full shadow-sm"></div>
-                        {/* Arrowhead */}
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
-                          <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-green-500"></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bottom: Sale Proceeds - Happy Ending (Light Background, Strong Border) */}
-                    <div className="p-5 bg-[rgba(240,253,244,0.08)] rounded-xl border-2 border-green-500 shadow-lg">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                          <Coins className="w-5 h-5 text-green-700" strokeWidth={1.5} />
-                        </div>
-                        <span className="text-base font-bold text-gray-900">Sale Proceeds</span>
-                      </div>
-                      <div className="space-y-3 ml-2">
-                        <div className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                          <span className="text-sm font-medium text-gray-900">Title Company receives proceeds</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                          <span className="text-sm font-medium text-gray-900">Investor capital returned</span>
-                        </div>
-                        <div className="flex items-center gap-3 pt-2 border-t border-green-200">
-                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                          <span className="text-sm font-bold text-green-700">50/50 Profit Distribution</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Footnote */}
-                    <div className="pt-4 mt-4 border-t border-gray-200">
-                      <p className="text-xs text-gray-500 flex items-center gap-1.5">
-                        <Shield className="w-3.5 h-3.5 text-gray-400" />
-                        All funds move through the title company. Investor capital is never pooled.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* About this Property / Deal Summary */}
               <Card className="border-0 shadow-sm">
                 <CardHeader>
@@ -1185,7 +1014,7 @@ export default function PropertyDetail() {
                     <CardTitle className="text-lg">Documents</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {(property.documents as any[])?.length > 0 ? (
+                    {Array.isArray(property.documents) && property.documents.length > 0 ? (
                       <div className="space-y-2">
                         {(property.documents as any[]).map((doc, idx) => (
                           <a 
@@ -1211,25 +1040,10 @@ export default function PropertyDetail() {
                         ))}
                       </div>
                     ) : (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-lg border border-gray-100">
-                          <div className="p-2 bg-white rounded-lg">
-                            <FileText className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-gray-900">Property Pro Forma</p>
-                            <p className="text-xs text-gray-500">PDF · 2.4 KB</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-lg border border-gray-100">
-                          <div className="p-2 bg-white rounded-lg">
-                            <FileText className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-gray-900">Inspection Report</p>
-                            <p className="text-xs text-gray-500">PDF · 5.1 KB</p>
-                          </div>
-                        </div>
+                      <div className="text-center py-6">
+                        <FileText className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                        <p className="text-sm text-gray-500">No documents available yet</p>
+                        <p className="text-xs text-gray-400 mt-1">Documents will appear here once uploaded</p>
                       </div>
                     )}
                   </CardContent>
@@ -1645,7 +1459,7 @@ export default function PropertyDetail() {
                   <CardTitle className="text-lg">Documents</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {(property.documents as any[])?.length > 0 ? (
+                  {Array.isArray(property.documents) && property.documents.length > 0 ? (
                     <div className="space-y-2">
                       {(property.documents as any[]).map((doc, idx) => (
                         <a 
@@ -1671,25 +1485,10 @@ export default function PropertyDetail() {
                       ))}
                     </div>
                   ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-lg border border-gray-100">
-                        <div className="p-2 bg-white rounded-lg">
-                          <FileText className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-900">Property Pro Forma</p>
-                          <p className="text-xs text-gray-500">PDF · 2.4 KB</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-lg border border-gray-100">
-                        <div className="p-2 bg-white rounded-lg">
-                          <FileText className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-900">Inspection Report</p>
-                          <p className="text-xs text-gray-500">PDF · 5.1 KB</p>
-                        </div>
-                      </div>
+                    <div className="text-center py-6">
+                      <FileText className="h-10 w-10 text-gray-300 mx-auto mb-3" />
+                      <p className="text-sm text-gray-500">No documents available yet</p>
+                      <p className="text-xs text-gray-400 mt-1">Documents will appear here once uploaded</p>
                     </div>
                   )}
                 </CardContent>
