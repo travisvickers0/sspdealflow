@@ -7,7 +7,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { extractBPOData } from "./services/openai";
-import { geocodeComps } from "./services/geocoding";
+import { geocodeComps, geocodeAddress } from "./services/geocoding";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { sendFacebookPixelEvent, type FacebookPixelEvent, createLeadEvent } from "./services/facebookPixel";
@@ -574,6 +574,17 @@ export async function registerRoutes(
   app.post("/api/admin/properties", isAdmin, async (req: Request, res: Response) => {
     try {
       const validatedData = insertPropertySchema.parse(req.body);
+      
+      // Auto-geocode if lat/lng not provided
+      if (!validatedData.lat || !validatedData.lng) {
+        const fullAddress = `${validatedData.address}, ${validatedData.city}, ${validatedData.state} ${validatedData.zip}`;
+        const geocodeResult = await geocodeAddress(fullAddress);
+        if (geocodeResult) {
+          validatedData.lat = geocodeResult.lat;
+          validatedData.lng = geocodeResult.lng;
+        }
+      }
+      
       const property = await storage.createProperty(validatedData);
       
       await storage.createActivityLog({
@@ -597,6 +608,26 @@ export async function registerRoutes(
   app.put("/api/admin/properties/:id", isAdmin, async (req: Request, res: Response) => {
     try {
       const validatedData = updatePropertySchema.parse(req.body);
+      
+      // Auto-geocode if address is being updated and lat/lng not provided
+      const hasAddressFields = validatedData.address || validatedData.city || validatedData.state || validatedData.zip;
+      if (hasAddressFields && !validatedData.lat && !validatedData.lng) {
+        // Get existing property to fill in missing address fields
+        const existingProperty = await storage.getProperty(req.params.id);
+        if (existingProperty) {
+          const address = validatedData.address || existingProperty.address;
+          const city = validatedData.city || existingProperty.city;
+          const state = validatedData.state || existingProperty.state;
+          const zip = validatedData.zip || existingProperty.zip;
+          const fullAddress = `${address}, ${city}, ${state} ${zip}`;
+          const geocodeResult = await geocodeAddress(fullAddress);
+          if (geocodeResult) {
+            validatedData.lat = geocodeResult.lat;
+            validatedData.lng = geocodeResult.lng;
+          }
+        }
+      }
+      
       const property = await storage.updateProperty(req.params.id, validatedData);
       
       if (!property) {
