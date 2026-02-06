@@ -1012,21 +1012,24 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               <Input 
                 type="number"
                 value={formData.purchasePrice} 
-                onChange={(e) => setFormData(prev => ({ ...prev, purchasePrice: parseInt(e.target.value) || 0 }))}
+                onChange={(e) => {
+                  const purchasePrice = parseInt(e.target.value) || 0;
+                  setFormData(prev => ({ ...prev, purchasePrice, estimatedEquity: Math.max(0, prev.bpoValue - purchasePrice) }));
+                }}
                 required
                 data-testid="input-purchase-price"
                 className="text-sm"
               />
             </div>
             <div>
-              <Label className="text-xs sm:text-sm">Estimated Equity *</Label>
+              <Label className="text-xs sm:text-sm">Estimated Equity</Label>
               <Input 
                 type="number"
                 value={formData.estimatedEquity} 
-                onChange={(e) => setFormData(prev => ({ ...prev, estimatedEquity: parseInt(e.target.value) || 0 }))}
-                required
+                readOnly
+                tabIndex={-1}
                 data-testid="input-equity"
-                className="text-sm"
+                className="text-sm bg-gray-50"
               />
             </div>
           </div>
@@ -1036,7 +1039,10 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               <Input 
                 type="number"
                 value={formData.bpoValue} 
-                onChange={(e) => setFormData(prev => ({ ...prev, bpoValue: parseInt(e.target.value) || 0 }))}
+                onChange={(e) => {
+                  const bpoValue = parseInt(e.target.value) || 0;
+                  setFormData(prev => ({ ...prev, bpoValue, estimatedEquity: Math.max(0, bpoValue - prev.purchasePrice) }));
+                }}
                 required
                 data-testid="input-bpo"
                 className="text-sm"
