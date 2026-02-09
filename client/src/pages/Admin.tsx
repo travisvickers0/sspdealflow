@@ -145,12 +145,21 @@ export default function Admin() {
                 </DialogHeader>
                 <PropertyForm
                   onSubmit={async (data) => {
-                    await createProperty.mutateAsync(data as InsertProperty);
-                    setIsCreateDialogOpen(false);
-                    toast({
-                      title: "Property Created",
-                      description: "The property has been added successfully.",
-                    });
+                    try {
+                      await createProperty.mutateAsync(data as InsertProperty);
+                      setIsCreateDialogOpen(false);
+                      toast({
+                        title: "Property Created",
+                        description: "The property has been added successfully.",
+                      });
+                    } catch (error) {
+                      console.error("Error creating property:", error);
+                      toast({
+                        title: "Error Creating Property",
+                        description: error instanceof Error ? error.message : "Failed to create property. Please try again.",
+                        variant: "destructive",
+                      });
+                    }
                   }}
                   isLoading={createProperty.isPending}
                   uploadPhoto={uploadPhoto}
@@ -468,13 +477,22 @@ export default function Admin() {
               <PropertyForm
                 property={editingProperty}
                 onSubmit={async (data) => {
-                  await updateProperty.mutateAsync({ id: editingProperty.id, data });
-                  setIsEditDialogOpen(false);
-                  setEditingProperty(null);
-                  toast({
-                    title: "Property Updated",
-                    description: "The property has been updated successfully.",
-                  });
+                  try {
+                    await updateProperty.mutateAsync({ id: editingProperty.id, data });
+                    setIsEditDialogOpen(false);
+                    setEditingProperty(null);
+                    toast({
+                      title: "Property Updated",
+                      description: "The property has been updated successfully.",
+                    });
+                  } catch (error) {
+                    console.error("Error updating property:", error);
+                    toast({
+                      title: "Error Updating Property",
+                      description: error instanceof Error ? error.message : "Failed to update property. Please try again.",
+                      variant: "destructive",
+                    });
+                  }
                 }}
                 isLoading={updateProperty.isPending}
                 uploadPhoto={uploadPhoto}
@@ -745,6 +763,7 @@ interface PropertyFormProps {
 function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos, uploadDocument }: PropertyFormProps) {
   const { toast } = useToast();
   const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
+  const [isProcessingBPO, setIsProcessingBPO] = useState(false);
   const [formData, setFormData] = useState({
     address: property?.address || "",
     city: property?.city || "",
@@ -867,6 +886,8 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       return;
     }
 
+    setIsProcessingBPO(true);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -924,6 +945,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       if (result.subject?.asIsValue) {
         successMessage += ` As-Is Price: $${result.subject.asIsValue.toLocaleString()} (auto-filled in BPO Value).`;
       }
+      successMessage += ` Click Save to persist changes.`;
 
       toast({
         title: "BPO Processed Successfully",
@@ -945,6 +967,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
         variant: "destructive",
       });
     } finally {
+      setIsProcessingBPO(false);
       // Reset the file input
       e.target.value = "";
     }
@@ -1294,12 +1317,20 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                 type="file" 
                 accept=".pdf"
                 onChange={handleBPOUpload}
+                disabled={isProcessingBPO}
                 data-testid="input-bpo"
                 className="text-sm"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Upload a BPO PDF to automatically extract comparable sales data
-              </p>
+              {isProcessingBPO ? (
+                <div className="flex items-center gap-2 text-xs text-amber-700 mt-1">
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                  Extracting comps from BPO... This may take up to a minute.
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500 mt-1">
+                  Upload a BPO PDF to automatically extract comparable sales data
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1403,11 +1434,22 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       </div>
 
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t">
-        <Button type="submit" disabled={isLoading} data-testid="button-submit" className="w-full sm:w-auto text-sm">
+        {isProcessingBPO && (
+          <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-3 py-2 rounded-lg mr-auto">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            Processing BPO... Please wait before saving.
+          </div>
+        )}
+        <Button type="submit" disabled={isLoading || isProcessingBPO} data-testid="button-submit" className="w-full sm:w-auto text-sm">
           {isLoading ? (
             <>
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
               Saving...
+            </>
+          ) : isProcessingBPO ? (
+            <>
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              Processing BPO...
             </>
           ) : (
             <>

@@ -43,6 +43,8 @@ const MapContent = memo(function MapContent({
   const [selectedComp, setSelectedComp] = useState<Comp | null>(null);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  // Track client-side geocoded coordinates for comps missing lat/lng
+  const [geocodedComps, setGeocodedComps] = useState<Map<string, { lat: number; lng: number }>>(new Map());
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -65,18 +67,56 @@ const MapContent = memo(function MapContent({
     }
   }, [isLoaded, subjectAddress, subjectCity, subjectState, subjectZip]);
 
+  // Client-side geocoding fallback for comps missing lat/lng
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const compsNeedingGeocoding = comps.filter(
+      (comp) => (!comp.lat || !comp.lng) && comp.address && !geocodedComps.has(comp.id)
+    );
+
+    if (compsNeedingGeocoding.length === 0) return;
+
+    const geocoder = new google.maps.Geocoder();
+
+    compsNeedingGeocoding.forEach((comp) => {
+      geocoder.geocode({ address: comp.address }, (results, status) => {
+        if (status === "OK" && results && results[0]) {
+          const location = results[0].geometry.location;
+          setGeocodedComps((prev) => {
+            const next = new Map(prev);
+            next.set(comp.id, { lat: location.lat(), lng: location.lng() });
+            return next;
+          });
+        }
+      });
+    });
+  }, [isLoaded, comps, geocodedComps]);
+
+  // Helper to get comp coordinates (server-side or client-side fallback)
+  const getCompCoords = useCallback(
+    (comp: Comp): { lat: number; lng: number } | null => {
+      if (comp.lat && comp.lng) {
+        return { lat: comp.lat, lng: comp.lng };
+      }
+      return geocodedComps.get(comp.id) || null;
+    },
+    [geocodedComps]
+  );
+
   useEffect(() => {
     if (map && subjectCoords && comps.length > 0) {
       const bounds = new google.maps.LatLngBounds();
       bounds.extend(subjectCoords);
       comps.forEach((comp) => {
-        if (comp.lat && comp.lng) {
-          bounds.extend({ lat: comp.lat, lng: comp.lng });
+        const coords = getCompCoords(comp);
+        if (coords) {
+          bounds.extend(coords);
         }
       });
       map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
     }
-  }, [map, subjectCoords, comps]);
+  }, [map, subjectCoords, comps, getCompCoords]);
 
   const onLoad = useCallback((mapInstance: google.maps.Map) => {
     setMap(mapInstance);
@@ -139,11 +179,12 @@ const MapContent = memo(function MapContent({
         )}
 
         {comps.map((comp, idx) => {
-          if (!comp.lat || !comp.lng) return null;
+          const coords = getCompCoords(comp);
+          if (!coords) return null;
           return (
             <Marker
               key={comp.id || idx}
-              position={{ lat: comp.lat, lng: comp.lng }}
+              position={coords}
               label={{
                 text: String(idx + 1),
                 color: "white",
@@ -164,27 +205,31 @@ const MapContent = memo(function MapContent({
           );
         })}
 
-        {selectedComp && selectedComp.lat && selectedComp.lng && (
-          <InfoWindow
-            position={{ lat: selectedComp.lat, lng: selectedComp.lng }}
-            onCloseClick={() => setSelectedComp(null)}
-          >
-            <div className="p-2 min-w-[180px]">
-              <p className="font-semibold text-gray-900 text-sm mb-1">
-                {selectedComp.address?.split(",")[0]}
-              </p>
-              <p className="text-xs text-gray-600 mb-2">
-                {selectedComp.beds} beds · {selectedComp.baths} baths · {selectedComp.sqft?.toLocaleString()} sqft
-              </p>
-              <p className="font-bold text-gray-900">${selectedComp.price?.toLocaleString()}</p>
-              {selectedComp.soldDate && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Sold {new Date(selectedComp.soldDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+        {selectedComp && (() => {
+          const coords = getCompCoords(selectedComp);
+          if (!coords) return null;
+          return (
+            <InfoWindow
+              position={coords}
+              onCloseClick={() => setSelectedComp(null)}
+            >
+              <div className="p-2 min-w-[180px]">
+                <p className="font-semibold text-gray-900 text-sm mb-1">
+                  {selectedComp.address?.split(",")[0]}
                 </p>
-              )}
-            </div>
-          </InfoWindow>
-        )}
+                <p className="text-xs text-gray-600 mb-2">
+                  {selectedComp.beds} beds · {selectedComp.baths} baths · {selectedComp.sqft?.toLocaleString()} sqft
+                </p>
+                <p className="font-bold text-gray-900">${selectedComp.price?.toLocaleString()}</p>
+                {selectedComp.soldDate && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Sold {new Date(selectedComp.soldDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                  </p>
+                )}
+              </div>
+            </InfoWindow>
+          );
+        })()}
       </GoogleMap>
 
       <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg z-10">

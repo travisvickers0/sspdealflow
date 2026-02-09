@@ -989,14 +989,14 @@ export async function registerRoutes(
         comps = await Promise.race([
           geocodeComps(comps) as Promise<any[]>,
           new Promise<any[]>((_, reject) => 
-            setTimeout(() => reject(new Error("Geocoding timeout after 30 seconds")), 30000)
+            setTimeout(() => reject(new Error("Geocoding timeout after 45 seconds")), 45000)
           )
         ]);
         console.log(`Geocoded ${comps.length} comps`);
       } catch (geocodeError) {
         console.error("Geocoding error:", geocodeError);
         // Continue even if geocoding fails - comps are still valid
-        console.warn("Continuing without geocoding...");
+        console.warn("Continuing without server-side geocoding - client CompsMap will attempt fallback...");
       }
 
       await storage.createActivityLog({
