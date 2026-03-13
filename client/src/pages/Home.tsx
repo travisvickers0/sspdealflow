@@ -34,8 +34,8 @@ export default function Home() {
     return property?.mainPhotoUrl || (property?.galleryPhotoUrls?.[0] ?? null);
   };
   
-  // Featured Opportunities shows next 3 different needs_funding properties
-  const featuredProperties = needsFundingProperties.slice(3, 6);
+  const heroIds = new Set(heroStackProperties.map((p: any) => p.id));
+  const featuredProperties = needsFundingProperties.filter((p: any) => !heroIds.has(p.id)).slice(0, 3);
   
   // Calculate total equity from all properties
   const totalEquity = properties?.reduce((sum, p) => sum + (p.estimatedEquity || 0), 0) || 0;
