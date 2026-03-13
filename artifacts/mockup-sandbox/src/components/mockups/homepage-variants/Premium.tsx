@@ -429,7 +429,7 @@ export function Premium() {
               placeholder="Enter your email address" 
               className="flex-grow rounded-xl bg-white/5 border border-zinc-800 text-white px-6 py-4 outline-none focus:border-emerald-400 transition-colors placeholder:text-zinc-500"
             />
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-0 px-8 py-4 h-auto text-lg rounded-xl transition-all duration-300 whitespace-nowrap shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+            <Button className="bg-red-600 hover:bg-red-700 text-white font-bold border-0 px-8 py-4 h-auto text-lg rounded-xl transition-all duration-300 whitespace-nowrap shadow-[0_0_20px_rgba(220,38,38,0.3)]">
               Apply Now
             </Button>
           </form>
