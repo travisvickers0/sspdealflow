@@ -1,20 +1,50 @@
 import { Button } from "@/components/ui/button";
-import { Github, Mail, Apple } from "lucide-react";
+import { Github, Mail, Apple, Eye, EyeOff } from "lucide-react";
 import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm_gradient_background.png";
 import { useState } from "react";
 import { Link } from "wouter";
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSignUp = () => {
     setIsLoading(true);
     window.location.href = "/api/login";
   };
 
+  const handleSimpleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/register/simple", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName, email, password }),
+      });
+
+      if (response.ok) {
+        window.location.href = "/";
+      } else {
+        const data = await response.json();
+        setError(data.message || "Registration failed");
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError("Registration failed. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-b from-amber-50 via-white to-white">
-      {/* Background Image */}
       <div className="absolute inset-0 opacity-50">
         <img 
           src={airbnbHero}
@@ -23,14 +53,11 @@ export default function SignUp() {
         />
       </div>
 
-      {/* Subtle Animated Accents */}
       <div className="hidden sm:block absolute top-32 right-32 w-72 h-72 bg-primary/5 rounded-full filter blur-3xl animate-pulse" />
       <div className="hidden sm:block absolute bottom-20 left-20 w-64 h-64 bg-orange-200/10 rounded-full filter blur-3xl animate-pulse delay-1000" />
 
-      {/* Content */}
       <div className="relative min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-700">
-          {/* Logo / Brand */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -45,20 +72,76 @@ export default function SignUp() {
             </p>
           </div>
 
-          {/* Sign Up Card */}
           <div className="p-6 sm:p-8 bg-white/70 backdrop-blur border border-gray-200/50 rounded-2xl shadow-lg space-y-6">
-            {/* Email/Password Sign Up */}
-            <button
-              onClick={handleSignUp}
-              disabled={isLoading}
-              data-testid="button-signup-email"
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-full transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Mail className="h-5 w-5" />
-              <span>Create with Email</span>
-            </button>
+            <form onSubmit={handleSimpleSignUp} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="First name"
+                    data-testid="input-first-name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/80"
+                    required
+                  />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last name"
+                    data-testid="input-last-name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/80"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email address"
+                  data-testid="input-email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/80"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  data-testid="input-password"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white/80 pr-12"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+              {error && (
+                <p className="text-red-500 text-sm text-center" data-testid="text-signup-error">{error}</p>
+              )}
+              <button
+                type="submit"
+                disabled={isLoading}
+                data-testid="button-signup-submit"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-white font-semibold rounded-full transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Mail className="h-5 w-5" />
+                <span>Create Account</span>
+              </button>
+            </form>
 
-            {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200" />
@@ -68,7 +151,6 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/* Social Sign Up */}
             <div className="space-y-3">
               <button
                 onClick={handleSignUp}
@@ -106,7 +188,6 @@ export default function SignUp() {
               </button>
             </div>
 
-            {/* Terms */}
             <p className="text-xs text-gray-600 text-center">
               By creating an account, you agree to our{" "}
               <a href="#" className="text-primary hover:underline font-medium">Terms of Service</a>
@@ -115,7 +196,6 @@ export default function SignUp() {
             </p>
           </div>
 
-          {/* Footer */}
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}

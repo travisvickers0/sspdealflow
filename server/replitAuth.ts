@@ -171,6 +171,54 @@ export async function setupAuth(app: Express) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
   });
+
+  app.post("/api/register/simple", async (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
+
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
+
+    const existing = await storage.getUserByEmail(email);
+    if (existing) {
+      return res.status(409).json({ message: "An account with this email already exists" });
+    }
+
+    const userId = `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    const user = await storage.upsertUser({
+      id: userId,
+      email,
+      firstName,
+      lastName,
+      profileImageUrl: null,
+    });
+
+    const sessionUser = {
+      claims: {
+        sub: userId,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        profile_image_url: null,
+        exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
+      },
+      access_token: `registered-${userId}`,
+      refresh_token: null,
+      expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
+    };
+
+    req.login(sessionUser, (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Registration failed" });
+      }
+      return res.json({ success: true, redirect: "/" });
+    });
+  });
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
