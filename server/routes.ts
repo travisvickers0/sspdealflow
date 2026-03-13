@@ -52,9 +52,9 @@ const photoUpload = multer({
   },
 });
 
-// Document upload uses disk storage (for PDF processing)
+// Document upload uses memory storage -> object storage
 const documentUpload = multer({
-  storage: diskStorage,
+  storage: memoryStorage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype === "application/pdf") {
@@ -719,7 +719,7 @@ export async function registerRoutes(
     }
   });
 
-  // POST /api/admin/upload/document - Upload document (kept on disk for processing)
+  // POST /api/admin/upload/document - Upload document to object storage
   app.post("/api/admin/upload/document", isAdmin, (req: Request, res: Response, next: NextFunction) => {
     documentUpload.any()(req, res, (err) => {
       if (err) {
@@ -739,17 +739,22 @@ export async function registerRoutes(
       }
       
       const file = files[0];
-      const url = `/uploads/documents/${file.filename}`;
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadBuffer(
+        file.buffer,
+        "documents",
+        file.mimetype
+      );
       
       await storage.createActivityLog({
         action: "upload",
         resourceType: "document",
-        details: { filename: file.filename, originalName: file.originalname, url },
+        details: { originalName: file.originalname, url },
       });
       
       res.json({ 
         url, 
-        filename: file.filename,
+        filename: file.originalname,
         originalName: file.originalname,
         size: file.size 
       });
@@ -999,26 +1004,37 @@ export async function registerRoutes(
         console.warn("Continuing without server-side geocoding - client CompsMap will attempt fallback...");
       }
 
+      // Upload BPO PDF to persistent object storage
+      const objectStorageService = new ObjectStorageService();
+      const fileBuffer = fs.readFileSync(filePath);
+      const persistentUrl = await objectStorageService.uploadBuffer(
+        fileBuffer,
+        "documents",
+        "application/pdf"
+      );
+
+      // Clean up local temp file
+      try { fs.unlinkSync(filePath); } catch (e) { /* ignore cleanup errors */ }
+
       await storage.createActivityLog({
         action: "upload",
         resourceType: "document",
         details: { 
-          filename: file.filename, 
           originalName: file.originalname, 
+          url: persistentUrl,
           type: "bpo",
           compsExtracted: comps.length 
         },
       }).catch(err => {
         console.error("Failed to create activity log:", err);
-        // Don't fail the request if activity log fails
       });
 
       res.json({ 
         comps,
         subject: extractedData.subject,
         repairs: extractedData.repairs || [],
-        url: `/uploads/documents/${file.filename}`,
-        filename: file.filename,
+        url: persistentUrl,
+        filename: file.originalname,
         originalName: file.originalname,
       });
     } catch (error) {
