@@ -141,39 +141,39 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="relative overflow-hidden bg-[#0a0908] lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
+      <div className="relative overflow-hidden bg-[#0a0908] lg:min-h-screen">
         <div
           className="absolute inset-0 pointer-events-none overflow-hidden"
           style={{
             maskImage: `
     radial-gradient(
-      ellipse 45% 60% at 30% 50%,
+      ellipse 55% 55% at 38% 52%,
       rgba(0,0,0,0) 0%,
-      rgba(0,0,0,0) 10%,
-      rgba(0,0,0,0.6) 38%,
-      rgba(0,0,0,1) 60%
+      rgba(0,0,0,0) 12%,
+      rgba(0,0,0,0.7) 42%,
+      rgba(0,0,0,1) 65%
     ),
     linear-gradient(
       to bottom,
       transparent 0%,
-      black 10%,
-      black 90%,
+      black 12%,
+      black 88%,
       transparent 100%
     )
   `,
             WebkitMaskImage: `
     radial-gradient(
-      ellipse 45% 60% at 30% 50%,
+      ellipse 55% 55% at 38% 52%,
       rgba(0,0,0,0) 0%,
-      rgba(0,0,0,0) 10%,
-      rgba(0,0,0,0.6) 38%,
-      rgba(0,0,0,1) 60%
+      rgba(0,0,0,0) 12%,
+      rgba(0,0,0,0.7) 42%,
+      rgba(0,0,0,1) 65%
     ),
     linear-gradient(
       to bottom,
       transparent 0%,
-      black 10%,
-      black 90%,
+      black 12%,
+      black 88%,
       transparent 100%
     )
   `,
@@ -181,7 +181,7 @@ export default function Home() {
             WebkitMaskComposite: "source-in",
           }}
         >
-          <div className="flex h-full flex-col justify-center items-center gap-[clamp(16px,3vh,40px)] py-[12vh]">
+          <div className="flex h-full flex-col justify-between lg:justify-center lg:gap-[clamp(20px,4vh,48px)] lg:items-center lg:py-[8vh]">
             <div className="flex overflow-hidden whitespace-nowrap">
               {renderTickerStrip(row1Items, "animate-[ticker-left_28s_linear_infinite]")}
             </div>
@@ -194,8 +194,8 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 w-full hidden lg:grid lg:grid-cols-[1fr_1fr] lg:gap-0 lg:items-center lg:min-h-screen lg:max-w-none">
-          <div className="flex flex-col justify-center h-full max-w-[620px] pl-[8vw] pr-[5vw] py-24">
+        <div className="relative z-10 mx-auto hidden max-w-[1280px] grid-cols-[1fr_380px] items-start gap-24 px-4 pb-8 pt-8 sm:px-8 lg:grid lg:px-12 lg:pb-20 lg:pt-14">
+          <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
               <span className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[#22c55e]">
@@ -203,7 +203,7 @@ export default function Home() {
               </span>
             </div>
 
-            <h1 className="font-['Bebas_Neue',sans-serif] text-[clamp(72px,6vw,108px)] font-normal leading-[0.90] tracking-[0.025em] text-[#f0ebe3]">
+            <h1 className="font-['Bebas_Neue',sans-serif] text-[clamp(72px,8.5vw,116px)] font-normal leading-[0.92] tracking-[0.025em] text-[#f0ebe3]">
               Real Estate
               <br />
               <span className="text-[#e8432d]">Built for</span>
@@ -273,9 +273,8 @@ export default function Home() {
             </div>
           </div>
 
-        <div className="flex items-center justify-center h-full min-h-screen pr-[8vw] pl-[5vw] py-24">
           <div
-            className="relative h-[480px] w-full max-w-[420px] overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
+            className="relative h-[460px] overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
             style={{
               maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
               WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
@@ -335,7 +334,6 @@ export default function Home() {
               )}
             </div>
           </div>
-        </div>
         </div>
 
         <div className="relative z-10 block px-5 pb-0 pt-8 lg:hidden">
