@@ -123,7 +123,7 @@ export default function Home() {
         items.map((item, idx) => (
           <span
             key={`${dup}-${idx}`}
-            className={`font-['Bebas_Neue',sans-serif] text-[58px] sm:text-[58px] lg:text-[clamp(80px,11vw,150px)] leading-none tracking-[0.02em] ${
+            className={`font-['Bebas_Neue',sans-serif] text-[58px] sm:text-[58px] lg:text-[clamp(64px,8vw,110px)] leading-none tracking-[0.02em] ${
               item.accent ? "text-[rgba(232,67,45,0.07)]" : "text-[rgba(240,235,227,0.055)]"
             }`}
           >
@@ -156,8 +156,8 @@ export default function Home() {
     linear-gradient(
       to bottom,
       transparent 0%,
-      black 18%,
-      black 82%,
+      black 12%,
+      black 88%,
       transparent 100%
     )
   `,
@@ -172,8 +172,8 @@ export default function Home() {
     linear-gradient(
       to bottom,
       transparent 0%,
-      black 18%,
-      black 82%,
+      black 12%,
+      black 88%,
       transparent 100%
     )
   `,
@@ -181,7 +181,7 @@ export default function Home() {
             WebkitMaskComposite: "source-in",
           }}
         >
-          <div className="flex h-full flex-col justify-between">
+          <div className="flex h-full flex-col justify-between lg:justify-center lg:gap-[clamp(20px,4vh,48px)] lg:items-center lg:py-[8vh]">
             <div className="flex overflow-hidden whitespace-nowrap">
               {renderTickerStrip(row1Items, "animate-[ticker-left_28s_linear_infinite]")}
             </div>

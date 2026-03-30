@@ -1,0 +1,89 @@
+In client/src/pages/Home.tsx, fix the desktop ticker 
+background alignment. Mobile unchanged.
+No logic changes.
+
+THE PROBLEM:
+The ticker background uses justify-between across
+the full 100vh which spreads rows to the very top
+and bottom edges — far outside where the content lives.
+The content (badge → headline → stats → CTAs) sits
+in roughly the middle 60% of the viewport.
+
+FIX 1 — Change ticker distribution from spread to centered:
+Find the ticker background outer div.
+Change its flex alignment:
+
+  From: justify-content: space-between (or justify-between)
+  To:   justify-content: center
+  Add:  gap between rows: gap-0 lg:gap-[clamp(20px,4vh,48px)]
+  Add:  align-items: center
+  Add:  padding: py-[10vh] lg:py-[8vh]
+
+This clusters the 3 ticker rows in the center zone
+where the content actually lives instead of spreading
+them edge to edge.
+
+FIX 2 — Reduce ticker font size slightly on desktop
+so all 3 rows fit comfortably in the content height:
+
+Find the ticker item className on desktop.
+Change: text-[clamp(80px,11vw,150px)]
+To:     text-[clamp(64px,8vw,110px)]
+
+This makes each row shorter so 3 rows clustered 
+together match the height of the content column
+(roughly badge to CTA button = ~480px).
+
+FIX 3 — Tighten the radial mask to match new position:
+Since rows are now centered, update the mask to
+clear the center more precisely.
+
+Update the maskImage style prop:
+style={{
+  maskImage: `
+    radial-gradient(
+      ellipse 55% 55% at 38% 52%,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,0) 12%,
+      rgba(0,0,0,0.7) 42%,
+      rgba(0,0,0,1) 65%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 12%,
+      black 88%,
+      transparent 100%
+    )
+  `,
+  WebkitMaskImage: `
+    radial-gradient(
+      ellipse 55% 55% at 38% 52%,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,0) 12%,
+      rgba(0,0,0,0.7) 42%,
+      rgba(0,0,0,1) 65%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 12%,
+      black 88%,
+      transparent 100%
+    )
+  `,
+  maskComposite: "intersect",
+  WebkitMaskComposite: "source-in"
+}}
+
+The linear gradient now fades at 12% from top/bottom
+instead of 18% — tighter fade since rows are centered
+and don't need as much edge clearance.
+
+Only apply FIX 1, 2, 3 on lg+ screens.
+On mobile keep existing ticker behavior unchanged
+by wrapping changes in media-query-aware classNames
+or only modifying the lg: prefixed values.
+
+Do not change any other files.
+Do not run tsc.
