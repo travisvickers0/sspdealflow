@@ -141,7 +141,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="relative overflow-hidden bg-[#0a0908] lg:min-h-screen">
+      <div className="relative overflow-hidden bg-[#0a0908] lg:min-h-screen lg:flex lg:flex-col lg:justify-center">
         <div
           className="absolute inset-0 pointer-events-none overflow-hidden"
           style={{
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto hidden max-w-[1280px] grid-cols-[1fr_380px] items-center gap-24 px-4 pb-8 pt-8 sm:px-8 lg:grid lg:px-12 lg:pb-20 lg:pt-14">
+        <div className="relative z-10 mx-auto my-auto hidden max-w-[1100px] grid-cols-[1fr_420px] items-center gap-10 lg:gap-12 px-6 pb-8 pt-8 sm:px-10 lg:grid lg:px-16 lg:pb-20 lg:pt-14">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
@@ -274,7 +274,7 @@ export default function Home() {
           </div>
 
           <div
-            className="relative h-[460px] overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
+            className="relative h-[500px] overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
             style={{
               maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
               WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",

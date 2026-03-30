@@ -1,0 +1,91 @@
+In client/src/pages/Home.tsx, fix the desktop hero
+layout proportions. Mobile unchanged. No logic changes.
+
+FIX 1 — Tighten the overall content max-width:
+Find the hero content grid wrapper.
+Change max-width:
+  From: max-w-[1280px]
+  To:   max-w-[1100px]
+
+This pulls both columns closer to center and reduces
+the dead space on the left edge.
+
+FIX 2 — Rebalance the grid column ratio:
+The current split gives too much space to the left
+and too little to the tape panel.
+
+Change grid columns:
+  From: lg:grid-cols-[1fr_380px]
+  To:   lg:grid-cols-[1fr_420px]
+
+And reduce gap:
+  From: gap-16
+  To:   gap-10 lg:gap-12
+
+FIX 3 — Add left padding to content to center it:
+The left column content (badge, headline, stats, CTAs)
+needs to start with breathing room from the left edge.
+
+Find the hero content grid wrapper padding:
+  From: px-4 sm:px-8 lg:px-12
+  To:   px-6 sm:px-10 lg:px-16
+
+FIX 4 — Increase tape panel width to feel substantial:
+The tape panel currently feels like a sidebar.
+It should feel like a co-equal element.
+
+Find the tape-panel div (the dark bordered container).
+Change its height:
+  From: h-[460px]
+  To:   h-[500px]
+
+And ensure it has no max-width constraint shrinking it —
+it should fill the full 420px column width.
+
+FIX 5 — Vertically center the whole grid in the hero:
+The content sits too high in the viewport.
+Add vertical centering to the hero section:
+
+Find the hero outer div.
+Ensure it has:
+  display: flex
+  flex-direction: column  
+  justify-content: center
+
+Or on the content grid wrapper add:
+  mt-auto mb-auto
+
+So the grid floats to the true vertical center
+of the min-h-screen container.
+
+FIX 6 — Pull ticker rows tighter to match content zone:
+With the narrower max-width the ticker rows now extend
+too far past the content edges.
+
+Update the ticker container to match:
+  max-width: 1100px (same as content)
+  margin: 0 auto
+
+Add to the ticker bg div:
+  className="... max-w-[1100px] mx-auto left-1/2
+  -translate-x-1/2 ..."
+
+Or simply add left/right inset to the absolute ticker:
+  Change: inset-0
+  To:     inset-0 lg:left-[calc(50%-550px)]
+          lg:right-[calc(50%-550px)]
+
+Actually simplest: just keep inset-0 but the 
+tighter content max-width + radial mask will
+naturally make it look better.
+Skip this if the mask already handles edge visibility.
+
+After all fixes verify:
+  - Content is horizontally centered on the page
+  - Tape panel and left content feel balanced
+  - No excessive dead space on either side
+  - Headline and tape panel share roughly equal
+    visual weight
+
+Do not change any other files.
+Do not run tsc.

@@ -1,7 +1,9 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, updatePropertySchema } from "@shared/schema";
+import { insertPropertySchema, updatePropertySchema, users } from "@shared/schema";
+import { db } from "./db";
+import { isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
