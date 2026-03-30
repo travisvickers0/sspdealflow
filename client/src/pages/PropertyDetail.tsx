@@ -630,7 +630,7 @@ export default function PropertyDetail() {
         {allImages.length > 1 && (
           <button
             type="button"
-            className="absolute bottom-[120px] right-12 flex items-center gap-2 px-4 py-2.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium rounded-[8px] hover:bg-black/80 transition-all cursor-pointer z-20"
+            className="absolute top-6 right-12 flex items-center gap-2 px-4 py-2.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium rounded-[8px] hover:bg-black/80 transition-all cursor-pointer z-20"
             onClick={() => setLightboxOpen(true)}
             data-testid="button-open-gallery"
           >
