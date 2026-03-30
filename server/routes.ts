@@ -11,6 +11,7 @@ import { geocodeComps, geocodeAddress } from "./services/geocoding";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { sendFacebookPixelEvent, type FacebookPixelEvent, createLeadEvent } from "./services/facebookPixel";
+import nodemailer from "nodemailer";
 import { sendQualificationConfirmation } from "./services/resend";
 import { appendLeadToSheet } from "./lib/googleSheets";
 
@@ -212,6 +213,135 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error creating lead:", error);
       res.status(500).json({ error: "Failed to save lead" });
+    }
+  });
+
+  app.post("/api/property-interest", async (req: Request, res: Response) => {
+    try {
+      const { propertyId, propertyAddress, fullName, email, phone, message } = req.body;
+
+      if (!propertyId || !fullName || !email) {
+        return res.status(400).json({
+          error: "propertyId, fullName, and email are required",
+        });
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+
+      const userId = (req as any).user?.claims?.sub ?? null;
+
+      const interest = await storage.createPropertyInterest({
+        propertyId: String(propertyId),
+        propertyAddress: propertyAddress != null ? String(propertyAddress) : "",
+        userId,
+        fullName: String(fullName).trim(),
+        email: String(email).trim(),
+        phone: phone != null && String(phone).trim() !== "" ? String(phone).trim() : null,
+        message: message != null && String(message).trim() !== "" ? String(message).trim() : null,
+      });
+
+      let emailSent = false;
+      try {
+        const notifyEmail = process.env.NOTIFY_EMAIL?.trim();
+        const smtpUser = process.env.SMTP_USER?.trim();
+        const smtpPass = process.env.SMTP_PASS?.trim();
+
+        if (!notifyEmail) {
+          console.warn("[property-interest] NOTIFY_EMAIL not set — skipping notification");
+        } else if (!smtpUser || !smtpPass) {
+          console.warn(
+            "[property-interest] SMTP_USER or SMTP_PASS missing — cannot send mail (set both in Replit Secrets)",
+          );
+        } else {
+          const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+              user: smtpUser,
+              pass: smtpPass,
+            },
+          });
+
+          await transporter.sendMail({
+            from: `"SSP Deal Flow" <${smtpUser}>`,
+            to: notifyEmail,
+            subject: `🏠 New Investor Interest — ${propertyAddress}`,
+            html: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+          <div style="background:#e8432d;padding:20px 24px;border-radius:8px 8px 0 0">
+            <h2 style="color:white;margin:0;font-size:18px">
+              New Investor Interest
+            </h2>
+          </div>
+          <div style="background:#f9f9f9;padding:24px;border-radius:0 0 8px 8px;border:1px solid #eee">
+            <p style="margin:0 0 16px;font-size:15px;color:#333">
+              Someone just expressed interest in a deal on SSP Deal Flow.
+            </p>
+            <table style="width:100%;border-collapse:collapse">
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;color:#666;font-size:13px;width:140px">Property</td>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;font-weight:600;font-size:13px">${propertyAddress}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;color:#666;font-size:13px">Name</td>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;font-weight:600;font-size:13px">${fullName}</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;color:#666;font-size:13px">Email</td>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;font-size:13px">
+                  <a href="mailto:${email}" style="color:#e8432d">${email}</a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;color:#666;font-size:13px">Phone</td>
+                <td style="padding:10px 0;border-bottom:1px solid #eee;font-size:13px">
+                  ${phone
+                    ? `<a href="tel:${phone}" style="color:#e8432d">${phone}</a>`
+                    : "Not provided"}
+                </td>
+              </tr>
+              ${message ? `
+              <tr>
+                <td style="padding:10px 0;color:#666;font-size:13px">Message</td>
+                <td style="padding:10px 0;font-size:13px">${message}</td>
+              </tr>` : ""}
+            </table>
+            <div style="margin-top:24px;padding:16px;background:#fff3f2;border-radius:6px;border-left:3px solid #e8432d">
+              <p style="margin:0;font-size:13px;color:#333">
+                <strong>Action needed:</strong> Call or email this investor
+                within 2 hours while the deal is top of mind.
+              </p>
+            </div>
+          </div>
+          <p style="text-align:center;margin-top:16px;font-size:11px;color:#999">
+            SSP Deal Flow · Southern Specialty Properties
+          </p>
+        </div>
+      `,
+          });
+
+          emailSent = true;
+          console.log(`[property-interest] Notification sent to ${notifyEmail}`);
+        }
+      } catch (emailErr: unknown) {
+        const err = emailErr as { message?: string; stack?: string };
+        console.error(
+          "[property-interest] Email failed:",
+          err?.message || emailErr,
+          err?.stack ? `\n${err.stack}` : "",
+        );
+      }
+
+      console.log(
+        `[property-interest] response interestId=${interest.id} emailSent=${emailSent}`,
+      );
+      res.json({ success: true, id: interest.id, emailSent });
+    } catch (error) {
+      console.error("Error creating property interest:", error);
+      res.status(500).json({ error: "Failed to save interest" });
     }
   });
 
@@ -1086,6 +1216,15 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching leads:", error);
       res.status(500).json({ error: "Failed to fetch leads" });
+    }
+  });
+
+  app.get("/api/admin/property-interests", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const interests = await storage.getPropertyInterests();
+      res.json(interests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch interests" });
     }
   });
 

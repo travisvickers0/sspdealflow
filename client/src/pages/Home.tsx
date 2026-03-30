@@ -141,7 +141,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="relative overflow-hidden bg-[#0a0908]" style={{ minHeight: "100vh" }}>
+      <div className="relative overflow-hidden bg-[#0a0908] lg:min-h-screen">
         <div
           className="absolute inset-0 pointer-events-none overflow-hidden"
           style={{
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto hidden max-w-[1280px] grid-cols-[1fr_380px] items-center gap-24 px-4 pb-20 pt-24 sm:px-8 lg:grid lg:px-12 lg:pt-28">
+        <div className="relative z-10 mx-auto hidden max-w-[1280px] grid-cols-[1fr_380px] items-start gap-24 px-4 pb-8 pt-8 sm:px-8 lg:grid lg:px-12 lg:pb-20 lg:pt-14">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
@@ -215,7 +215,7 @@ export default function Home() {
               Vetted off-market acquisitions. 50/50 profit split at sale. No fees — deal-by-deal JV structure built for accredited investors.
             </p>
 
-            <div className="mb-8 grid grid-cols-2 gap-x-6 gap-y-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8">
               {[
                 "10+ Years Verified Exits",
                 "Deal-by-Deal JV Structure",
@@ -336,7 +336,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 block px-5 pb-0 pt-7 lg:hidden">
+        <div className="relative z-10 block px-5 pb-0 pt-8 lg:hidden">
           <div className="mb-4 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
             <span className="font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-[#22c55e]">
@@ -352,9 +352,25 @@ export default function Home() {
             Investors
           </h1>
 
-          <p className="mb-5 mt-3.5 border-l-2 border-[#2a2724] pl-3.5 text-[14px] leading-[1.75] text-[#a89e91]">
+          <p className="hidden sm:block mb-5 mt-3.5 border-l-2 border-[#2a2724] pl-3.5 text-[14px] leading-[1.75] text-[#a89e91]">
             Vetted off-market acquisitions. 50/50 profit split. No fees, no funds.
           </p>
+
+          <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8">
+            {[
+              "10+ Years Verified Exits",
+              "Deal-by-Deal JV Structure",
+              "No Fees · 100% Transparent",
+              "50/50 Profit Split at Sale",
+            ].map((label) => (
+              <div key={`m-${label}`} className="flex items-center gap-2 text-[13px] text-[#a89e91]">
+                <span className="grid h-4 w-4 flex-shrink-0 place-items-center rounded-full border border-[rgba(232,67,45,0.25)] bg-[rgba(232,67,45,0.1)]">
+                  <CheckIcon className="h-2.5 w-2.5 text-[#e8432d]" />
+                </span>
+                {label}
+              </div>
+            ))}
+          </div>
 
           <div className="mb-5 grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-[#2a2724] bg-[#2a2724]">
             {[
@@ -386,19 +402,19 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setLocation("/how-it-works")}
-              className="w-full rounded-[8px] border border-[#353129] bg-transparent py-3.5 text-[14px] font-medium text-[#a89e91] transition-all hover:border-[#6b6158] hover:text-[#f0ebe3]"
+              className="hidden sm:flex w-full items-center justify-center rounded-[8px] border border-[#353129] bg-transparent py-3.5 text-[14px] font-medium text-[#a89e91] transition-all hover:border-[#6b6158] hover:text-[#f0ebe3]"
             >
               View Partnership Structure
             </button>
           </div>
 
-          <div className="flex items-center justify-center gap-1.5 pb-1 text-[11px] text-[#6b6158]">
+          <div className="hidden sm:flex items-center justify-center gap-1.5 pb-1 text-[11px] text-[#6b6158]">
             <ShieldCheck className="h-3 w-3 flex-shrink-0" />
             Secured by First-Position Lien Structure
           </div>
         </div>
 
-        <div className="block overflow-hidden border-t border-[#2a2724] bg-[#0f0e0d] py-3.5 lg:hidden">
+        <div className="mt-0 block overflow-hidden border-t border-[#2a2724] bg-[#0f0e0d] py-3.5 lg:hidden">
           <div className="mb-2.5 flex items-center justify-between px-5">
             <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#6b6158]">Live Deal Flow</span>
             <div className="flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-[#22c55e]">
@@ -406,7 +422,15 @@ export default function Home() {
               {properties?.length ?? 81} Active
             </div>
           </div>
-          <div className="overflow-hidden">
+          <div
+            className="overflow-hidden"
+            style={{
+              maskImage:
+                "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+            }}
+          >
             {isLoading ? (
               <div className="flex justify-center py-6">
                 <Loader2 className="h-8 w-8 animate-spin text-[#e8432d]" />
@@ -431,18 +455,18 @@ export default function Home() {
                           goToProperty(property);
                         }
                       }}
-                      className="w-[195px] flex-shrink-0 cursor-pointer rounded-[10px] border border-[#2a2724] bg-[#181614] p-3 transition-all hover:border-[#353129]"
+                      className="w-[160px] flex-shrink-0 cursor-pointer rounded-[10px] border border-[#2a2724] bg-[#181614] p-2.5 transition-all hover:border-[#353129]"
                     >
                       <div className="mb-2 flex items-start justify-between gap-1.5">
                         <div className="min-w-0">
-                          <div className="text-[12px] font-semibold leading-[1.3] text-[#f0ebe3]">{property.address}</div>
-                          <div className="mt-0.5 text-[10px] text-[#6b6158]">
+                          <div className="text-[11px] font-semibold leading-[1.3] text-[#f0ebe3]">{property.address}</div>
+                          <div className="mt-0.5 text-[9px] text-[#6b6158]">
                             {property.city}, {property.state}
                           </div>
                         </div>
                         <span className={statusBadgeClass(open)}>{label}</span>
                       </div>
-                      <div className="font-mono text-[14px] font-medium tracking-[-0.01em] text-[#22c55e]">
+                      <div className="font-mono text-[13px] font-medium tracking-[-0.01em] text-[#22c55e]">
                         {formatMoney(property.estimatedEquity ?? 0)}
                       </div>
                     </div>
@@ -452,13 +476,18 @@ export default function Home() {
             )}
           </div>
         </div>
+
+        <div
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0f0e0d] to-transparent lg:hidden"
+          aria-hidden
+        />
       </div>
 
-      <section className="py-20 sm:py-28 bg-[var(--surface-hex)] border-t border-[var(--line)]">
+      <section className="pt-4 pb-20 sm:pt-28 sm:pb-28 bg-[#0f0e0d] lg:bg-[var(--surface-hex)] border-t border-[var(--line)]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex items-end justify-between mb-4 lg:mb-12">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-3">Current Opportunities</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-2 lg:mb-3">Current Opportunities</p>
               <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[var(--text-primary)] leading-tight">Featured Deals</h2>
             </div>
             <Link href="/properties" className="text-[13px] text-primary font-medium hover:gap-3 transition-all flex items-center gap-2">

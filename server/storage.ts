@@ -1,9 +1,10 @@
 import { 
-  users, properties, activityLogs, leads,
+  users, properties, activityLogs, leads, propertyInterests,
   type User, type UpsertUser,
   type Property, type InsertProperty, type UpdateProperty,
   type ActivityLog, type InsertActivityLog,
   type Lead, type InsertLead,
+  type PropertyInterest, type InsertPropertyInterest,
   generatePropertySlug
 } from "@shared/schema";
 import { db } from "./db";
@@ -34,6 +35,9 @@ export interface IStorage {
   getLead(id: string): Promise<Lead | undefined>;
   getAllLeads(): Promise<Lead[]>;
   getLeads(): Promise<Lead[]>;
+
+  createPropertyInterest(data: InsertPropertyInterest): Promise<PropertyInterest>;
+  getPropertyInterests(): Promise<PropertyInterest[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -201,6 +205,21 @@ export class DatabaseStorage implements IStorage {
 
   async getAllLeads(): Promise<Lead[]> {
     return this.getLeads();
+  }
+
+  async createPropertyInterest(data: InsertPropertyInterest): Promise<PropertyInterest> {
+    const [result] = await db
+      .insert(propertyInterests)
+      .values(data)
+      .returning();
+    return result;
+  }
+
+  async getPropertyInterests(): Promise<PropertyInterest[]> {
+    return await db
+      .select()
+      .from(propertyInterests)
+      .orderBy(desc(propertyInterests.createdAt));
   }
 }
 

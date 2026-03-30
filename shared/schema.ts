@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, real, timestamp, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, real, timestamp, jsonb, index, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -183,3 +183,18 @@ export const insertLeadSchema = z.object({
 
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 export type Lead = typeof leads.$inferSelect;
+
+export const propertyInterests = pgTable("property_interests", {
+  id: serial("id").primaryKey(),
+  propertyId: text("property_id").notNull(),
+  propertyAddress: text("property_address").notNull(),
+  userId: text("user_id"),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PropertyInterest = typeof propertyInterests.$inferSelect;
+export type InsertPropertyInterest = typeof propertyInterests.$inferInsert;

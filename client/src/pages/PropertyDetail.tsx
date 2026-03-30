@@ -31,6 +31,7 @@ import { posthog } from "@/lib/posthog";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { apiRequest } from "@/lib/queryClient";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
@@ -42,9 +43,18 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading } = useProperty(params?.slug);
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [interestOpen, setInterestOpen] = useState(false);
+  const [interestForm, setInterestForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+  const [interestSubmitting, setInterestSubmitting] = useState(false);
+  const [interestSuccess, setInterestSuccess] = useState(false);
 
   const galleryImages = property?.galleryPhotoUrls || [];
   const allImages = property?.mainPhotoUrl ? [property.mainPhotoUrl, ...galleryImages] : galleryImages;
@@ -52,6 +62,22 @@ export default function PropertyDetail() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [params?.slug]);
+
+  useEffect(() => {
+    setInterestOpen(false);
+    setInterestSuccess(false);
+    setInterestForm({ fullName: "", email: "", phone: "", message: "" });
+  }, [property?.id]);
+
+  useEffect(() => {
+    if (user) {
+      setInterestForm((f) => ({
+        ...f,
+        fullName: user.firstName ? `${user.firstName} ${user.lastName ?? ""}`.trim() : f.fullName,
+        email: user.email ?? f.email,
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!property) return;
@@ -194,6 +220,9 @@ export default function PropertyDetail() {
     returnPercentage = purchasePrice > 0 ? (investorProfitShare / purchasePrice) * 100 : 0;
   }
 
+  investorProfitShare = Math.round(investorProfitShare);
+  sspProfitShare = Math.round(sspProfitShare);
+
   const investorTotalReturn = purchasePrice + investorProfitShare;
 
   const handlePreviousImage = () => {
@@ -204,24 +233,32 @@ export default function PropertyDetail() {
     setSelectedImage((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
   };
 
-  const handleInvestClick = () => {
-    posthog.capture("invest_clicked", {
-      property_id: property.id,
-      property_address: property.address,
-      purchase_price: property.purchasePrice,
-      estimated_equity: property.estimatedEquity,
-    });
-
-    if (typeof window.gtag !== "undefined") {
-      window.gtag("event", "begin_checkout", {
-        items: [
-          {
-            item_id: String(property.id),
-            item_name: property.address,
-            price: property.purchasePrice,
-          },
-        ],
+  const handleInterestSubmit = async () => {
+    if (!property) return;
+    if (!interestForm.fullName || !interestForm.email) return;
+    setInterestSubmitting(true);
+    try {
+      await apiRequest("POST", "/api/property-interest", {
+        propertyId: property.id,
+        propertyAddress: property.address,
+        ...interestForm,
       });
+      setInterestSuccess(true);
+
+      posthog.capture("invest_clicked", {
+        property_id: property.id,
+        property_address: property.address,
+        purchase_price: property.purchasePrice,
+      });
+      if (typeof window.gtag !== "undefined") {
+        window.gtag("event", "begin_checkout", {
+          items: [{ item_id: String(property.id), item_name: property.address }],
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setInterestSubmitting(false);
     }
   };
 
@@ -561,16 +598,96 @@ export default function PropertyDetail() {
             </div>
 
             {isAvailable ? (
-              <a
-                href="https://calendly.com/sspdealflow/30min"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={investButtonClass}
-                data-testid="button-invest"
-                onClick={handleInvestClick}
-              >
-                Commit to Invest →
-              </a>
+              <div>
+                {!interestOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setInterestOpen(true)}
+                    className={investButtonClass}
+                    data-testid="button-invest"
+                  >
+                    I'm In — Contact Me
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                ) : !interestSuccess ? (
+                  <div className="space-y-3">
+                    <p className="text-[12px] text-[var(--text-tertiary)] mb-1">
+                      We'll call you within 2 hours to finalize.
+                    </p>
+                    <input
+                      type="text"
+                      placeholder="Full Name"
+                      value={interestForm.fullName}
+                      onChange={(e) => setInterestForm((f) => ({ ...f, fullName: e.target.value }))}
+                      className="w-full bg-[var(--surface-2-hex)] border border-[var(--line-light)] rounded-[8px] text-[var(--text-primary)] text-[13px] px-3 py-2.5 outline-none placeholder:text-[var(--text-tertiary)] focus:border-primary transition-all"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={interestForm.email}
+                      onChange={(e) => setInterestForm((f) => ({ ...f, email: e.target.value }))}
+                      className="w-full bg-[var(--surface-2-hex)] border border-[var(--line-light)] rounded-[8px] text-[var(--text-primary)] text-[13px] px-3 py-2.5 outline-none placeholder:text-[var(--text-tertiary)] focus:border-primary transition-all"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone (optional)"
+                      value={interestForm.phone}
+                      onChange={(e) => setInterestForm((f) => ({ ...f, phone: e.target.value }))}
+                      className="w-full bg-[var(--surface-2-hex)] border border-[var(--line-light)] rounded-[8px] text-[var(--text-primary)] text-[13px] px-3 py-2.5 outline-none placeholder:text-[var(--text-tertiary)] focus:border-primary transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleInterestSubmit}
+                      disabled={interestSubmitting || !interestForm.fullName || !interestForm.email}
+                      className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-semibold text-[14px] py-3 rounded-[8px] flex items-center justify-center gap-2 transition-all"
+                      data-testid="button-invest-submit"
+                    >
+                      {interestSubmitting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          Confirm Interest <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInterestOpen(false)}
+                      className="w-full text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors py-1"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="w-10 h-10 bg-green-500/10 border border-green-500/20 rounded-full grid place-items-center mx-auto mb-3">
+                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path
+                          d="M3.5 9l4 4 7-8"
+                          stroke="#22c55e"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-[14px] font-semibold text-[var(--text-primary)] mb-1">We got it — you're on this deal.</p>
+                    <p className="text-[12px] text-[var(--text-tertiary)] leading-relaxed">
+                      Travis will call you within 2 hours to walk through next steps.
+                    </p>
+                  </div>
+                )}
+                {!interestOpen && !interestSuccess && (
+                  <a
+                    href="https://calendly.com/sspdealflow/30min"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-center text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors mt-2"
+                  >
+                    Prefer to schedule a call instead →
+                  </a>
+                )}
+              </div>
             ) : (
               <button
                 type="button"
@@ -604,66 +721,129 @@ export default function PropertyDetail() {
 
   return (
     <Layout transparentNav>
-      <div className="relative w-full overflow-hidden" style={{ height: "92vh", maxHeight: "900px" }}>
-        {allImages[selectedImage] ? (
-          <img
-            src={allImages[selectedImage]}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover brightness-75"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-hex)] via-[var(--surface-2-hex)] to-[var(--bg-hex)]">
-            <div
-              className="absolute inset-0 opacity-30"
-              style={{
-                backgroundImage:
-                  "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
-                backgroundSize: "48px 48px",
-              }}
-            />
-          </div>
-        )}
-
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[var(--bg-hex)]" />
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/30 to-transparent" />
-
-        {allImages.length > 1 && (
-          <button
-            type="button"
-            className="absolute top-6 right-12 flex items-center gap-2 px-4 py-2.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium rounded-[8px] hover:bg-black/80 transition-all cursor-pointer z-20"
-            onClick={() => setLightboxOpen(true)}
-            data-testid="button-open-gallery"
+      <div className="relative w-full overflow-hidden lg:h-[92vh] lg:max-h-[900px]">
+        <div className="relative w-full h-[56vw] min-h-[260px] max-h-[420px] lg:absolute lg:inset-0 lg:h-full lg:min-h-0 group">
+          <Link
+            href="/properties"
+            className="absolute top-6 left-12 z-20 flex items-center gap-1.5 text-white/60 hover:text-white/90 text-[13px] font-medium transition-colors pointer-events-auto group"
           >
-            <Images className="h-4 w-4" />
-            View all {allImages.length} photos
-          </button>
-        )}
+            <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            Back to Marketplace
+          </Link>
+          <div className="absolute inset-0 aspect-[16/10] lg:aspect-auto lg:h-full w-full">
+            {allImages[selectedImage] ? (
+              <img
+                src={allImages[selectedImage]}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover brightness-75"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-hex)] via-[var(--surface-2-hex)] to-[var(--bg-hex)]">
+                <div
+                  className="absolute inset-0 opacity-30"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
+                    backgroundSize: "48px 48px",
+                  }}
+                />
+              </div>
+            )}
 
-        {allImages.length > 1 && (
-          <>
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[var(--bg-hex)]" />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/30 to-transparent" />
+          </div>
+
+          {allImages.length > 1 && (
             <button
               type="button"
-              onClick={handlePreviousImage}
-              className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all"
-              aria-label="Previous image"
+              className="absolute top-3 right-3 lg:bottom-[120px] lg:right-12 lg:top-auto flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[11px] lg:text-[13px] font-medium rounded-[6px] hover:bg-black/80 transition-all cursor-pointer z-20"
+              onClick={() => setLightboxOpen(true)}
+              data-testid="button-open-gallery"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <Images className="h-4 w-4" />
+              View all {allImages.length} photos
             </button>
-            <button
-              type="button"
-              onClick={handleNextImage}
-              className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all"
-              aria-label="Next image"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </>
-        )}
+          )}
 
-        <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-12 pb-12 z-10">
+          {allImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePreviousImage}
+                className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="h-4 w-4 lg:h-6 lg:w-6" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextImage}
+                className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                aria-label="Next image"
+              >
+                <ChevronRight className="h-4 w-4 lg:h-6 lg:w-6" />
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 pt-3 lg:pt-0 lg:px-12 lg:pb-12 bg-[var(--bg-hex)] lg:bg-transparent z-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end">
             <div>
-              <div className="flex flex-wrap items-center gap-3 mb-5">
+              <div className="flex lg:hidden items-center justify-between px-5 py-3 bg-[var(--bg-hex)] border-b border-[var(--line)]">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  {isAvailable && (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/15 border border-green-500/20 text-green-400">
+                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      Open for Funding
+                    </span>
+                  )}
+                  {isCommitted && (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                      Funding Committed
+                    </span>
+                  )}
+                  {isFunded && (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                      Funded
+                    </span>
+                  )}
+                  {isSold && (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/15 border border-amber-500/20 text-amber-400">
+                      <Check className="h-3 w-3" />
+                      Sold · Case Study
+                    </span>
+                  )}
+                  <a
+                    href={zillowHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-[#006AFF] hover:bg-[#0055CC] text-white text-[12px] font-bold rounded-[6px] transition-colors shrink-0"
+                    data-testid="link-zillow"
+                  >
+                    Zillow
+                  </a>
+                </div>
+                <div className="flex gap-2 shrink-0 ml-2">
+                  <button
+                    type="button"
+                    className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                    title="Share"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                    title="Save"
+                  >
+                    <Heart className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="hidden lg:flex flex-wrap items-center gap-3 mb-5">
                 {isAvailable && (
                   <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/15 border border-green-500/20 text-green-400">
                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -698,35 +878,18 @@ export default function PropertyDetail() {
               </div>
 
               <h1
-                className="font-serif text-5xl sm:text-6xl lg:text-[68px] leading-[1.0] tracking-tight text-white mb-3 break-words"
+                className="font-serif text-5xl sm:text-6xl lg:text-[68px] leading-[1.0] tracking-tight text-white px-5 pt-3 pb-1 lg:px-0 lg:pt-0 lg:pb-0 mb-0 lg:mb-3 break-words"
                 data-testid="text-property-address"
               >
                 {property.address}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-2 text-white/70 text-[16px]">
+              <div className="flex flex-wrap items-center gap-2 text-white/70 text-[16px] px-5 pb-4 border-b border-[var(--line)] lg:px-0 lg:pb-0 lg:border-0">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
                 <span>
                   {property.city}, {property.state} {property.zip}
                   {isSold && <span className="text-white/50"> · Exited Investment</span>}
                 </span>
-              </div>
-
-              <div className="flex gap-2 mt-4 md:hidden">
-                <button
-                  type="button"
-                  className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-                  title="Share"
-                >
-                  <Share2 className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-                  title="Save"
-                >
-                  <Heart className="h-4 w-4" />
-                </button>
               </div>
             </div>
 
@@ -779,16 +942,6 @@ export default function PropertyDetail() {
       />
 
       <div className="bg-[var(--bg-hex)] relative z-10 min-h-screen">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <Link
-            href="/properties"
-            className="inline-flex items-center text-[13px] font-medium text-[var(--text-secondary)] hover:text-primary transition-colors group"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1 group-hover:-translate-x-1 transition-transform" />
-            Back to Marketplace
-          </Link>
-        </div>
-
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-12 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-10 items-start">
           <div className="flex flex-col">
             <section className="py-10 border-b border-[var(--line)]">
@@ -1170,7 +1323,7 @@ export default function PropertyDetail() {
             </section>
           </div>
 
-          <aside className="hidden lg:flex flex-col gap-4 sticky top-[80px]">
+          <aside className="hidden lg:flex flex-col gap-4 lg:sticky lg:top-[80px]">
             {sidebarCommitCard}
 
             <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6">
@@ -1223,17 +1376,96 @@ export default function PropertyDetail() {
       {!isSold && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--bg-hex)] border-t border-[var(--line)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {isAvailable ? (
-            <a
-              href="https://calendly.com/sspdealflow/30min"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all rounded-md flex items-center justify-center gap-2"
-              data-testid="button-invest-mobile-sticky"
-              onClick={handleInvestClick}
-            >
-              Commit to Invest
-              <ArrowRight className="w-5 h-5" />
-            </a>
+            <div>
+              {!interestOpen ? (
+                <button
+                  type="button"
+                  onClick={() => setInterestOpen(true)}
+                  className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all rounded-md flex items-center justify-center gap-2"
+                  data-testid="button-invest-mobile-sticky"
+                >
+                  I'm In — Contact Me
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              ) : !interestSuccess ? (
+                <div className="space-y-3 max-h-[70vh] overflow-y-auto pb-1">
+                  <p className="text-[12px] text-[var(--text-tertiary)] mb-1 text-center">
+                    We'll call you within 2 hours to finalize.
+                  </p>
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={interestForm.fullName}
+                    onChange={(e) => setInterestForm((f) => ({ ...f, fullName: e.target.value }))}
+                    className="w-full bg-[var(--surface-2-hex)] border border-[var(--line-light)] rounded-[8px] text-[var(--text-primary)] text-[13px] px-3 py-2.5 outline-none placeholder:text-[var(--text-tertiary)] focus:border-primary transition-all"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={interestForm.email}
+                    onChange={(e) => setInterestForm((f) => ({ ...f, email: e.target.value }))}
+                    className="w-full bg-[var(--surface-2-hex)] border border-[var(--line-light)] rounded-[8px] text-[var(--text-primary)] text-[13px] px-3 py-2.5 outline-none placeholder:text-[var(--text-tertiary)] focus:border-primary transition-all"
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone (optional)"
+                    value={interestForm.phone}
+                    onChange={(e) => setInterestForm((f) => ({ ...f, phone: e.target.value }))}
+                    className="w-full bg-[var(--surface-2-hex)] border border-[var(--line-light)] rounded-[8px] text-[var(--text-primary)] text-[13px] px-3 py-2.5 outline-none placeholder:text-[var(--text-tertiary)] focus:border-primary transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleInterestSubmit}
+                    disabled={interestSubmitting || !interestForm.fullName || !interestForm.email}
+                    className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-semibold text-[14px] py-3 rounded-[8px] flex items-center justify-center gap-2 transition-all"
+                    data-testid="button-invest-submit"
+                  >
+                    {interestSubmitting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        Confirm Interest <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInterestOpen(false)}
+                    className="w-full text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors py-1"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center py-3">
+                  <div className="w-10 h-10 bg-green-500/10 border border-green-500/20 rounded-full grid place-items-center mx-auto mb-3">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path
+                        d="M3.5 9l4 4 7-8"
+                        stroke="#22c55e"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-[14px] font-semibold text-[var(--text-primary)] mb-1">We got it — you're on this deal.</p>
+                  <p className="text-[12px] text-[var(--text-tertiary)] leading-relaxed">
+                    Travis will call you within 2 hours to walk through next steps.
+                  </p>
+                </div>
+              )}
+              {!interestOpen && !interestSuccess && (
+                <a
+                  href="https://calendly.com/sspdealflow/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-center text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors mt-2"
+                >
+                  Prefer to schedule a call instead →
+                </a>
+              )}
+            </div>
           ) : (
             <Button
               className="w-full h-14 text-base font-semibold opacity-50 cursor-not-allowed"

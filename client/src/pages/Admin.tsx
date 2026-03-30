@@ -13,9 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical, Users, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { Property, InsertProperty, UpdateProperty, PropertyStatus, Lead } from "@shared/schema";
+import type { Property, InsertProperty, UpdateProperty, PropertyStatus, Lead, PropertyInterest } from "@shared/schema";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -236,6 +236,10 @@ export default function Admin() {
               <Users className="h-4 w-4 mr-1.5 inline-block align-middle" />
               Leads
             </TabsTrigger>
+            <TabsTrigger value="interests" data-testid="tab-interests">
+              <Heart className="h-4 w-4 mr-1.5 inline-block align-middle" />
+              Interests
+            </TabsTrigger>
             <TabsTrigger value="bulk-add" data-testid="tab-bulk-add">Bulk Add</TabsTrigger>
             <TabsTrigger value="bulk-edit" data-testid="tab-bulk-edit">Bulk Edit</TabsTrigger>
           </TabsList>
@@ -453,6 +457,10 @@ export default function Admin() {
             <AdminLeadsPanel />
           </TabsContent>
 
+          <TabsContent value="interests">
+            <AdminPropertyInterestsPanel />
+          </TabsContent>
+
           <TabsContent value="bulk-add">
             <BulkAddEditor onSuccess={() => {
               refetch();
@@ -606,6 +614,110 @@ function AdminLeadsPanel() {
                       >
                         {lead.isAccredited === "true" ? "Yes" : "No"}
                       </Badge>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminPropertyInterestsPanel() {
+  const { data: interests, isLoading } = useQuery<PropertyInterest[]>({
+    queryKey: ["/api/admin/property-interests"],
+  });
+
+  const list = interests ?? [];
+
+  const { last7, last30 } = useMemo(() => {
+    const now = Date.now();
+    const cutoff7 = now - 7 * 86400000;
+    const cutoff30 = now - 30 * 86400000;
+    let n7 = 0;
+    let n30 = 0;
+    for (const row of list) {
+      const t = row.createdAt ? new Date(row.createdAt).getTime() : 0;
+      if (t >= cutoff7) n7++;
+      if (t >= cutoff30) n30++;
+    }
+    return { last7: n7, last30: n30 };
+  }, [list]);
+
+  const truncateMessage = (msg: string | null, max = 72) => {
+    if (!msg) return "—";
+    const s = msg.trim();
+    if (s.length <= max) return s;
+    return `${s.slice(0, max)}…`;
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { label: "Total", value: String(list.length) },
+          { label: "Last 7 days", value: String(last7) },
+          { label: "Last 30 days", value: String(last30) },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="rounded-xl border border-[var(--line)] bg-[var(--surface-hex)] px-4 py-3 text-[var(--text-primary)]"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">{s.label}</p>
+            <p className="mt-1 text-2xl font-bold font-mono">{s.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-16 rounded-xl border border-[var(--line)] bg-[var(--surface-hex)]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      ) : (
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-hex)] overflow-hidden overflow-x-auto">
+          <table className="w-full min-w-[900px] text-left">
+            <thead className="bg-[var(--surface-2-hex)] border-b border-[var(--line)]">
+              <tr>
+                {["Date", "Property", "Name", "Email", "Phone", "Message"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--text-tertiary)]"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--line)]">
+              {list.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-[13px] text-[var(--text-tertiary)]">
+                    No property interests yet.
+                  </td>
+                </tr>
+              ) : (
+                list.map((row) => (
+                  <tr key={row.id} className="hover:bg-[var(--surface-2-hex)]/80 transition-colors">
+                    <td className="px-4 py-3 text-[13px] text-[var(--text-secondary)] whitespace-nowrap">
+                      {row.createdAt ? format(new Date(row.createdAt), "MMM d, yyyy h:mm a") : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-[13px] font-medium text-[var(--text-primary)] max-w-[220px]">
+                      <span className="line-clamp-2">{row.propertyAddress}</span>
+                    </td>
+                    <td className="px-4 py-3 text-[13px] font-medium text-[var(--text-primary)]">{row.fullName}</td>
+                    <td className="px-4 py-3 text-[13px]">
+                      <a href={`mailto:${row.email}`} className="text-primary hover:underline">
+                        {row.email}
+                      </a>
+                    </td>
+                    <td className="px-4 py-3 text-[13px] text-[var(--text-secondary)] whitespace-nowrap">
+                      {row.phone || "—"}
+                    </td>
+                    <td className="px-4 py-3 text-[13px] text-[var(--text-secondary)] max-w-[280px]">
+                      <span title={row.message ?? undefined}>{truncateMessage(row.message)}</span>
                     </td>
                   </tr>
                 ))
