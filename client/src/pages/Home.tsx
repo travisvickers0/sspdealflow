@@ -717,16 +717,16 @@ export default function Home() {
 
       <section className="py-20 bg-[var(--surface-hex)] border-t border-[var(--line)]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative border border-[var(--line)] rounded-[20px] overflow-hidden p-16 sm:p-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="relative border border-[var(--line)] rounded-[20px] overflow-hidden p-10 sm:p-20 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div className="absolute top-[-80px] right-[-80px] w-[320px] h-[320px] bg-primary/8 rounded-full filter blur-[80px] pointer-events-none" />
-            <div className="relative">
+            <div className="relative text-center lg:text-left">
               <p className="text-[11px] uppercase tracking-[0.1em] font-semibold text-primary mb-4">Ready to invest?</p>
               <h2 className="font-serif text-3xl sm:text-4xl text-[var(--text-primary)] mb-4 tracking-tight">Start Investing Today</h2>
-              <p className="text-[15px] text-[var(--text-secondary)] leading-[1.7] max-w-md">
+              <p className="text-[15px] text-[var(--text-secondary)] leading-[1.7] max-w-md mx-auto lg:mx-0">
                 Join our community of accredited investors and access exclusive real estate opportunities.
               </p>
             </div>
-            <div className="relative flex flex-col items-end gap-3">
+            <div className="relative flex flex-col items-center lg:items-end gap-3">
               <Link
                 href="/properties"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 h-12 rounded-xl text-[15px] inline-flex items-center gap-2 shadow-[0_8px_24px_rgba(232,67,45,0.2)] hover:shadow-[0_12px_32px_rgba(232,67,45,0.3)] hover:-translate-y-0.5 transition-all"
