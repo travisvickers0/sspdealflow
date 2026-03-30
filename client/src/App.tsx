@@ -17,6 +17,24 @@ import Qualify from "@/pages/Qualify";
 import ThankYou from "@/pages/ThankYou";
 import { useAuth } from "@/hooks/useAuth";
 
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Redirect to="/signup" />;
+  }
+
+  return <Component />;
+}
+
 function AdminRoute() {
   const { isAdmin, isLoading } = useAuth();
   
@@ -45,7 +63,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
-      <Route path="/properties" component={Properties} />
+      <Route path="/properties">{() => <ProtectedRoute component={Properties} />}</Route>
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/investor-intro" component={InvestorIntroRedirect} />
       <Route path="/investors" component={MetaLanding} />
