@@ -17,6 +17,249 @@ import nodemailer from "nodemailer";
 import { sendQualificationConfirmation } from "./services/resend";
 import { appendLeadToSheet } from "./lib/googleSheets";
 
+async function sendDealAlertEmails(property: any) {
+  try {
+    const allUsers = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      })
+      .from(users)
+      .where(isNotNull(users.email));
+
+    if (!allUsers.length) {
+      console.log("[deal-alert] No users to notify");
+      return;
+    }
+
+    const nodemailer = await import("nodemailer");
+    const transporter = nodemailer.default.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    const propertyUrl = `${process.env.SITE_URL ?? "https://sspdealflow.com"}/property/${property.slug}`;
+
+    const photoUrl = property.mainPhotoUrl
+      ? property.mainPhotoUrl.startsWith("http")
+        ? property.mainPhotoUrl
+        : `${process.env.SITE_URL ?? "https://sspdealflow.com"}${property.mainPhotoUrl}`
+      : null;
+
+    const equityFormatted = property.estimatedEquity
+      ? `${property.estimatedEquity.toLocaleString()}`
+      : "TBD";
+
+    const priceFormatted = property.purchasePrice
+      ? `${property.purchasePrice.toLocaleString()}`
+      : "TBD";
+
+    const bpoFormatted = property.bpoValue
+      ? `${property.bpoValue.toLocaleString()}`
+      : "TBD";
+
+    const closingFormatted = property.closingDate
+      ? new Date(property.closingDate).toLocaleDateString("en-US", {
+          month: "long", day: "numeric", year: "numeric"
+        })
+      : "TBD";
+
+    const emailPromises = allUsers
+      .filter(u => u.email)
+      .map(user => {
+        const firstName = user.firstName ?? "Investor";
+
+        return transporter.sendMail({
+          from: `"SSP Deal Flow" <${process.env.SMTP_USER}>`,
+          to: user.email,
+          subject: `🏠 New Deal Available — ${property.address}`,
+          html: `
+  <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0908;border-radius:12px;overflow:hidden">
+
+    <!-- Header -->
+    <div style="background:#e8432d;padding:20px 28px;display:flex;align-items:center;gap:10px">
+      <div style="width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:13px;flex-shrink:0">S</div>
+      <span style="color:white;font-weight:600;font-size:15px">SSP Deal Flow</span>
+    </div>
+
+${photoUrl ? `
+  <!-- Property photo -->
+  <div style="width:100%;position:relative;overflow:hidden;max-height:280px">
+    <img
+      src="${photoUrl}"
+      alt="${property.address}"
+      width="600"
+      style="width:100%;height:280px;object-fit:cover;display:block;filter:brightness(0.9)"
+    />
+    <!-- Equity tag overlay -->
+    <div style="position:absolute;bottom:14px;left:14px;background:rgba(10,9,8,0.82);border:1px solid rgba(34,197,94,0.25);border-radius:6px;padding:6px 12px">
+      <span style="font-family:monospace;font-size:14px;font-weight:700;color:#22c55e">
+        +${equityFormatted} equity
+      </span>
+    </div>
+    <!-- Status badge -->
+    <div style="position:absolute;top:14px;left:14px;background:#e8432d;border-radius:4px;padding:4px 10px">
+      <span style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:white">
+        Needs Funding
+      </span>
+    </div>
+  </div>
+` : ""}
+
+    <!-- Body -->
+    <div style="padding:28px;background:#181614">
+
+      <p style="margin:0 0 6px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b6158">
+        New Deal Available · Needs Funding
+      </p>
+      <h1 style="margin:0 0 4px;font-size:28px;font-weight:700;color:#f0ebe3;line-height:1.2">
+        ${property.address}
+      </h1>
+      <p style="margin:0 0 24px;font-size:14px;color:#6b6158">
+        📍 ${property.city}, ${property.state} ${property.zip}
+      </p>
+
+      <p style="margin:0 0 20px;font-size:15px;color:#a89e91;line-height:1.65">
+        Hi ${firstName}, a new deal just dropped on SSP Deal Flow.
+        These fund fast — here are the numbers:
+      </p>
+
+      <!-- Key numbers 2x2 grid -->
+      <table style="width:100%;border-collapse:collapse;margin-bottom:18px">
+        <tr>
+          <td style="padding:14px 16px;background:#252220;border:1px solid #2a2724;width:50%;vertical-align:top">
+            <div style="font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b6158;margin-bottom:5px">Purchase Price</div>
+            <div style="font-size:22px;font-weight:700;color:#f0ebe3;font-family:monospace;letter-spacing:-0.02em">${priceFormatted}</div>
+          </td>
+          <td style="padding:14px 16px;background:#111f12;border:1px solid #2a2724;width:50%;vertical-align:top">
+            <div style="font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(34,197,94,0.6);margin-bottom:5px">Est. Equity</div>
+            <div style="font-size:22px;font-weight:700;color:#22c55e;font-family:monospace;letter-spacing:-0.02em">${equityFormatted}</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:14px 16px;background:#111520;border:1px solid #2a2724;vertical-align:top">
+            <div style="font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(59,130,246,0.6);margin-bottom:5px">After Repair Value</div>
+            <div style="font-size:22px;font-weight:700;color:#3b82f6;font-family:monospace;letter-spacing:-0.02em">${bpoFormatted}</div>
+          </td>
+          <td style="padding:14px 16px;background:#252220;border:1px solid #2a2724;vertical-align:top">
+            <div style="font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#6b6158;margin-bottom:5px">Closing Date</div>
+            <div style="font-size:17px;font-weight:600;color:#f0ebe3">${closingFormatted}</div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Specs -->
+      <p style="margin:0 0 18px;padding-bottom:18px;border-bottom:1px solid #2a2724;font-size:13px;color:#6b6158">
+        ${property.beds ?? "—"} bed &nbsp;·&nbsp;
+        ${property.baths ?? "—"} bath &nbsp;·&nbsp;
+        ${property.squareFeet ? property.squareFeet.toLocaleString() : "—"} sqft
+      </p>
+
+      <!-- Urgency bar -->
+      ${property.closingDate ? (() => {
+        const daysUntilClose = Math.max(0, Math.ceil(
+          (new Date(property.closingDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        ));
+        return `
+          <div style="background:rgba(232,67,45,0.08);border:1px solid rgba(232,67,45,0.18);border-left:3px solid #e8432d;border-radius:0 6px 6px 0;padding:12px 16px;margin-bottom:20px">
+            <div style="font-size:13px;font-weight:600;color:#f0ebe3;margin-bottom:3px">
+              ⚡ This deal closes in ${daysUntilClose} days
+            </div>
+            <div style="font-size:11px;color:#a89e91">
+              Deals at this equity level typically fund within 48–72 hours of posting.
+            </div>
+          </div>
+        `;
+      })() : ""}
+
+      <!-- Deal breakdown -->
+      <div style="background:#252220;border:1px solid #2a2724;border-radius:8px;padding:16px;margin-bottom:22px">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#6b6158;margin-bottom:12px">
+          Deal Breakdown
+        </div>
+
+        <table style="width:100%;border-collapse:collapse">
+          <tr style="border-bottom:1px solid #2a2724">
+            <td style="padding:9px 0;font-size:12px;color:#a89e91">Structure</td>
+            <td style="padding:9px 0;font-size:13px;font-weight:600;color:#f0ebe3;text-align:right">Deal-by-deal JV</td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2724">
+            <td style="padding:9px 0;font-size:12px;color:#a89e91">Your profit split</td>
+            <td style="padding:9px 0;font-size:13px;font-weight:600;color:#22c55e;text-align:right;font-family:monospace">50% of net profit</td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2724">
+            <td style="padding:9px 0;font-size:12px;color:#a89e91">Rehab budget</td>
+            <td style="padding:9px 0;font-size:13px;font-weight:600;color:#f0ebe3;text-align:right;font-family:monospace">
+              ${property.rehabBudget === 0 ? "$0 — cosmetic only" : priceFormatted}
+            </td>
+          </tr>
+          <tr style="border-bottom:1px solid #2a2724">
+            <td style="padding:9px 0;font-size:12px;color:#a89e91">Your est. return</td>
+            <td style="padding:9px 0;font-size:13px;font-weight:600;color:#22c55e;text-align:right;font-family:monospace">
+              ${property.estimatedEquity
+                ? `${Math.round(property.estimatedEquity * 0.5).toLocaleString()} (+${property.purchasePrice ? ((property.estimatedEquity * 0.5 / property.purchasePrice) * 100).toFixed(1) : "—"}%)`
+                : "TBD"}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:9px 0;font-size:12px;color:#a89e91">Protection</td>
+            <td style="padding:9px 0;font-size:13px;font-weight:600;color:#f0ebe3;text-align:right">1st position lien</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- CTA button -->
+      <div style="text-align:center;margin-bottom:16px">
+        <a href="${propertyUrl}"
+          style="display:inline-block;background:#e8432d;color:white;text-decoration:none;padding:16px 48px;border-radius:8px;font-weight:700;font-size:15px;letter-spacing:0.01em">
+          View This Deal →
+        </a>
+      </div>
+
+      <p style="margin:0;font-size:11px;color:#6b6158;text-align:center;line-height:1.7">
+        Questions? Reply to this email or call Travis directly.
+      </p>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:16px 28px 24px;background:#0f0e0d;border-top:1px solid #2a2724;text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
+        <div style="width:20px;height:20px;background:#e8432d;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white">S</div>
+        <span style="font-size:13px;font-weight:600;color:#a89e91">SSP Deal Flow</span>
+      </div>
+      <p style="margin:0 0 8px;font-size:11px;color:#6b6158;line-height:1.6">
+        Deal-by-deal joint venture partnerships. Not a Fund. No pooled capital.<br/>
+        You're receiving this because you have an SSP Deal Flow account.
+      </p>
+      <p style="margin:0;font-size:10px;color:#6b6158">
+        © 2026 Southern Specialty Properties
+      </p>
+    </div>
+
+  </div>
+`,
+        });
+      });
+
+    const results = await Promise.allSettled(emailPromises);
+    const sent = results.filter(r => r.status === "fulfilled").length;
+    const failed = results.filter(r => r.status === "rejected").length;
+
+    console.log(`[deal-alert] Sent ${sent}/${allUsers.length} emails. Failed: ${failed}`);
+  } catch (err: any) {
+    console.error("[deal-alert] Failed:", err.message);
+  }
+}
+
+
 // Configure multer for file uploads
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -755,6 +998,10 @@ export async function registerRoutes(
         resourceId: property.id,
         details: { address: property.address },
       });
+
+      sendDealAlertEmails(property).catch((err) =>
+        console.error("[deal-alert] Background send failed:", err)
+      );
       
       res.status(201).json(property);
     } catch (error) {

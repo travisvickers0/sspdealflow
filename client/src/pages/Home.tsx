@@ -147,33 +147,33 @@ export default function Home() {
           style={{
             maskImage: `
     radial-gradient(
-      ellipse 55% 55% at 38% 52%,
+      ellipse 60% 55% at 50% 50%,
       rgba(0,0,0,0) 0%,
-      rgba(0,0,0,0) 12%,
-      rgba(0,0,0,0.7) 42%,
-      rgba(0,0,0,1) 65%
+      rgba(0,0,0,0) 10%,
+      rgba(0,0,0,0.6) 38%,
+      rgba(0,0,0,1) 60%
     ),
     linear-gradient(
       to bottom,
       transparent 0%,
-      black 12%,
-      black 88%,
+      black 10%,
+      black 90%,
       transparent 100%
     )
   `,
             WebkitMaskImage: `
     radial-gradient(
-      ellipse 55% 55% at 38% 52%,
+      ellipse 60% 55% at 50% 50%,
       rgba(0,0,0,0) 0%,
-      rgba(0,0,0,0) 12%,
-      rgba(0,0,0,0.7) 42%,
-      rgba(0,0,0,1) 65%
+      rgba(0,0,0,0) 10%,
+      rgba(0,0,0,0.6) 38%,
+      rgba(0,0,0,1) 60%
     ),
     linear-gradient(
       to bottom,
       transparent 0%,
-      black 12%,
-      black 88%,
+      black 10%,
+      black 90%,
       transparent 100%
     )
   `,
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto my-auto hidden max-w-[1100px] grid-cols-[1fr_420px] items-center gap-10 lg:gap-12 px-6 pb-8 pt-8 sm:px-10 lg:grid lg:px-16 lg:pb-20 lg:pt-14">
+        <div className="relative z-10 mx-auto my-auto hidden max-w-[1200px] grid-cols-[1fr_400px] items-center gap-16 px-6 pb-8 pt-8 sm:px-10 lg:grid lg:px-20 lg:pb-20 lg:pt-14">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
