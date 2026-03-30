@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto hidden max-w-[1280px] grid-cols-[1fr_380px] items-start gap-24 px-4 pb-8 pt-8 sm:px-8 lg:grid lg:px-12 lg:pb-20 lg:pt-14">
+        <div className="relative z-10 mx-auto hidden max-w-[1280px] grid-cols-[1fr_380px] items-center gap-24 px-4 pb-8 pt-8 sm:px-8 lg:grid lg:px-12 lg:pb-20 lg:pt-14">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
