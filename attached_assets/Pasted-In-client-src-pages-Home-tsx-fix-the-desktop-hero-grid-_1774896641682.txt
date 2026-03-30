@@ -1,0 +1,100 @@
+In client/src/pages/Home.tsx, fix the desktop hero 
+grid to fill the screen with equal balanced spacing.
+Mobile unchanged. No logic changes.
+
+FIND the desktop grid wrapper div with className
+containing "hidden lg:grid grid-cols-[1fr_420px]"
+
+REPLACE its className with:
+
+className="relative z-10 w-full
+  hidden lg:grid
+  lg:grid-cols-[1fr_1fr]
+  lg:gap-0
+  lg:items-center
+  lg:min-h-screen
+  lg:max-w-none"
+
+Key changes:
+- grid-cols-[1fr_1fr] — equal columns, no fixed width
+- gap-0 — no gap, each column handles its own padding
+- max-w-none — fills the full viewport width
+- min-h-screen — hero fills full height
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LEFT COLUMN — add internal padding so content
+sits centered within its half of the screen:
+
+Find the left column div (direct child of the grid,
+contains the badge + h1 + stats + CTAs).
+Change its className padding to:
+
+className="flex flex-col justify-center
+  h-full
+  pl-[8vw] pr-[5vw]
+  py-24"
+
+This gives:
+- pl-[8vw]: pushes content away from left edge
+- pr-[5vw]: breathing room toward center divide
+- Content sits centered in the left half
+
+Also add max-w to content inside left column
+to prevent headline from stretching too wide:
+  Add to the left column div:
+  max-w-[620px]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RIGHT COLUMN — the tape panel div.
+Change its wrapper to fill the right half:
+
+Find the tape panel outer div (has h-[480px] 
+border border-[#2a2724] rounded-[16px]).
+
+Wrap it in a new div if needed, or update
+the existing right column wrapper:
+
+className="flex items-center justify-center
+  h-full min-h-screen
+  pr-[8vw] pl-[5vw]
+  py-24 bg-[#181614]/20"
+
+Then the tape panel itself:
+  Remove: any fixed width
+  Add: w-full max-w-[420px]
+  Keep: h-[480px]
+
+This centers the tape panel in the right half
+with matching padding mirror of the left.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HEADLINE SIZE — with full viewport width the
+headline can be larger again:
+
+Find desktop h1:
+  Change to: text-[clamp(72px,6vw,108px)]
+  leading-[0.90]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TICKER MASK — update center point to match
+the new full-width layout where content
+lives in the left 50% of the screen:
+
+Update maskImage at position:
+  From: at 42% 50%
+  To:   at 30% 50%
+
+And ellipse size to cover more of left side:
+  From: ellipse 60% 55%
+  To:   ellipse 45% 60%
+
+This clears the left content area while keeping
+the ticker visible on the right side behind
+the tape panel.
+
+Update WebkitMaskImage to match.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Do not change any other code.
+Do not change mobile layout.
+Do not run tsc.
