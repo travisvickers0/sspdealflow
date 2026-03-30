@@ -54,15 +54,15 @@ async function sendDealAlertEmails(property: any) {
       : null;
 
     const equityFormatted = property.estimatedEquity
-      ? `${property.estimatedEquity.toLocaleString()}`
+      ? `$${property.estimatedEquity.toLocaleString()}`
       : "TBD";
 
     const priceFormatted = property.purchasePrice
-      ? `${property.purchasePrice.toLocaleString()}`
+      ? `$${property.purchasePrice.toLocaleString()}`
       : "TBD";
 
     const bpoFormatted = property.bpoValue
-      ? `${property.bpoValue.toLocaleString()}`
+      ? `$${property.bpoValue.toLocaleString()}`
       : "TBD";
 
     const closingFormatted = property.closingDate
@@ -204,7 +204,7 @@ ${photoUrl ? `
             <td style="padding:9px 0;font-size:12px;color:#a89e91">Your est. return</td>
             <td style="padding:9px 0;font-size:13px;font-weight:600;color:#22c55e;text-align:right;font-family:monospace">
               ${property.estimatedEquity
-                ? `${Math.round(property.estimatedEquity * 0.5).toLocaleString()} (+${property.purchasePrice ? ((property.estimatedEquity * 0.5 / property.purchasePrice) * 100).toFixed(1) : "—"}%)`
+                ? `$${Math.round(property.estimatedEquity * 0.5).toLocaleString()} (+${property.purchasePrice ? ((property.estimatedEquity * 0.5 / property.purchasePrice) * 100).toFixed(1) : "—"}%)`
                 : "TBD"}
             </td>
           </tr>

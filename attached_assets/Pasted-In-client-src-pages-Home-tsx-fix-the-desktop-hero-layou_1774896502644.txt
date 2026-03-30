@@ -1,0 +1,89 @@
+In client/src/pages/Home.tsx, fix the desktop hero 
+layout. Find the desktop grid wrapper div — the one 
+with className containing "hidden max-w-[1200px] 
+grid-cols-[1fr_400px]".
+
+Replace its entire className with:
+
+className="relative z-10 mx-auto w-full
+  hidden lg:grid
+  grid-cols-[1fr_420px]
+  gap-12
+  items-center
+  max-w-[1140px]
+  px-16
+  py-16"
+
+Key changes:
+- hidden lg:grid (was hidden with no lg:grid override)
+- grid-cols-[1fr_420px] (wider tape panel: 400→420)
+- gap-12 (tighter gap: 16→12)
+- max-w-[1140px] (narrower: 1200→1140 pulls content in)
+- px-16 (more horizontal padding: centers content better)
+- py-16 (vertical padding so content breathes)
+- items-center (vertically centers both columns)
+- Remove: my-auto (not needed with items-center on grid)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Also fix the ticker background alignment.
+Find the ticker bg inner flex div — the one with:
+  className containing "flex h-full flex-col 
+  justify-between lg:justify-center"
+
+Replace its className with:
+
+className="flex h-full flex-col
+  justify-center
+  items-center
+  gap-[clamp(16px,3vh,40px)]
+  py-[12vh]"
+
+Key changes:
+- justify-center always (not just lg)
+- gap replaces justify-between spacing
+- py-[12vh] creates top/bottom clearance so ticker
+  rows cluster in the middle where content lives
+- Remove: lg:justify-center lg:gap-* lg:items-center
+  (simplify to always-on values)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Also fix the tape panel height to match content:
+Find the tape panel div — the dark bordered container
+on the right of the desktop grid.
+Change: h-[500px]
+To: h-[480px]
+
+And verify it has NO self-* alignment class.
+It should stretch to fill the grid column naturally.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Also fix the headline size — at 1140px max-width
+the current clamp(72px,8.5vw,116px) is too large
+and causes the headline to feel heavy relative
+to the tape panel.
+
+Find the desktop h1:
+  text-[clamp(72px,8.5vw,116px)]
+Change to:
+  text-[clamp(64px,7.5vw,100px)]
+
+And reduce leading slightly:
+  leading-[0.92] → leading-[0.90]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Finally — the mask radial center needs to shift
+left to match the new narrower layout.
+The content lives in the left column of a 1140px
+container centered on the page. The mask center
+point at 50% 50% is too centered — it should
+favor the left side where content is.
+
+Update maskImage style prop center point:
+  From: at 50% 50%
+  To:   at 42% 50%
+
+And update WebkitMaskImage to match.
+
+Do not change any other code.
+Do not change mobile layout.
+Do not run tsc.

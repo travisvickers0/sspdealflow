@@ -147,7 +147,7 @@ export default function Home() {
           style={{
             maskImage: `
     radial-gradient(
-      ellipse 60% 55% at 50% 50%,
+      ellipse 60% 55% at 42% 50%,
       rgba(0,0,0,0) 0%,
       rgba(0,0,0,0) 10%,
       rgba(0,0,0,0.6) 38%,
@@ -163,7 +163,7 @@ export default function Home() {
   `,
             WebkitMaskImage: `
     radial-gradient(
-      ellipse 60% 55% at 50% 50%,
+      ellipse 60% 55% at 42% 50%,
       rgba(0,0,0,0) 0%,
       rgba(0,0,0,0) 10%,
       rgba(0,0,0,0.6) 38%,
@@ -181,7 +181,7 @@ export default function Home() {
             WebkitMaskComposite: "source-in",
           }}
         >
-          <div className="flex h-full flex-col justify-between lg:justify-center lg:gap-[clamp(20px,4vh,48px)] lg:items-center lg:py-[8vh]">
+          <div className="flex h-full flex-col justify-center items-center gap-[clamp(16px,3vh,40px)] py-[12vh]">
             <div className="flex overflow-hidden whitespace-nowrap">
               {renderTickerStrip(row1Items, "animate-[ticker-left_28s_linear_infinite]")}
             </div>
@@ -194,7 +194,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto my-auto hidden max-w-[1200px] grid-cols-[1fr_400px] items-center gap-16 px-6 pb-8 pt-8 sm:px-10 lg:grid lg:px-20 lg:pb-20 lg:pt-14">
+        <div className="relative z-10 mx-auto w-full hidden lg:grid grid-cols-[1fr_420px] gap-12 items-center max-w-[1140px] px-16 py-16">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
@@ -203,7 +203,7 @@ export default function Home() {
               </span>
             </div>
 
-            <h1 className="font-['Bebas_Neue',sans-serif] text-[clamp(72px,8.5vw,116px)] font-normal leading-[0.92] tracking-[0.025em] text-[#f0ebe3]">
+            <h1 className="font-['Bebas_Neue',sans-serif] text-[clamp(64px,7.5vw,100px)] font-normal leading-[0.90] tracking-[0.025em] text-[#f0ebe3]">
               Real Estate
               <br />
               <span className="text-[#e8432d]">Built for</span>
@@ -274,7 +274,7 @@ export default function Home() {
           </div>
 
           <div
-            className="relative h-[500px] overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
+            className="relative h-[480px] overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
             style={{
               maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
               WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
