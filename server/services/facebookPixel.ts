@@ -3,6 +3,8 @@
  * Sends server-side events to Facebook's Conversions API
  */
 
+import { createHash } from "crypto";
+
 const PIXEL_ID = '167356294022738';
 const API_VERSION = 'v18.0';
 const CONVERSIONS_API_URL = `https://graph.facebook.com/${API_VERSION}/${PIXEL_ID}/events`;
@@ -121,7 +123,7 @@ export async function sendFacebookPixelEvent(options: SendEventOptions): Promise
  * Hash data using SHA-256 (required by Facebook for PII)
  */
 function hashData(data: string): string {
-  return crypto.createHash('sha256').update(data.toLowerCase().trim()).digest('hex');
+  return createHash("sha256").update(data.toLowerCase().trim()).digest("hex");
 }
 
 /**

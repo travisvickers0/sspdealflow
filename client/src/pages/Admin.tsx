@@ -1,4 +1,6 @@
 import { useState, useRef, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { Link } from "wouter";
 import { Layout } from "@/components/Layout";
 import { useProperties, useAdminProperties, useBulkEditor, useUpload } from "@/hooks/useProperties";
@@ -11,9 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { Property, InsertProperty, UpdateProperty, PropertyStatus } from "@shared/schema";
+import type { Property, InsertProperty, UpdateProperty, PropertyStatus, Lead } from "@shared/schema";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -230,6 +232,10 @@ export default function Admin() {
         <Tabs defaultValue="properties" className="space-y-6">
           <TabsList>
             <TabsTrigger value="properties" data-testid="tab-properties">Properties</TabsTrigger>
+            <TabsTrigger value="leads" data-testid="tab-leads">
+              <Users className="h-4 w-4 mr-1.5 inline-block align-middle" />
+              Leads
+            </TabsTrigger>
             <TabsTrigger value="bulk-add" data-testid="tab-bulk-add">Bulk Add</TabsTrigger>
             <TabsTrigger value="bulk-edit" data-testid="tab-bulk-edit">Bulk Edit</TabsTrigger>
           </TabsList>
@@ -443,6 +449,10 @@ export default function Admin() {
             )}
           </TabsContent>
 
+          <TabsContent value="leads">
+            <AdminLeadsPanel />
+          </TabsContent>
+
           <TabsContent value="bulk-add">
             <BulkAddEditor onSuccess={() => {
               refetch();
@@ -504,6 +514,107 @@ export default function Admin() {
         </Dialog>
       </div>
     </Layout>
+  );
+}
+
+function AdminLeadsPanel() {
+  const { data: leads, isLoading } = useQuery<Lead[]>({
+    queryKey: ["/api/admin/leads"],
+  });
+
+  const list = leads ?? [];
+
+  const { last7, last30 } = useMemo(() => {
+    const now = Date.now();
+    const cutoff7 = now - 7 * 86400000;
+    const cutoff30 = now - 30 * 86400000;
+    let n7 = 0;
+    let n30 = 0;
+    for (const l of list) {
+      const t = l.createdAt ? new Date(l.createdAt).getTime() : 0;
+      if (t >= cutoff7) n7++;
+      if (t >= cutoff30) n30++;
+    }
+    return { last7: n7, last30: n30 };
+  }, [list]);
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { label: "Total leads", value: String(list.length) },
+          { label: "Last 7 days", value: String(last7) },
+          { label: "Last 30 days", value: String(last30) },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="rounded-xl border border-[var(--line)] bg-[var(--surface-hex)] px-4 py-3 text-[var(--text-primary)]"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">{s.label}</p>
+            <p className="mt-1 text-2xl font-bold font-mono">{s.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-16 rounded-xl border border-[var(--line)] bg-[var(--surface-hex)]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      ) : (
+        <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-hex)] overflow-hidden overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left">
+            <thead className="bg-[var(--surface-2-hex)] border-b border-[var(--line)]">
+              <tr>
+                {["Date", "Name", "Email", "Phone", "Source", "Accredited"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--text-tertiary)]"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--line)]">
+              {list.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-[13px] text-[var(--text-tertiary)]">
+                    No leads yet.
+                  </td>
+                </tr>
+              ) : (
+                list.map((lead) => (
+                  <tr key={lead.id} className="hover:bg-[var(--surface-2-hex)]/80 transition-colors">
+                    <td className="px-4 py-3 text-[13px] text-[var(--text-secondary)] whitespace-nowrap">
+                      {lead.createdAt ? format(new Date(lead.createdAt), "MMM d, yyyy h:mm a") : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-[13px] font-medium text-[var(--text-primary)]">{lead.fullName}</td>
+                    <td className="px-4 py-3 text-[13px]">
+                      <a href={`mailto:${lead.email}`} className="text-primary hover:underline">
+                        {lead.email}
+                      </a>
+                    </td>
+                    <td className="px-4 py-3 text-[13px] text-[var(--text-secondary)] whitespace-nowrap">{lead.phone || "—"}</td>
+                    <td className="px-4 py-3 text-[13px] text-[var(--text-secondary)]">{lead.primaryInterest}</td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        className={
+                          lead.isAccredited === "true"
+                            ? "bg-green-500/15 text-green-400 border-green-500/25 hover:bg-green-500/15"
+                            : "bg-[var(--surface-2-hex)] text-[var(--text-tertiary)] border-[var(--line)] hover:bg-[var(--surface-2-hex)]"
+                        }
+                      >
+                        {lead.isAccredited === "true" ? "Yes" : "No"}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 }
 

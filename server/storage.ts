@@ -33,6 +33,7 @@ export interface IStorage {
   createLead(lead: InsertLead): Promise<Lead>;
   getLead(id: string): Promise<Lead | undefined>;
   getAllLeads(): Promise<Lead[]>;
+  getLeads(): Promise<Lead[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -194,8 +195,12 @@ export class DatabaseStorage implements IStorage {
     return lead;
   }
 
-  async getAllLeads(): Promise<Lead[]> {
+  async getLeads(): Promise<Lead[]> {
     return await db.select().from(leads).orderBy(desc(leads.createdAt));
+  }
+
+  async getAllLeads(): Promise<Lead[]> {
+    return this.getLeads();
   }
 }
 

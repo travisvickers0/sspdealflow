@@ -187,21 +187,28 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
       temperature: 0.1,
     });
 
-    const toolCall = completion.choices[0]?.message?.tool_calls?.[0];
-    if (!toolCall?.function?.arguments) {
+    const rawToolCall = completion.choices[0]?.message?.tool_calls?.[0];
+    const toolArgs =
+      rawToolCall &&
+      rawToolCall.type === "function" &&
+      "function" in rawToolCall &&
+      typeof rawToolCall.function?.arguments === "string"
+        ? rawToolCall.function.arguments
+        : undefined;
+    if (!toolArgs) {
       throw new Error("Failed to extract data from BPO - no tool call response");
     }
 
     let extracted: any;
     try {
-      extracted = JSON.parse(toolCall.function.arguments);
+      extracted = JSON.parse(toolArgs);
       console.log(`BPO Extraction summary:`, {
         compsCount: extracted.comps?.length || 0,
         repairsCount: extracted.repairs?.length || 0,
         hasSubject: !!extracted.subject,
       });
     } catch (parseErr) {
-      console.error("Failed to parse OpenAI extraction:", parseErr, toolCall.function.arguments);
+      console.error("Failed to parse OpenAI extraction:", parseErr, toolArgs);
       throw new Error("Failed to parse extracted BPO data");
     }
 

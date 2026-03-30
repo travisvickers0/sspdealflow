@@ -185,6 +185,36 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/leads", async (req: Request, res: Response) => {
+    try {
+      const { firstName, lastName, email, phone } = req.body;
+
+      if (!firstName || !email) {
+        return res.status(400).json({ error: "firstName and email are required" });
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+
+      const fullName = `${String(firstName).trim()} ${String(lastName || "").trim()}`.trim();
+
+      await storage.createLead({
+        fullName,
+        email: String(email).trim(),
+        phone: phone != null ? String(phone).trim() : "",
+        isAccredited: true,
+        capitalRange: "not_specified",
+        investmentTimeline: "not_specified",
+        primaryInterest: "general_inquiry",
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error creating lead:", error);
+      res.status(500).json({ error: "Failed to save lead" });
+    }
+  });
+
   // POST /api/qualify - Investor qualification form submission
   app.post("/api/qualify", async (req: Request, res: Response) => {
     try {
@@ -1046,6 +1076,16 @@ export async function registerRoutes(
           message: error instanceof Error ? error.message : "Unknown error" 
         });
       }
+    }
+  });
+
+  app.get("/api/admin/leads", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const leadsList = await storage.getLeads();
+      res.json(leadsList);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+      res.status(500).json({ error: "Failed to fetch leads" });
     }
   });
 

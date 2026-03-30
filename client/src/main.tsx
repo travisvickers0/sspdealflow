@@ -1,3 +1,5 @@
+import "./lib/posthog";
+export { posthog } from "./lib/posthog";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";

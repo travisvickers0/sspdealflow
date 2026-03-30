@@ -1,10 +1,33 @@
 import { Layout } from "@/components/Layout";
 import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRoute, Link, Redirect } from "wouter";
-import { MapPin, ChevronLeft, ChevronRight, Home as HomeIcon, FileText, Share2, Loader2, Bed, Bath, Calendar, Ruler, Heart, TrendingUp, DollarSign, Hammer, Target, ArrowRight, Images, Check, Download, Shield, ArrowDown, Building2, Wallet, Lock, CheckCircle2, Landmark, Home, Coins, ArrowUp } from "lucide-react";
+import {
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Share2,
+  Loader2,
+  Bed,
+  Bath,
+  Calendar,
+  Ruler,
+  Heart,
+  TrendingUp,
+  DollarSign,
+  Hammer,
+  Target,
+  ArrowRight,
+  Images,
+  Check,
+  Download,
+  Shield,
+  Lock,
+  CheckCircle2,
+} from "lucide-react";
 import { useState, useEffect } from "react";
+import { posthog } from "@/lib/posthog";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,12 +41,11 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
-  const { data: property, isLoading, error } = useProperty(params?.slug);
+  const { data: property, isLoading } = useProperty(params?.slug);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  // Calculate images array early for keyboard navigation
   const galleryImages = property?.galleryPhotoUrls || [];
   const allImages = property?.mainPhotoUrl ? [property.mainPhotoUrl, ...galleryImages] : galleryImages;
 
@@ -31,21 +53,67 @@ export default function PropertyDetail() {
     window.scrollTo(0, 0);
   }, [params?.slug]);
 
-  // Keyboard navigation - must be before any conditional returns
+  useEffect(() => {
+    if (!property) return;
+
+    posthog.capture("property_viewed", {
+      property_id: property.id,
+      property_address: property.address,
+      property_city: property.city,
+      property_state: property.state,
+      property_status: property.status,
+      purchase_price: property.purchasePrice,
+      estimated_equity: property.estimatedEquity,
+    });
+
+    if (typeof window.gtag !== "undefined") {
+      window.gtag("event", "view_item", {
+        items: [
+          {
+            item_id: String(property.id),
+            item_name: property.address,
+            item_category: property.status,
+            price: property.purchasePrice,
+          },
+        ],
+      });
+    }
+  }, [property?.id]);
+
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        setSelectedImage((prev) => (prev > 0 ? prev - 1 : (allImages.length > 0 ? allImages.length - 1 : 0)));
-      } else if (e.key === 'ArrowRight') {
-        setSelectedImage((prev) => (prev < (allImages.length > 0 ? allImages.length - 1 : 0) ? prev + 1 : 0));
+      if (e.key === "ArrowLeft") {
+        setSelectedImage((prev) => (prev > 0 ? prev - 1 : allImages.length > 0 ? allImages.length - 1 : 0));
+      } else if (e.key === "ArrowRight") {
+        setSelectedImage((prev) =>
+          prev < (allImages.length > 0 ? allImages.length - 1 : 0) ? prev + 1 : 0,
+        );
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [allImages.length]);
 
-  // Require authentication to view property details
+  useEffect(() => {
+    document.body.removeAttribute("data-nav-scrolled");
+
+    const handleScroll = () => {
+      if (window.scrollY > 80) {
+        document.body.setAttribute("data-nav-scrolled", "true");
+      } else {
+        document.body.removeAttribute("data-nav-scrolled");
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.body.removeAttribute("data-nav-scrolled");
+    };
+  }, []);
+
   if (!authLoading && !isAuthenticated) {
     return <Redirect to="/signin" />;
   }
@@ -64,7 +132,7 @@ export default function PropertyDetail() {
     return (
       <Layout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Property not found</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-4">Property not found</h1>
           <Link href="/properties">
             <Button>Back to Properties</Button>
           </Link>
@@ -73,69 +141,59 @@ export default function PropertyDetail() {
     );
   }
 
-  // Status mode logic with backwards compatibility
-  // Map old status values to new system for backwards compatibility
-  const normalizedStatus = property.status === "needs_funding"
-    ? "AVAILABLE" 
-    : property.status === "committed"
-    ? "COMMITTED"
-    : property.status === "funded" || property.status === "archived"
-    ? "FUNDED"
-    : property.status;
-  
+  const normalizedStatus =
+    property.status === "needs_funding"
+      ? "AVAILABLE"
+      : property.status === "committed"
+        ? "COMMITTED"
+        : property.status === "funded" || property.status === "archived"
+          ? "FUNDED"
+          : property.status;
+
   const isAvailable = normalizedStatus === "AVAILABLE";
   const isCommitted = normalizedStatus === "COMMITTED";
   const isFunded = normalizedStatus === "FUNDED";
   const isSold = normalizedStatus === "SOLD";
 
-  // Calculate profit metrics - use SOLD values if available, otherwise use estimates
-  const totalEquity = isSold && property.totalProjectProfit !== null && property.totalProjectProfit !== undefined
-    ? property.totalProjectProfit
-    : property?.estimatedEquity || 0;
-  
+  const totalEquity =
+    isSold && property.totalProjectProfit !== null && property.totalProjectProfit !== undefined
+      ? property.totalProjectProfit
+      : property?.estimatedEquity || 0;
+
   const purchasePrice = property?.purchasePrice || 0;
-  
-  // For sold deals, use actual values
+
   let investorProfitShare: number;
   let sspProfitShare: number;
   let returnPercentage: number;
   let usesGuaranteedMinimum = false;
-  
+
   if (isSold && property.investorProfit !== null && property.investorProfit !== undefined) {
-    // Use actual sold values
     investorProfitShare = property.investorProfit;
-    sspProfitShare = property.sponsorProfit !== null && property.sponsorProfit !== undefined 
-      ? property.sponsorProfit 
-      : totalEquity - investorProfitShare;
-    returnPercentage = property.realizedROI !== null && property.realizedROI !== undefined
-      ? property.realizedROI
-      : purchasePrice > 0 ? (investorProfitShare / purchasePrice) * 100 : 0;
+    sspProfitShare =
+      property.sponsorProfit !== null && property.sponsorProfit !== undefined
+        ? property.sponsorProfit
+        : totalEquity - investorProfitShare;
+    returnPercentage =
+      property.realizedROI !== null && property.realizedROI !== undefined
+        ? property.realizedROI
+        : purchasePrice > 0
+          ? (investorProfitShare / purchasePrice) * 100
+          : 0;
   } else {
-    // Calculate for available/funded deals
-    // Step 1: Calculate 50/50 profit split
     const profitSplit50_50 = totalEquity * 0.5;
-    
-    // Step 2: Calculate guaranteed minimum return (1% per month, minimum 8% total)
-    // Estimate hold period: use actual if available, otherwise estimate 3 months (typical 60-120 days)
     const holdPeriodMonths = property?.holdPeriodMonths || 3;
-    const monthlyReturnPercent = 1; // 1% per month
-    const minimumTotalReturnPercent = 8; // Minimum 8% total
+    const monthlyReturnPercent = 1;
+    const minimumTotalReturnPercent = 8;
     const calculatedMonthlyReturn = monthlyReturnPercent * holdPeriodMonths;
     const guaranteedReturnPercent = Math.max(calculatedMonthlyReturn, minimumTotalReturnPercent);
     const guaranteedMinimumProfit = (purchasePrice * guaranteedReturnPercent) / 100;
-    
-    // Step 3: Investor gets whichever is higher: 50/50 split OR guaranteed minimum
+
     investorProfitShare = Math.max(profitSplit50_50, guaranteedMinimumProfit);
     usesGuaranteedMinimum = profitSplit50_50 < guaranteedMinimumProfit;
-    
-    // Step 4: SSP profit is the remainder (may be negative if guaranteed minimum exceeds 50% split)
-    // SSP covers the shortfall per the agreement
     sspProfitShare = Math.max(0, totalEquity - investorProfitShare);
-    
-    // Step 5: Calculate ROI
     returnPercentage = purchasePrice > 0 ? (investorProfitShare / purchasePrice) * 100 : 0;
   }
-  
+
   const investorTotalReturn = purchasePrice + investorProfitShare;
 
   const handlePreviousImage = () => {
@@ -146,1339 +204,1047 @@ export default function PropertyDetail() {
     setSelectedImage((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
   };
 
+  const handleInvestClick = () => {
+    posthog.capture("invest_clicked", {
+      property_id: property.id,
+      property_address: property.address,
+      purchase_price: property.purchasePrice,
+      estimated_equity: property.estimatedEquity,
+    });
+
+    if (typeof window.gtag !== "undefined") {
+      window.gtag("event", "begin_checkout", {
+        items: [
+          {
+            item_id: String(property.id),
+            item_name: property.address,
+            price: property.purchasePrice,
+          },
+        ],
+      });
+    }
+  };
+
+  const zillowHref = `https://www.zillow.com/homes/${encodeURIComponent(`${property.address} ${property.city} ${property.state} ${property.zip}`.replace(/,/g, "").replace(/\s+/g, "-").trim())}_rb/`;
+
+  const bpoValue = property.bpoValue ?? 0;
+  const rehabBudget = property.rehabBudget ?? 0;
+  const estimatedEquityVal = property.estimatedEquity ?? 0;
+  const purchaseBarPct = bpoValue > 0 ? Math.min(95, (purchasePrice / bpoValue) * 100) : 0;
+  const rehabBarPct = bpoValue > 0 ? Math.min(100, (rehabBudget / bpoValue) * 100) : 0;
+  const netEquityBarPct = bpoValue > 0 ? Math.min(100, (estimatedEquityVal / bpoValue) * 100) : 0;
+
+  const closingDaysRemaining = property.closingDate
+    ? Math.max(0, Math.ceil((new Date(property.closingDate).getTime() - Date.now()) / 86400000))
+    : 14;
+
+  const rawComps =
+    (property.comps as { id?: string; address?: string; beds?: number; baths?: number; sqft?: number; price?: number; soldDate?: string }[]) || [];
+  const comps = rawComps;
+  const compsForMap = comps.map((c, i) => ({
+    id: String(c.id ?? i),
+    address: c.address ?? "",
+    beds: c.beds,
+    baths: c.baths,
+    sqft: c.sqft,
+    price: c.price,
+    soldDate: c.soldDate,
+  }));
+  const hasComps = Array.isArray(comps) && comps.length > 0;
+  const documents = Array.isArray(property.documents) ? (property.documents as { url: string; name: string; type?: string; size?: number }[]) : [];
+
+  const closingDateDisplay = property.closingDate
+    ? new Date(property.closingDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : "TBD";
+
+  const specDateLabel = isSold ? "Exit Date" : "Closing";
+  const specDateValue =
+    isSold && property.exitDate
+      ? new Date(property.exitDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      : property.closingDate
+        ? new Date(property.closingDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : "N/A";
+
+  const sectionLabel = (label: string) => (
+    <div className="flex items-center gap-3 mb-6">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] whitespace-nowrap">
+        {label}
+      </span>
+      <div className="flex-1 border-t border-[var(--line)]" />
+    </div>
+  );
+
+  const profitCalculatorCard = (
+    <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6 space-y-5">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-[13px] font-semibold text-[var(--text-primary)]">Profit Calculator</span>
+        <span className="text-[10px] bg-[var(--surface-2-hex)] border border-[var(--line)] text-[var(--text-tertiary)] px-2 py-0.5 rounded-full">
+          50/50 Split
+        </span>
+      </div>
+
+      <div className="p-4 bg-[var(--surface-2-hex)] rounded-xl border border-[var(--line)]">
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Your Investment</span>
+            <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">Full purchase price</p>
+          </div>
+          <span className="text-2xl font-mono font-bold text-[var(--text-primary)]">${purchasePrice.toLocaleString()}</span>
+        </div>
+      </div>
+
+      <div className="p-4 bg-[var(--blue-muted)] rounded-xl border border-[var(--blue-border)]">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-sm font-semibold text-[var(--text-secondary)]">
+            {isSold ? "Final Project Profit" : "Total Projected Equity"}
+          </span>
+          <span className="text-xl font-mono font-bold text-blue-400">${totalEquity.toLocaleString()}</span>
+        </div>
+        <p className="text-[11px] text-blue-400/70">
+          {isSold ? "Total profit realized at exit" : "ARV minus purchase price and rehab costs"}
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Profit Distribution</p>
+          {usesGuaranteedMinimum && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-500/15 text-amber-400 rounded-full border border-amber-500/20">
+              Guaranteed Minimum Applied
+            </span>
+          )}
+        </div>
+
+        {totalEquity > 0 ? (
+          <div className="h-4 rounded-full overflow-hidden flex relative">
+            {usesGuaranteedMinimum ? (
+              <>
+                <div
+                  className="bg-green-500 flex items-center justify-center"
+                  style={{ width: `${(investorProfitShare / totalEquity) * 100}%` }}
+                >
+                  <span className="text-[10px] font-bold text-white px-1">YOU</span>
+                </div>
+                <div className="bg-[var(--surface-3-hex)] flex items-center justify-center flex-1">
+                  <span className="text-[10px] font-bold text-[var(--text-secondary)] px-1">SSP</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-1/2 bg-green-500 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-white">YOU 50%</span>
+                </div>
+                <div className="w-1/2 bg-[var(--surface-3-hex)] flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-[var(--text-secondary)]">SSP 50%</span>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="h-4 rounded-full bg-[var(--surface-2-hex)]" />
+        )}
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 bg-[var(--green-muted)] rounded-lg border border-[var(--green-border)] text-center">
+            <p className="text-[11px] text-[var(--text-tertiary)] mb-1">{isSold ? "Investor Share" : "Your Share"}</p>
+            <p className="text-lg font-mono font-bold text-green-400">${investorProfitShare.toLocaleString()}</p>
+            {usesGuaranteedMinimum && <p className="text-[10px] text-amber-400 mt-1">(Guaranteed Min)</p>}
+          </div>
+          <div className="p-3 bg-[var(--surface-2-hex)] rounded-lg border border-[var(--line)] text-center">
+            <p className="text-[11px] text-[var(--text-tertiary)] mb-1">{isSold ? "Sponsor Share" : "SSP Share"}</p>
+            <p className="text-lg font-mono font-bold text-[var(--text-secondary)]">${sspProfitShare.toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 bg-[var(--green-muted)] rounded-xl border-2 border-[var(--green-border)]">
+        <div className="flex justify-between items-start mb-3">
+          <div>
+            <span className="text-sm font-semibold text-[var(--text-secondary)]">Your Total Return</span>
+            <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">Investment + profit share</p>
+          </div>
+          <span className="text-2xl font-mono font-bold text-green-400">${investorTotalReturn.toLocaleString()}</span>
+        </div>
+        <div className="flex justify-between items-center pt-3 border-t border-[var(--green-border)]">
+          <span className="text-[11px] font-medium text-[var(--text-tertiary)]">
+            {isSold ? "Realized ROI" : "Estimated ROI"}
+          </span>
+          <div className="flex items-center gap-2">
+            {usesGuaranteedMinimum && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-amber-500/15 text-amber-400 rounded border border-amber-500/20">
+                MIN
+              </span>
+            )}
+            <span className="text-lg font-mono font-bold text-green-400">
+              +{typeof returnPercentage === "number" ? returnPercentage.toFixed(1) : returnPercentage}%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {!isSold && usesGuaranteedMinimum && (
+        <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+          <div className="flex items-start gap-2">
+            <Shield className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-[11px] font-semibold text-amber-400 mb-1">Protected by Guaranteed Minimum</p>
+              <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                Your return is protected by our guaranteed minimum (1% per month, minimum 8% total). You receive whichever is higher: 50% of profit or the guaranteed minimum.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isSold ? (
+        <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--surface-2-hex)] rounded-lg p-3 border border-[var(--line)]">
+          <p className="font-semibold text-[var(--text-secondary)] mb-1">Final numbers at exit</p>
+          <p>All figures reflect the actual financial results from this completed deal.</p>
+        </div>
+      ) : (
+        <div className="text-[11px] text-[var(--text-tertiary)] bg-[var(--surface-2-hex)] rounded-lg p-3 border border-[var(--line)]">
+          <p className="font-semibold text-[var(--text-secondary)] mb-1">How it works:</p>
+          <p className="mb-2">
+            You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus your profit share.
+          </p>
+          <p className="text-[var(--text-secondary)]">
+            <strong>Your return:</strong> Whichever is higher — 50% of net profit or guaranteed minimum (1% per month, minimum 8% total).
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  const investButtonClass =
+    "w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-[15px] py-4 rounded-[12px] flex items-center justify-center gap-2 transition-all hover:shadow-[0_8px_28px_rgba(232,67,45,0.3)] hover:-translate-y-0.5";
+
+  const sidebarCommitCard = (
+    <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] overflow-hidden">
+      {isSold ? (
+        <div className="bg-[var(--amber-muted)] border-b border-[var(--amber-border)] px-5 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[12px] font-semibold text-amber-400">
+            <Check className="h-4 w-4" />
+            Sold and Exited
+          </div>
+        </div>
+      ) : isAvailable ? (
+        <div className="bg-[var(--green-muted)] border-b border-[var(--green-border)] px-5 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[12px] font-semibold text-green-400">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            Open for Funding
+          </div>
+          <span className="text-[10px] uppercase tracking-wide text-green-400/60">LIVE</span>
+        </div>
+      ) : isCommitted ? (
+        <div className="bg-[var(--blue-muted)] border-b border-[var(--blue-border)] px-5 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[12px] font-semibold text-blue-400">
+            <span className="w-2 h-2 bg-blue-400 rounded-full" />
+            Funding Committed
+          </div>
+          <span className="text-[10px] uppercase tracking-wide text-blue-400/60">COMMITTED</span>
+        </div>
+      ) : (
+        <div className="bg-[var(--blue-muted)] border-b border-[var(--blue-border)] px-5 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[12px] font-semibold text-blue-400">
+            <span className="w-2 h-2 bg-blue-400 rounded-full" />
+            Funded
+          </div>
+          <span className="text-[10px] uppercase tracking-wide text-blue-400/60">CLOSED</span>
+        </div>
+      )}
+
+      <div className="p-6">
+        {isSold ? (
+          <div className="space-y-4">
+            {property.exitDate && (
+              <div className="flex justify-between items-center py-2 border-b border-[var(--line)]">
+                <span className="text-[13px] text-[var(--text-secondary)]">Exit Date</span>
+                <span className="text-[13px] font-mono font-semibold text-[var(--text-primary)]">
+                  {new Date(property.exitDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                </span>
+              </div>
+            )}
+            {property.holdPeriodMonths != null && (
+              <div className="flex justify-between items-center py-2 border-b border-[var(--line)]">
+                <span className="text-[13px] text-[var(--text-secondary)]">Hold Period</span>
+                <span className="text-[13px] font-mono font-semibold text-[var(--text-primary)]">
+                  {property.holdPeriodMonths} {property.holdPeriodMonths === 1 ? "month" : "months"}
+                </span>
+              </div>
+            )}
+            {property.finalSalePrice != null && (
+              <div className="py-3 border-b border-[var(--line)]">
+                <p className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-1">Final Sale Price</p>
+                <p className="font-mono text-[32px] font-medium text-green-400 leading-none">${property.finalSalePrice.toLocaleString()}</p>
+              </div>
+            )}
+            {property.totalProjectProfit != null && (
+              <div className="flex justify-between items-center py-2 border-b border-[var(--line)]">
+                <span className="text-[13px] text-[var(--text-secondary)]">Total Project Profit</span>
+                <span className="text-[13px] font-mono font-medium text-[var(--text-primary)]">
+                  ${property.totalProjectProfit.toLocaleString()}
+                </span>
+              </div>
+            )}
+            {property.investorProfit != null && (
+              <div className="pt-2">
+                <p className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-1">Investor Profit</p>
+                <p className="font-mono text-[38px] font-medium text-green-400 leading-none">${property.investorProfit.toLocaleString()}</p>
+              </div>
+            )}
+            <Button variant="outline" className="w-full mt-4 h-12 text-[15px] font-semibold border-[var(--line)]" data-testid="button-case-study">
+              <Download className="mr-2 w-4 h-4" />
+              Download Case Study PDF
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="border-b border-[var(--line)] pb-6 mb-5 text-center">
+              <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[var(--text-tertiary)] mb-3">
+                EQUITY AVAILABLE TO YOU
+              </p>
+              <p className="font-mono text-[52px] font-medium text-green-400 leading-none text-center mb-1" data-testid="text-estimated-equity">
+                ${estimatedEquityVal.toLocaleString()}
+              </p>
+              <p className="text-[12px] text-[var(--text-tertiary)] text-center">
+                50% of ${estimatedEquityVal.toLocaleString()} net profit · est. {returnPercentage.toFixed(1)}% ROI
+              </p>
+            </div>
+
+            <div className="mb-5">
+              <div className="flex items-center justify-between py-2.5 border-b border-[var(--line)]">
+                <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                  <DollarSign className="h-4 w-4 text-[var(--text-tertiary)]" />
+                  Purchase Price
+                </div>
+                <span className="font-mono text-[13px] font-medium text-[var(--text-primary)]" data-testid="text-purchase-price">
+                  ${purchasePrice.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2.5 border-b border-[var(--line)]">
+                <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                  <Hammer className="h-4 w-4 text-[var(--text-tertiary)]" />
+                  Rehab Budget
+                </div>
+                <span className="font-mono text-[13px] font-medium text-[var(--text-primary)]">${rehabBudget.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between py-2.5 border-b border-[var(--line)]">
+                <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                  <Target className="h-4 w-4 text-[var(--text-tertiary)]" />
+                  ARV
+                </div>
+                <span className="font-mono text-[13px] font-medium text-[var(--text-primary)]">${bpoValue.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between py-2.5">
+                <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                  <TrendingUp className="h-4 w-4 text-green-400" />
+                  Your 50%
+                </div>
+                <span className="font-mono text-[13px] font-medium text-green-400">${estimatedEquityVal.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="bg-[var(--surface-2-hex)] border border-[var(--line)] rounded-[10px] p-4 mb-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] text-[var(--text-tertiary)]">Closing Date</span>
+                <div className="text-right">
+                  <span className="text-[13px] font-semibold text-[var(--text-primary)] block">{closingDateDisplay}</span>
+                  {isAvailable && (
+                    <span className="text-[11px] text-amber-400 block mt-1">
+                      {closingDaysRemaining > 0
+                        ? `⚡ ${closingDaysRemaining} day${closingDaysRemaining === 1 ? "" : "s"} to closing`
+                        : "⚡ Closing soon"}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {isAvailable ? (
+              <a
+                href="https://calendly.com/sspdealflow/30min"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={investButtonClass}
+                data-testid="button-invest"
+                onClick={handleInvestClick}
+              >
+                Commit to Invest →
+              </a>
+            ) : (
+              <button
+                type="button"
+                className={`${investButtonClass} opacity-50 cursor-not-allowed`}
+                disabled
+                data-testid="button-invest"
+              >
+                Funding Secured
+              </button>
+            )}
+
+            <div className="flex items-center justify-center gap-5 pt-4 flex-wrap">
+              <span className="flex items-center gap-1.5 text-[11px] text-[var(--text-tertiary)]">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
+                Verified
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-[var(--text-tertiary)]">
+                <Shield className="h-3.5 w-3.5 text-[var(--text-tertiary)]" />
+                1st Lien
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-[var(--text-tertiary)]">
+                <Lock className="h-3.5 w-3.5 text-[var(--text-tertiary)]" />
+                Secure
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <Layout>
-      <div className="bg-gray-50 min-h-screen">
-        {/* Back Button */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <Link href="/properties" className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-primary transition-colors group">
-            <ChevronLeft className="h-4 w-4 mr-1 group-hover:-translate-x-1 transition-transform" /> 
+    <Layout transparentNav>
+      <div className="relative w-full overflow-hidden" style={{ height: "92vh", maxHeight: "900px" }}>
+        {allImages[selectedImage] ? (
+          <img
+            src={allImages[selectedImage]}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover brightness-75"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-hex)] via-[var(--surface-2-hex)] to-[var(--bg-hex)]">
+            <div
+              className="absolute inset-0 opacity-30"
+              style={{
+                backgroundImage:
+                  "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
+                backgroundSize: "48px 48px",
+              }}
+            />
+          </div>
+        )}
+
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[var(--bg-hex)]" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/30 to-transparent" />
+
+        {allImages.length > 1 && (
+          <button
+            type="button"
+            className="absolute bottom-[120px] right-12 flex items-center gap-2 px-4 py-2.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[13px] font-medium rounded-[8px] hover:bg-black/80 transition-all cursor-pointer z-20"
+            onClick={() => setLightboxOpen(true)}
+            data-testid="button-open-gallery"
+          >
+            <Images className="h-4 w-4" />
+            View all {allImages.length} photos
+          </button>
+        )}
+
+        {allImages.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={handlePreviousImage}
+              className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleNextImage}
+              className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all"
+              aria-label="Next image"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-12 pb-12 z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end">
+            <div>
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+                {isAvailable && (
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/15 border border-green-500/20 text-green-400">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    Open for Funding
+                  </span>
+                )}
+                {isCommitted && (
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                    Funding Committed
+                  </span>
+                )}
+                {isFunded && (
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                    Funded
+                  </span>
+                )}
+                {isSold && (
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/15 border border-amber-500/20 text-amber-400">
+                    <Check className="h-3 w-3" />
+                    Sold · Case Study
+                  </span>
+                )}
+                <a
+                  href={zillowHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 bg-[#006AFF] hover:bg-[#0055CC] text-white text-[12px] font-bold rounded-[6px] transition-colors"
+                  data-testid="link-zillow"
+                >
+                  Zillow
+                </a>
+              </div>
+
+              <h1
+                className="font-serif text-5xl sm:text-6xl lg:text-[68px] leading-[1.0] tracking-tight text-white mb-3 break-words"
+                data-testid="text-property-address"
+              >
+                {property.address}
+              </h1>
+
+              <div className="flex flex-wrap items-center gap-2 text-white/70 text-[16px]">
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+                <span>
+                  {property.city}, {property.state} {property.zip}
+                  {isSold && <span className="text-white/50"> · Exited Investment</span>}
+                </span>
+              </div>
+
+              <div className="flex gap-2 mt-4 md:hidden">
+                <button
+                  type="button"
+                  className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                  title="Share"
+                >
+                  <Share2 className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                  title="Save"
+                >
+                  <Heart className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="hidden lg:flex flex-col gap-3 items-end">
+              <div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3.5 text-right min-w-[190px]">
+                <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-white/40 mb-1">Purchase Price</p>
+                <p className="font-mono text-[22px] font-medium text-white leading-none">${purchasePrice.toLocaleString()}</p>
+              </div>
+              <div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3.5 text-right min-w-[190px]">
+                <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-white/40 mb-1">Est. Equity</p>
+                <p className="font-mono text-[22px] font-medium text-green-400 leading-none">${estimatedEquityVal.toLocaleString()}</p>
+              </div>
+              <div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3.5 text-right min-w-[190px]">
+                <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-white/40 mb-1">After Repair Value</p>
+                <p className="font-mono text-[22px] font-medium text-white leading-none">${bpoValue.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={selectedImage}
+        slides={allImages.map((src) => ({ src }))}
+        plugins={[Thumbnails, Counter, Zoom]}
+        thumbnails={{
+          position: "bottom",
+          width: 100,
+          height: 70,
+          gap: 8,
+          padding: 8,
+        }}
+        counter={{ container: { style: { top: "unset", bottom: 0, left: "50%", transform: "translateX(-50%)" } } }}
+        carousel={{
+          finite: false,
+          preload: 3,
+        }}
+        zoom={{
+          maxZoomPixelRatio: 3,
+          scrollToZoom: true,
+        }}
+        styles={{
+          container: { backgroundColor: "rgba(0, 0, 0, 0.95)" },
+        }}
+        on={{
+          view: ({ index }) => setSelectedImage(index),
+        }}
+      />
+
+      <div className="bg-[var(--bg-hex)] relative z-10 min-h-screen">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <Link
+            href="/properties"
+            className="inline-flex items-center text-[13px] font-medium text-[var(--text-secondary)] hover:text-primary transition-colors group"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1 group-hover:-translate-x-1 transition-transform" />
             Back to Marketplace
           </Link>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Left Column - Images & Content */}
-            <div className="lg:col-span-2 space-y-8 order-2 lg:order-first">
-              
-              {/* Address Header - Above Gallery */}
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
-                        isAvailable
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                          : isCommitted
-                          ? 'bg-blue-50 text-blue-700 border-blue-200'
-                          : isFunded
-                          ? 'bg-green-50 text-green-700 border-green-200'
-                          : 'bg-amber-100/80 text-amber-800 border-amber-300'
-                      }`}>
-                        {isSold && <Check className="w-3 h-3" />}
-                        {isAvailable ? "Needs Funding" : 
-                         isCommitted ? "Funding Committed" :
-                         isFunded ? "Funded" : 
-                         "SOLD · Case Study"}
-                      </span>
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-12 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-10 items-start">
+          <div className="flex flex-col">
+            <section className="py-10 border-b border-[var(--line)]">
+              {sectionLabel("Property")}
+              <div className="grid grid-cols-2 sm:grid-cols-4 border border-[var(--line)] rounded-[16px] overflow-hidden bg-[var(--surface-hex)] divide-x divide-y divide-[var(--line)]">
+                {[
+                  { Icon: Bed, value: property.beds, label: "Bedrooms" },
+                  { Icon: Bath, value: property.baths, label: "Bathrooms" },
+                  { Icon: Ruler, value: (property.squareFeet ?? 0).toLocaleString(), label: "Sq. Ft." },
+                  { Icon: Calendar, value: specDateValue, label: specDateLabel },
+                ].map(({ Icon, value, label }, i) => (
+                  <div key={i} className="px-5 py-6 hover:bg-[var(--surface-2-hex)] transition-colors">
+                    <div className="w-9 h-9 bg-[var(--surface-2-hex)] rounded-[8px] grid place-items-center mb-4 text-[var(--text-tertiary)]">
+                      <Icon className="h-4 w-4" strokeWidth={1.5} />
                     </div>
-                    
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-2 break-words" data-testid="text-property-address">
-                      {property.address}
-                    </h1>
-                    
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                        <span className="text-base">{property.city}, {property.state} {property.zip}</span>
-                      </div>
-                      {isSold && (
-                        <span className="text-sm text-gray-500 mt-0.5">Exited Investment</span>
-                      )}
-                    </div>
+                    <p className="font-serif text-[32px] leading-none text-[var(--text-primary)] mb-1.5">{value}</p>
+                    <p className="text-[11px] text-[var(--text-tertiary)]">{label}</p>
                   </div>
+                ))}
+              </div>
+            </section>
 
-                  <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 sm:self-start">
-                    <a
-                      href={`https://www.zillow.com/homes/${encodeURIComponent(`${property.address} ${property.city} ${property.state} ${property.zip}`.replace(/,/g, '').replace(/\s+/g, '-').trim())}_rb/`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 md:px-4 md:py-2 bg-[#006AFF] hover:bg-[#0055CC] text-white rounded-lg text-[10px] md:text-sm font-bold transition-colors whitespace-nowrap"
-                      title="View on Zillow"
-                      data-testid="link-zillow"
-                    >
-                      Zillow
-                    </a>
-                    <button className="p-1.5 md:p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0" title="Share">
-                      <Share2 className="w-4 h-4 md:w-5 md:h-5" />
-                    </button>
-                    <button className="p-1.5 md:p-2 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0" title="Save">
-                      <Heart className="w-4 h-4 md:w-5 md:h-5" />
-                    </button>
-                  </div>
+            <section className="py-10 border-b border-[var(--line)]">
+              {sectionLabel("Deal Financials")}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+                <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[14px] p-6">
+                  <p className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-3">PURCHASE PRICE</p>
+                  <p className="font-mono text-[28px] font-medium text-[var(--text-primary)]">${purchasePrice.toLocaleString()}</p>
+                  <p className="text-[11px] text-[var(--text-tertiary)] mt-2">Your total investment</p>
                 </div>
+                <div className="bg-[var(--blue-muted)] border border-[var(--blue-border)] rounded-[14px] p-6">
+                  <p className="text-[10px] uppercase tracking-wide text-blue-400/60 mb-3">AFTER REPAIR VALUE</p>
+                  <p className="font-mono text-[28px] font-medium text-blue-400">${bpoValue.toLocaleString()}</p>
+                  <p className="text-[11px] text-blue-400/50 mt-2">BPO-verified market value</p>
+                </div>
+                {!isSold && (
+                  <div className="bg-[var(--green-muted)] border border-[var(--green-border)] rounded-[14px] p-6">
+                    <p className="text-[10px] uppercase tracking-wide text-green-400/60 mb-3">EST. PROFIT</p>
+                    <p className="font-mono text-[28px] font-medium text-green-400">${estimatedEquityVal.toLocaleString()}</p>
+                    <p className="text-[11px] text-green-400/50 mt-2">50/50 split at sale</p>
+                  </div>
+                )}
               </div>
 
-              {/* Image Gallery */}
-              <div>
-                {/* Main Image */}
-                <div 
-                  className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-gray-200 shadow-lg group cursor-pointer"
-                  onClick={() => setLightboxOpen(true)}
-                  data-testid="button-open-gallery"
-                >
-                  {allImages[selectedImage] ? (
-                    <img 
-                      src={allImages[selectedImage]} 
-                      className="w-full h-full object-cover transition-opacity duration-300" 
-                      alt="Property" 
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <HomeIcon className="h-16 w-16" />
-                    </div>
-                  )}
-                  
-                  {/* View All Photos Button */}
-                  {allImages.length > 1 && (
-                    <button
-                      className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white/95 hover:bg-white rounded-lg shadow-lg text-sm font-medium text-gray-900 transition-all hover:scale-105"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setLightboxOpen(true);
-                      }}
-                    >
-                      <Images className="w-4 h-4" />
-                      View all {allImages.length} photos
-                    </button>
-                  )}
-                  
-                  {/* Navigation Arrows */}
-                  {allImages.length > 1 && (
-                    <>
-                      {/* Previous Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePreviousImage();
+              <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[16px] p-7">
+                <div className="flex justify-between items-center mb-6">
+                  <span className="text-[13px] font-semibold text-[var(--text-secondary)]">Deal Waterfall</span>
+                  <span className="text-[11px] text-[var(--text-tertiary)]">
+                    {rehabBudget === 0 ? "$0 rehab budget" : `$${rehabBudget.toLocaleString()} rehab budget`}
+                  </span>
+                </div>
+
+                {[
+                  {
+                    label: "Purchase",
+                    widthPct: purchaseBarPct,
+                    fillClass: "bg-[var(--surface-3-hex)] text-[var(--text-secondary)] border border-[var(--line)]",
+                    value: `$${purchasePrice.toLocaleString()}`,
+                  },
+                  {
+                    label: "Rehab",
+                    widthPct: rehabBarPct,
+                    fillClass: "bg-[var(--surface-3-hex)] text-[var(--text-secondary)] border border-[var(--line)]",
+                    value: rehabBudget === 0 ? "$0" : `$${rehabBudget.toLocaleString()}`,
+                    empty: rehabBudget === 0,
+                  },
+                  {
+                    label: "ARV",
+                    widthPct: 100,
+                    fillClass: "bg-blue-500/25 border border-blue-500/20 text-blue-400",
+                    value: `$${bpoValue.toLocaleString()}`,
+                  },
+                  {
+                    label: "Net Equity",
+                    widthPct: netEquityBarPct,
+                    fillClass: "bg-green-500/20 border border-green-500/20 text-green-400",
+                    value: `$${estimatedEquityVal.toLocaleString()}`,
+                  },
+                ].map((row, idx) => (
+                  <div key={idx} className="flex items-center gap-4 mb-3 last:mb-0">
+                    <span className="text-[12px] text-[var(--text-tertiary)] w-[140px] flex-shrink-0">{row.label}</span>
+                    <div className="flex-1 h-8 bg-[var(--surface-2-hex)] rounded-[6px] overflow-hidden">
+                      <div
+                        className={`h-full rounded-[6px] flex items-center px-3 font-mono text-[12px] font-medium min-w-0 ${row.fillClass}`}
+                        style={{
+                          width: row.empty ? "4px" : `${row.widthPct}%`,
+                          minWidth: row.empty ? "4px" : undefined,
                         }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:scale-110 active:scale-95"
-                        aria-label="Previous image"
                       >
-                        <ChevronLeft className="w-6 h-6 text-gray-900" />
-                      </button>
-                      
-                      {/* Next Button */}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleNextImage();
-                        }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 hover:bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:scale-110 active:scale-95"
-                        aria-label="Next image"
-                      >
-                        <ChevronRight className="w-6 h-6 text-gray-900" />
-                      </button>
-                      
-                      {/* Image Counter */}
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/60 backdrop-blur-sm rounded-full text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        {selectedImage + 1} / {allImages.length}
+                        {(row.empty || row.widthPct > 12) && <span className="truncate">{row.value}</span>}
                       </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Lightbox Gallery */}
-                <Lightbox
-                  open={lightboxOpen}
-                  close={() => setLightboxOpen(false)}
-                  index={selectedImage}
-                  slides={allImages.map(src => ({ src }))}
-                  plugins={[Thumbnails, Counter, Zoom]}
-                  thumbnails={{
-                    position: "bottom",
-                    width: 100,
-                    height: 70,
-                    gap: 8,
-                    padding: 8,
-                  }}
-                  counter={{ container: { style: { top: "unset", bottom: 0, left: "50%", transform: "translateX(-50%)" } } }}
-                  carousel={{
-                    finite: false,
-                    preload: 3,
-                  }}
-                  zoom={{
-                    maxZoomPixelRatio: 3,
-                    scrollToZoom: true,
-                  }}
-                  styles={{
-                    container: { backgroundColor: "rgba(0, 0, 0, 0.95)" },
-                  }}
-                  on={{
-                    view: ({ index }) => setSelectedImage(index),
-                  }}
-                />
+                    </div>
+                    <span className="font-mono text-[12px] text-[var(--text-tertiary)] w-20 text-right flex-shrink-0">{row.value}</span>
+                  </div>
+                ))}
               </div>
+            </section>
 
-              {/* Property Specs */}
-              <Card className="border-0 shadow-sm">
-                <CardContent className="p-0">
-                  <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100">
-                    
-                    <div className="p-4 flex items-center gap-3 hover:bg-gray-50/50 transition-colors group">
-                      <div className="p-2 rounded-lg bg-gray-100 group-hover:bg-gray-200 transition-colors">
-                        <Bed className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <span className="block text-xl font-bold text-gray-900">{property.beds}</span>
-                        <span className="text-xs text-gray-500">Bedrooms</span>
-                      </div>
-                    </div>
-
-                    <div className="p-4 flex items-center gap-3 hover:bg-gray-50/50 transition-colors group">
-                      <div className="p-2 rounded-lg bg-gray-100 group-hover:bg-gray-200 transition-colors">
-                        <Bath className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <span className="block text-xl font-bold text-gray-900">{property.baths}</span>
-                        <span className="text-xs text-gray-500">Bathrooms</span>
-                      </div>
-                    </div>
-
-                    <div className="p-4 flex items-center gap-3 hover:bg-gray-50/50 transition-colors group">
-                      <div className="p-2 rounded-lg bg-gray-100 group-hover:bg-gray-200 transition-colors">
-                        <Ruler className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <span className="block text-xl font-bold text-gray-900">{(property.squareFeet || 0).toLocaleString()}</span>
-                        <span className="text-xs text-gray-500">Sq. Ft.</span>
-                      </div>
-                    </div>
-
-                    <div className="p-4 flex items-center gap-3 hover:bg-gray-50/50 transition-colors group">
-                      <div className="p-2 rounded-lg bg-gray-100 group-hover:bg-gray-200 transition-colors">
-                        <Calendar className="w-5 h-5 text-gray-600" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <span className="block text-xl font-bold text-gray-900">
-                          {isSold && property.exitDate
-                            ? new Date(property.exitDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                            : property.closingDate 
-                            ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                            : 'N/A'}
-                        </span>
-                        <span className="text-xs text-gray-500">{isSold ? 'Exit Date' : 'Closing'}</span>
-                      </div>
-                    </div>
-
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Mobile: Investment Status Card - Show on mobile only, right after Property Specs */}
-              <div className="lg:hidden space-y-6">
-                {/* Investment Status Card / Deal Outcome Card */}
-                <Card className="shadow-lg border-0">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg">{isSold ? "Deal Outcome" : "Investment Status"}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Status Indicator */}
-                    {isSold ? (
-                      <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl p-5 border border-amber-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-semibold text-gray-700">Status</span>
-                          <div className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-amber-700" />
-                            <span className="text-xs font-bold text-amber-800 uppercase tracking-wide">Sold and Exited</span>
-                          </div>
-                        </div>
-                        <div className="text-amber-900 text-sm font-semibold mb-1">
-                          Successfully Exited
-                        </div>
-                        <p className="text-xs text-amber-700/80 leading-relaxed">
-                          This deal has been completed and exited. View the financial breakdown below.
-                        </p>
-                      </div>
-                    ) : isAvailable ? (
-                      <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-5 border border-emerald-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-semibold text-gray-700">Status</span>
-                          <div className="flex items-center gap-2">
-                            <span className="relative flex h-3 w-3">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                            </span>
-                            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Live</span>
-                          </div>
-                        </div>
-                        <div className="text-emerald-800 text-sm font-semibold mb-1">
-                          Open for Funding
-                        </div>
-                        <p className="text-xs text-emerald-700/80 leading-relaxed">
-                          Secure this deal with full funding commitment.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-5 border border-blue-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-semibold text-gray-700">Status</span>
-                          <div className="flex items-center gap-2">
-                            <span className="relative flex h-3 w-3">
-                              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                            </span>
-                            <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">Funded</span>
-                          </div>
-                        </div>
-                        <div className="text-blue-800 text-sm font-semibold mb-1">
-                          Fully Funded
-                        </div>
-                        <p className="text-xs text-blue-700/80 leading-relaxed">
-                          This deal has been fully funded and closed.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Equity Available / Deal Outcome Metrics */}
-                    {isSold ? (
-                      <div className="space-y-4">
-                        {property.exitDate && (
-                          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-semibold text-gray-700">Exit Date</span>
-                              <span className="text-sm font-bold text-gray-900">
-                                {new Date(property.exitDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        {property.holdPeriodMonths !== null && property.holdPeriodMonths !== undefined && (
-                          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-semibold text-gray-700">Hold Period</span>
-                              <span className="text-sm font-bold text-gray-900">
-                                {property.holdPeriodMonths} {property.holdPeriodMonths === 1 ? 'month' : 'months'}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        {property.finalSalePrice !== null && property.finalSalePrice !== undefined && (
-                          <div className="p-4 bg-green-50 rounded-xl border-2 border-green-200">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-sm font-semibold text-gray-700">Final Sale Price</span>
-                              <span className="text-xl font-bold text-green-600">
-                                ${property.finalSalePrice.toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        {property.totalProjectProfit !== null && property.totalProjectProfit !== undefined && (
-                          <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm font-semibold text-gray-700">Total Project Profit</span>
-                              <span className="text-lg font-bold text-blue-600">
-                                ${property.totalProjectProfit.toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        {property.investorProfit !== null && property.investorProfit !== undefined && (
-                          <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-sm font-semibold text-gray-700">Investor Profit</span>
-                              <span className="text-2xl font-bold text-green-600">
-                                ${property.investorProfit.toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-green-600" />
-                            <span className="text-sm font-semibold text-gray-700">Equity Available</span>
-                          </div>
-                          <span className="text-2xl font-bold text-green-600" data-testid="text-estimated-equity">
-                            ${(property.estimatedEquity || 0).toLocaleString()}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-2">Your potential profit share</p>
-                      </div>
-                    )}
-
-                    {/* Deal Financials */}
-                    <div className="space-y-2.5 pt-2">
-                      <div className="flex justify-between items-center py-2.5 border-b border-gray-100">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-600">Purchase Price</span>
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900" data-testid="text-purchase-price">
-                          ${(property.purchasePrice || 0).toLocaleString()}
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center py-2.5 border-b border-gray-100">
-                        <div className="flex items-center gap-2">
-                          <Hammer className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-600">Rehab Budget</span>
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900">
-                          ${(property.rehabBudget || 0).toLocaleString()}
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center py-2.5 border-b border-gray-100">
-                        <div className="flex items-center gap-2">
-                          <Target className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-600">After Repair Value</span>
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900">
-                          ${(property.bpoValue || 0).toLocaleString()}
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center py-2.5">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4 text-green-500" />
-                          <span className="text-sm text-gray-600">Est. Profit</span>
-                        </div>
-                        <span className="text-sm font-medium text-green-500">
-                          ${(property.estimatedEquity || 0).toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Timeline - Only show for AVAILABLE/FUNDED */}
-                    {!isSold && (
-                      <div className="pt-4 border-t border-gray-200 space-y-2.5">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Closing Date</span>
-                          <span className="text-sm font-semibold text-gray-900">
-                            {property.closingDate ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
-                          </span>
-                        </div>
-                        {isAvailable && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">Funding Deadline</span>
-                            <span className="text-sm font-semibold text-gray-900">14 days</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* CTA Button */}
-                    {isSold ? (
-                      <Button 
-                        variant="outline"
-                        className="w-full h-12 text-base font-semibold border-2 hover:bg-gray-50 transition-all"
-                        data-testid="button-case-study"
-                      >
-                        <Download className="mr-2 w-4 h-4" />
-                        Download Case Study PDF
-                      </Button>
-                    ) : (
-                      <a 
-                        href="https://calendly.com/sspdealflow/30min" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                      >
-                        <Button 
-                          className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
-                          disabled={!isAvailable}
-                          data-testid="button-invest"
-                        >
-                          {isAvailable ? (
-                            <>
-                              Commit to Invest
-                              <ArrowRight className="ml-2 w-4 h-4" />
-                            </>
-                          ) : (
-                            'Funding Secured'
-                          )}
-                        </Button>
-                      </a>
-                    )}
-
-                    {/* Trust Badges */}
-                    <div className="flex items-center justify-center gap-6 pt-2 text-xs text-gray-500">
-                      <span className="flex items-center gap-1.5">
-                        <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                        </svg>
-                        Verified
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
-                        </svg>
-                        Secure
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Profit Calculator Card - 50/50 Split */}
-                <Card className="shadow-lg border-0">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      Profit Calculator
-                      <span className="text-xs font-normal bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">50/50 Split</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-5">
-                    {/* Your Investment */}
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Your Investment</span>
-                          <p className="text-xs text-gray-500 mt-0.5">Full purchase price</p>
-                        </div>
-                        <span className="text-2xl font-bold text-gray-900">
-                          ${(property.purchasePrice || 0).toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Total Equity */}
-                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm font-semibold text-gray-700">
-                          {isSold ? "Final Project Profit" : "Total Projected Equity"}
-                        </span>
-                        <span className="text-xl font-bold text-blue-600">
-                          ${totalEquity.toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-blue-700/80">
-                        {isSold ? "Total profit realized at exit" : "ARV minus purchase price and rehab costs"}
-                      </p>
-                    </div>
-
-                    {/* Profit Split Visualization */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profit Distribution</p>
-                        {usesGuaranteedMinimum && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
-                            Guaranteed Minimum Applied
-                          </span>
-                        )}
-                      </div>
-                      
-                      {/* Visual Split Bar */}
-                      {totalEquity > 0 ? (
-                        <div className="h-4 rounded-full overflow-hidden flex relative">
-                          {usesGuaranteedMinimum ? (
-                            <>
-                              <div 
-                                className="bg-green-500 flex items-center justify-center"
-                                style={{ width: `${(investorProfitShare / totalEquity) * 100}%` }}
-                              >
-                                <span className="text-[10px] font-bold text-white px-1">YOU</span>
-                              </div>
-                              <div className="bg-gray-400 flex items-center justify-center flex-1">
-                                <span className="text-[10px] font-bold text-white px-1">SSP</span>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="w-1/2 bg-green-500 flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-white">YOU 50%</span>
-                              </div>
-                              <div className="w-1/2 bg-gray-400 flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-white">SSP 50%</span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="h-4 rounded-full bg-gray-200"></div>
-                      )}
-
-                      {/* Split Details */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
-                          <p className="text-xs text-gray-600 mb-1">{isSold ? "Investor Share" : "Your Share"}</p>
-                          <p className="text-lg font-bold text-green-600">${investorProfitShare.toLocaleString()}</p>
-                          {usesGuaranteedMinimum && (
-                            <p className="text-[10px] text-amber-600 mt-1">(Guaranteed Min)</p>
-                          )}
-                        </div>
-                        <div className="p-3 bg-gray-100 rounded-lg border border-gray-200 text-center">
-                          <p className="text-xs text-gray-600 mb-1">{isSold ? "Sponsor Share" : "SSP Share"}</p>
-                          <p className="text-lg font-bold text-gray-600">${sspProfitShare.toLocaleString()}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Total Return */}
-                    <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <span className="text-sm font-semibold text-gray-700">Your Total Return</span>
-                          <p className="text-xs text-gray-500 mt-0.5">Investment + profit share</p>
-                        </div>
-                        <span className="text-2xl font-bold text-green-600">
-                          ${investorTotalReturn.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center pt-3 border-t border-green-200">
-                        <span className="text-xs font-medium text-gray-600">
-                          {isSold ? "Realized ROI" : "Estimated ROI"}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {usesGuaranteedMinimum && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">
-                              MIN
-                            </span>
-                          )}
-                          <span className="text-lg font-bold text-green-700">
-                            +{typeof returnPercentage === 'number' ? returnPercentage.toFixed(1) : returnPercentage}%
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Guaranteed Minimum Info (only show for non-sold deals) */}
-                    {!isSold && usesGuaranteedMinimum && (
-                      <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                        <div className="flex items-start gap-2">
-                          <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                          <div className="flex-1">
-                            <p className="text-xs font-semibold text-amber-900 mb-1">Protected by Guaranteed Minimum</p>
-                            <p className="text-xs text-amber-700 leading-relaxed">
-                              Your return is protected by our guaranteed minimum (1% per month, minimum 8% total). You receive whichever is higher: 50% of profit or the guaranteed minimum.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* How It Works Note / Final Numbers Helper */}
-                    {isSold ? (
-                      <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
-                        <p className="font-semibold text-gray-700 mb-1">Final numbers at exit</p>
-                        <p>All figures reflect the actual financial results from this completed deal.</p>
-                      </div>
-                    ) : (
-                      <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
-                        <p className="font-semibold text-gray-700 mb-1">How it works:</p>
-                        <p className="mb-2">You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus your profit share.</p>
-                        <p className="text-gray-600">
-                          <strong>Your return:</strong> Whichever is higher — 50% of net profit or guaranteed minimum (1% per month, minimum 8% total).
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* About this Property / Deal Summary */}
-              <Card className="border-0 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl">{isSold ? "Deal Summary" : "About this Property"}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-sm max-w-none">
-                    {isSold ? (
-                      <div className="text-gray-700 leading-relaxed space-y-4">
-                        <p>
-                          This property was successfully acquired, renovated, and sold as part of our value-add strategy. 
-                          The project was secured off-market at a competitive entry price and executed through a standardized, 
-                          low-risk cosmetic update. The renovation focused on high-impact basics—new flooring, fresh paint, 
-                          and general improvements—to bring the property to market standards and maximize resale value.
-                        </p>
-                        {property.description && (
-                          <p>{property.description}</p>
-                        )}
-                      </div>
-                    ) : (
-                      <>
-                        <div 
-                          className="text-gray-700 leading-relaxed space-y-4"
-                          dangerouslySetInnerHTML={{
-                            __html: generatePropertyDescription(property)
-                              .split('\n\n')
-                              .map(para => `<p>${para.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`)
-                              .join('')
-                          }}
-                          data-testid="text-property-description"
-                        />
-                        <p className="text-gray-700 leading-relaxed mt-4">
-                          This opportunity represents a clear value-add scenario secured off-market at a competitive entry price. The project scope is a standardized, low-risk cosmetic update. The renovation plan focuses strictly on high-impact basics—new flooring, fresh paint, and a general spruce-up—to bring the property to market standards and maximize resale value.
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Location & Comps Map - Mobile: Show after About this Property */}
-              {(property.comps as any[])?.length > 0 && (
-                <div className="space-y-6 lg:hidden">
-                  <h2 className="text-xl font-semibold text-gray-900">Location & Comps Map</h2>
-                  
-                  {/* Interactive Map Container */}
-                  <div className="rounded-xl overflow-hidden h-80 shadow-sm border border-gray-200">
-                    <CompsMap
-                      subjectAddress={property.address}
-                      subjectCity={property.city}
-                      subjectState={property.state}
-                      subjectZip={property.zip}
-                      comps={property.comps as any[]}
-                    />
-                  </div>
-
-                  {/* Comparable Sales List */}
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Comparable Sales</h3>
-                    <div className="divide-y divide-gray-100">
-                      {(property.comps as any[]).map((comp, idx) => (
-                        <div 
-                          key={comp.id || idx}
-                          className="py-4 flex items-start justify-between"
-                        >
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900">{comp.address?.split(',')[0]}</p>
-                            <p className="text-sm text-gray-500 mt-0.5">
-                              {comp.beds} beds · {comp.baths} baths · {comp.sqft?.toLocaleString()} sqft
-                            </p>
-                          </div>
-                          <div className="text-right ml-4">
-                            <p className="font-bold text-gray-900">${comp.price?.toLocaleString()}</p>
-                            <p className="text-sm text-gray-500 mt-0.5">
-                              Sold {new Date(comp.soldDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Optional Timeline Section - Only for SOLD */}
-              {isSold && (
-                <Card className="border-0 shadow-sm">
-                  <CardHeader>
-                    <CardTitle className="text-xl">Project Timeline</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {property.closingDate && (
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-1.5"></div>
-                          <div>
-                            <p className="font-semibold text-gray-900">Acquired</p>
-                            <p className="text-sm text-gray-500">{new Date(property.closingDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                          </div>
-                        </div>
-                      )}
-                      {property.exitDate && (
-                        <>
-                          <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gray-400 mt-1.5"></div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Renovation Start</p>
-                              <p className="text-sm text-gray-500">Renovation completed</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gray-400 mt-1.5"></div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Listed</p>
-                              <p className="text-sm text-gray-500">Property listed for sale</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gray-400 mt-1.5"></div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Under Contract</p>
-                              <p className="text-sm text-gray-500">Sale contract executed</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-1.5"></div>
-                            <div>
-                              <p className="font-semibold text-gray-900">Closed</p>
-                              <p className="text-sm text-gray-500">{new Date(property.exitDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                            </div>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Location & Comps Map - Desktop: Show in left column */}
-              {(property.comps as any[])?.length > 0 && (
-                <div className="space-y-6 hidden lg:block">
-                  <h2 className="text-xl font-semibold text-gray-900">Location & Comps Map</h2>
-                  
-                  {/* Interactive Map Container */}
-                  <div className="rounded-xl overflow-hidden h-80 shadow-sm border border-gray-200">
-                    <CompsMap
-                      subjectAddress={property.address}
-                      subjectCity={property.city}
-                      subjectState={property.state}
-                      subjectZip={property.zip}
-                      comps={property.comps as any[]}
-                    />
-                  </div>
-
-                  {/* Comparable Sales List */}
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Comparable Sales</h3>
-                    <div className="divide-y divide-gray-100">
-                      {(property.comps as any[]).map((comp, idx) => (
-                        <div 
-                          key={comp.id || idx}
-                          className="py-4 flex items-start justify-between"
-                        >
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900">{comp.address?.split(',')[0]}</p>
-                            <p className="text-sm text-gray-500 mt-0.5">
-                              {comp.beds} beds · {comp.baths} baths · {comp.sqft?.toLocaleString()} sqft
-                            </p>
-                          </div>
-                          <div className="text-right ml-4">
-                            <p className="font-bold text-gray-900">${comp.price?.toLocaleString()}</p>
-                            <p className="text-sm text-gray-500 mt-0.5">
-                              Sold {new Date(comp.soldDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Mobile: Documents Card - Show at end for mobile */}
-              <div className="lg:hidden">
-                <Card className="shadow-lg border-0">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg">Documents</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {Array.isArray(property.documents) && property.documents.length > 0 ? (
-                      <div className="space-y-2">
-                        {(property.documents as any[]).map((doc, idx) => (
-                          <a 
-                            key={idx}
-                            href={doc.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 hover:shadow-sm transition-all group border border-transparent hover:border-gray-200"
-                          >
-                            <div className="p-2 bg-white rounded-lg group-hover:bg-primary/5 transition-colors">
-                              <FileText className="h-5 w-5 text-primary" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-primary transition-colors">
-                                {doc.name}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {doc.type || 'PDF'} {doc.size ? `· ${(doc.size / 1024).toFixed(1)} KB` : ''}
-                              </p>
-                            </div>
-                            <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                          </a>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-6">
-                        <FileText className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                        <p className="text-sm text-gray-500">No documents available yet</p>
-                        <p className="text-xs text-gray-400 mt-1">Documents will appear here once uploaded</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            {/* Right Column - Sidebar (Desktop Only) */}
-            <div className="lg:col-span-1 hidden lg:block order-first lg:order-last">
-              <div className="sticky top-6 space-y-6">
-              
-              {/* Investment Status Card / Deal Outcome Card */}
-              <Card className="shadow-lg border-0">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">{isSold ? "Deal Outcome" : "Investment Status"}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Status Indicator */}
-                  {isSold ? (
-                    <div className="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-xl p-5 border border-amber-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-semibold text-gray-700">Status</span>
-                        <div className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-amber-700" />
-                          <span className="text-xs font-bold text-amber-800 uppercase tracking-wide">Sold and Exited</span>
-                        </div>
-                      </div>
-                      <div className="text-amber-900 text-sm font-semibold mb-1">
-                        Successfully Exited
-                      </div>
-                      <p className="text-xs text-amber-700/80 leading-relaxed">
-                        This deal has been completed and exited. View the financial breakdown below.
-                      </p>
-                    </div>
-                  ) : isAvailable ? (
-                    <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl p-5 border border-emerald-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-semibold text-gray-700">Status</span>
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                          </span>
-                          <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Live</span>
-                        </div>
-                      </div>
-                      <div className="text-emerald-800 text-sm font-semibold mb-1">
-                        Open for Funding
-                      </div>
-                      <p className="text-xs text-emerald-700/80 leading-relaxed">
-                        Secure this deal with full funding commitment.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-5 border border-blue-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-semibold text-gray-700">Status</span>
-                        <div className="flex items-center gap-2">
-                          <span className="relative flex h-3 w-3">
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                          </span>
-                          <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">Funded</span>
-                        </div>
-                      </div>
-                      <div className="text-blue-800 text-sm font-semibold mb-1">
-                        Fully Funded
-                      </div>
-                      <p className="text-xs text-blue-700/80 leading-relaxed">
-                        This deal has been fully funded and closed.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Equity Available / Deal Outcome Metrics */}
-                  {isSold ? (
-                    <div className="space-y-4">
-                      {property.exitDate && (
-                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-semibold text-gray-700">Exit Date</span>
-                            <span className="text-sm font-bold text-gray-900">
-                              {new Date(property.exitDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      {property.holdPeriodMonths !== null && property.holdPeriodMonths !== undefined && (
-                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-semibold text-gray-700">Hold Period</span>
-                            <span className="text-sm font-bold text-gray-900">
-                              {property.holdPeriodMonths} {property.holdPeriodMonths === 1 ? 'month' : 'months'}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      {property.finalSalePrice !== null && property.finalSalePrice !== undefined && (
-                        <div className="p-4 bg-green-50 rounded-xl border-2 border-green-200">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm font-semibold text-gray-700">Final Sale Price</span>
-                            <span className="text-xl font-bold text-green-600">
-                              ${property.finalSalePrice.toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      {property.totalProjectProfit !== null && property.totalProjectProfit !== undefined && (
-                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm font-semibold text-gray-700">Total Project Profit</span>
-                            <span className="text-lg font-bold text-blue-600">
-                              ${property.totalProjectProfit.toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                      {property.investorProfit !== null && property.investorProfit !== undefined && (
-                        <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm font-semibold text-gray-700">Investor Profit</span>
-                            <span className="text-2xl font-bold text-green-600">
-                              ${property.investorProfit.toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="w-5 h-5 text-green-600" />
-                          <span className="text-sm font-semibold text-gray-700">Equity Available</span>
-                        </div>
-                        <span className="text-2xl font-bold text-green-600" data-testid="text-estimated-equity">
-                          ${(property.estimatedEquity || 0).toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-600 mt-2">Your potential profit share</p>
-                    </div>
-                  )}
-
-                  {/* Deal Financials */}
-                  <div className="space-y-2.5 pt-2">
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">Purchase Price</span>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-900" data-testid="text-purchase-price">
-                        ${(property.purchasePrice || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <Hammer className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">Rehab Budget</span>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-900">
-                        ${(property.rehabBudget || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2.5 border-b border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <Target className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">After Repair Value</span>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-900">
-                        ${(property.bpoValue || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center py-2.5">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-green-500" />
-                        <span className="text-sm text-gray-600">Est. Profit</span>
-                      </div>
-                      <span className="text-sm font-medium text-green-500">
-                        ${(property.estimatedEquity || 0).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Timeline - Only show for AVAILABLE/FUNDED */}
-                  {!isSold && (
-                    <div className="pt-4 border-t border-gray-200 space-y-2.5">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Closing Date</span>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {property.closingDate ? new Date(property.closingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
-                        </span>
-                      </div>
-                      {isAvailable && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Funding Deadline</span>
-                          <span className="text-sm font-semibold text-gray-900">14 days</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* CTA Button */}
-                  {isSold ? (
-                    <Button 
-                      variant="outline"
-                      className="w-full h-12 text-base font-semibold border-2 hover:bg-gray-50 transition-all"
-                      data-testid="button-case-study"
-                    >
-                      <Download className="mr-2 w-4 h-4" />
-                      Download Case Study PDF
-                    </Button>
-                  ) : (
-                    <a 
-                      href="https://calendly.com/sspdealflow/30min" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                    >
-                      <Button 
-                        className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
-                        disabled={!isAvailable}
-                        data-testid="button-invest"
-                      >
-                        {isAvailable ? (
-                          <>
-                            Commit to Invest
-                            <ArrowRight className="ml-2 w-4 h-4" />
-                          </>
-                        ) : (
-                          'Funding Secured'
-                        )}
-                      </Button>
-                    </a>
-                  )}
-
-                  {/* Trust Badges */}
-                  <div className="flex items-center justify-center gap-6 pt-2 text-xs text-gray-500">
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                      </svg>
-                      Verified
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/>
-                      </svg>
-                      Secure
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Profit Calculator Card - 50/50 Split */}
-              <Card className="shadow-lg border-0">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    Profit Calculator
-                    <span className="text-xs font-normal bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">50/50 Split</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  {/* Your Investment */}
-                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Your Investment</span>
-                        <p className="text-xs text-gray-500 mt-0.5">Full purchase price</p>
-                      </div>
-                      <span className="text-2xl font-bold text-gray-900">
-                        ${(property.purchasePrice || 0).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Total Equity */}
-                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm font-semibold text-gray-700">
-                        {isSold ? "Final Project Profit" : "Total Projected Equity"}
-                      </span>
-                      <span className="text-xl font-bold text-blue-600">
-                        ${totalEquity.toLocaleString()}
-                      </span>
-                    </div>
-                    <p className="text-xs text-blue-700/80">
-                      {isSold ? "Total profit realized at exit" : "ARV minus purchase price and rehab costs"}
+            {!isSold && (
+              <section className="py-10 border-b border-[var(--line)]">
+                {sectionLabel("50 / 50 Profit Split")}
+                <div className="grid grid-cols-2 gap-0.5 rounded-[16px] overflow-hidden mb-5">
+                  <div className="bg-[var(--green-muted)] border border-[var(--green-border)] rounded-l-[16px] p-7">
+                    <p className="text-[10px] uppercase tracking-wide text-green-400/60 mb-2">YOUR SHARE</p>
+                    <p className="font-mono text-[38px] font-medium text-green-400 leading-none mb-2">
+                      ${investorProfitShare.toLocaleString()}
+                    </p>
+                    <p className="text-[12px] text-[var(--text-tertiary)]">
+                      50% of net profit at sale
+                      {usesGuaranteedMinimum && <span className="text-amber-400"> (Guaranteed Minimum)</span>}
                     </p>
                   </div>
-
-                  {/* Profit Split Visualization */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profit Distribution</p>
-                      {usesGuaranteedMinimum && (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
-                          Guaranteed Minimum Applied
-                        </span>
-                      )}
-                    </div>
-                    
-                    {/* Visual Split Bar */}
-                    {totalEquity > 0 ? (
-                      <div className="h-4 rounded-full overflow-hidden flex relative">
-                        {usesGuaranteedMinimum ? (
-                          <>
-                            <div 
-                              className="bg-green-500 flex items-center justify-center"
-                              style={{ width: `${(investorProfitShare / totalEquity) * 100}%` }}
-                            >
-                              <span className="text-[10px] font-bold text-white px-1">YOU</span>
-                            </div>
-                            <div className="bg-gray-400 flex items-center justify-center flex-1">
-                              <span className="text-[10px] font-bold text-white px-1">SSP</span>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="w-1/2 bg-green-500 flex items-center justify-center">
-                              <span className="text-[10px] font-bold text-white">YOU 50%</span>
-                            </div>
-                            <div className="w-1/2 bg-gray-400 flex items-center justify-center">
-                              <span className="text-[10px] font-bold text-white">SSP 50%</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="h-4 rounded-full bg-gray-200"></div>
-                    )}
-
-                    {/* Split Details */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
-                        <p className="text-xs text-gray-600 mb-1">{isSold ? "Investor Share" : "Your Share"}</p>
-                        <p className="text-lg font-bold text-green-600">${investorProfitShare.toLocaleString()}</p>
-                        {usesGuaranteedMinimum && (
-                          <p className="text-[10px] text-amber-600 mt-1">(Guaranteed Min)</p>
-                        )}
-                      </div>
-                      <div className="p-3 bg-gray-100 rounded-lg border border-gray-200 text-center">
-                        <p className="text-xs text-gray-600 mb-1">{isSold ? "Sponsor Share" : "SSP Share"}</p>
-                        <p className="text-lg font-bold text-gray-600">${sspProfitShare.toLocaleString()}</p>
-                      </div>
-                    </div>
+                  <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-r-[16px] p-7">
+                    <p className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-2">SSP SHARE</p>
+                    <p className="font-mono text-[38px] font-medium text-[var(--text-secondary)] leading-none mb-2">
+                      ${sspProfitShare.toLocaleString()}
+                    </p>
+                    <p className="text-[12px] text-[var(--text-tertiary)]">SSP manages all operations</p>
                   </div>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden flex mb-5 bg-[var(--surface-2-hex)]">
+                  <div className="w-1/2 bg-green-500 rounded-full" />
+                  <div className="w-1/2 bg-[var(--surface-3-hex)] rounded-full" />
+                </div>
+                <div className="flex items-center justify-between bg-[var(--surface-hex)] border border-[var(--line)] rounded-[12px] px-6 py-5">
+                  <div>
+                    <p className="text-[13px] text-[var(--text-secondary)]">Your Total Return at Sale</p>
+                    <p className="text-[11px] text-[var(--text-tertiary)] mt-1">${investorTotalReturn.toLocaleString()} total</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-mono text-[26px] font-medium text-green-400">+{returnPercentage.toFixed(1)}%</p>
+                    <p className="text-[11px] text-[var(--text-tertiary)] mt-1">Est. ROI</p>
+                  </div>
+                </div>
+              </section>
+            )}
 
-                  {/* Total Return */}
-                  <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <span className="text-sm font-semibold text-gray-700">Your Total Return</span>
-                        <p className="text-xs text-gray-500 mt-0.5">Investment + profit share</p>
-                      </div>
-                      <span className="text-2xl font-bold text-green-600">
-                        ${investorTotalReturn.toLocaleString()}
+            <section className="py-10 border-b border-[var(--line)]">
+              {sectionLabel("Deal Thesis")}
+              {isSold ? (
+                <div className="text-[15px] text-[var(--text-secondary)] leading-[1.85] space-y-4">
+                  <p>
+                    This property was successfully acquired, renovated, and sold as part of our value-add strategy. The project was secured off-market at a competitive entry price and executed through a standardized, low-risk cosmetic update. The renovation focused on high-impact basics—new flooring, fresh paint, and general improvements—to bring the property to market standards and maximize resale value.
+                  </p>
+                  {property.description && <p>{property.description}</p>}
+                </div>
+              ) : (
+                <>
+                  <div
+                    className="text-[15px] text-[var(--text-secondary)] leading-[1.85] space-y-4 [&_p]:mb-4"
+                    dangerouslySetInnerHTML={{
+                      __html: generatePropertyDescription(property)
+                        .split("\n\n")
+                        .map((para) => `<p>${para.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`)
+                        .join(""),
+                    }}
+                    data-testid="text-property-description"
+                  />
+                  <div className="mt-7 pl-5 border-l-4 border-primary bg-[var(--surface-hex)] rounded-r-[12px] p-5 text-[13px] text-[var(--text-secondary)] leading-[1.7]">
+                    This opportunity represents a clear value-add scenario secured off-market at a competitive entry price. You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus your 50% profit share.
+                  </div>
+                </>
+              )}
+            </section>
+
+            {isSold && (
+              <section className="lg:hidden py-10 border-b border-[var(--line)]">
+                {sectionLabel("Deal Outcome")}
+                <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6 space-y-4">
+                  {property.exitDate && (
+                    <div className="flex justify-between text-[13px]">
+                      <span className="text-[var(--text-secondary)]">Exit Date</span>
+                      <span className="font-mono font-semibold text-[var(--text-primary)]">
+                        {new Date(property.exitDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center pt-3 border-t border-green-200">
-                      <span className="text-xs font-medium text-gray-600">
-                        {isSold ? "Realized ROI" : "Estimated ROI"}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {usesGuaranteedMinimum && (
-                          <span className="text-[10px] font-semibold px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">
-                            MIN
-                          </span>
-                        )}
-                        <span className="text-lg font-bold text-green-700">
-                          +{typeof returnPercentage === 'number' ? returnPercentage.toFixed(1) : returnPercentage}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Guaranteed Minimum Info (only show for non-sold deals) */}
-                  {!isSold && usesGuaranteedMinimum && (
-                    <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                      <div className="flex items-start gap-2">
-                        <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <div className="flex-1">
-                          <p className="text-xs font-semibold text-amber-900 mb-1">Protected by Guaranteed Minimum</p>
-                          <p className="text-xs text-amber-700 leading-relaxed">
-                            Your return is protected by our guaranteed minimum (1% per month, minimum 8% total). You receive whichever is higher: 50% of profit or the guaranteed minimum.
-                          </p>
-                        </div>
-                      </div>
+                  )}
+                  {property.finalSalePrice != null && (
+                    <div>
+                      <p className="text-[10px] uppercase text-[var(--text-tertiary)] mb-1">Final Sale Price</p>
+                      <p className="font-mono text-2xl font-medium text-green-400">${property.finalSalePrice.toLocaleString()}</p>
                     </div>
                   )}
-
-                  {/* How It Works Note / Final Numbers Helper */}
-                  {isSold ? (
-                    <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
-                      <p className="font-semibold text-gray-700 mb-1">Final numbers at exit</p>
-                      <p>All figures reflect the actual financial results from this completed deal.</p>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-100">
-                      <p className="font-semibold text-gray-700 mb-1">How it works:</p>
-                      <p className="mb-2">You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus your profit share.</p>
-                      <p className="text-gray-600">
-                        <strong>Your return:</strong> Whichever is higher — 50% of net profit or guaranteed minimum (1% per month, minimum 8% total).
-                      </p>
+                  {property.investorProfit != null && (
+                    <div>
+                      <p className="text-[10px] uppercase text-[var(--text-tertiary)] mb-1">Investor Profit</p>
+                      <p className="font-mono text-2xl font-medium text-green-400">${property.investorProfit.toLocaleString()}</p>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                  <Button variant="outline" className="w-full h-12 border-[var(--line)]" data-testid="button-case-study">
+                    <Download className="mr-2 w-4 h-4" />
+                    Download Case Study PDF
+                  </Button>
+                </div>
+              </section>
+            )}
 
-              {/* Documents Card */}
-              <Card className="shadow-lg border-0">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg">Documents</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {Array.isArray(property.documents) && property.documents.length > 0 ? (
-                    <div className="space-y-2">
-                      {(property.documents as any[]).map((doc, idx) => (
-                        <a 
-                          key={idx}
-                          href={doc.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-3.5 bg-gray-50 rounded-lg hover:bg-gray-100 hover:shadow-sm transition-all group border border-transparent hover:border-gray-200"
-                        >
-                          <div className="p-2 bg-white rounded-lg group-hover:bg-primary/5 transition-colors">
-                            <FileText className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-primary transition-colors">
-                              {doc.name}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {doc.type || 'PDF'} {doc.size ? `· ${(doc.size / 1024).toFixed(1)} KB` : ''}
-                            </p>
-                          </div>
-                          <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                        </a>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                      <FileText className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                      <p className="text-sm text-gray-500">No documents available yet</p>
-                      <p className="text-xs text-gray-400 mt-1">Documents will appear here once uploaded</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              </div>
+            <div className="lg:hidden py-10 border-b border-[var(--line)]">
+              {sectionLabel("Profit Calculator")}
+              {profitCalculatorCard}
             </div>
-          </div>
-        </div>
 
-        {/* Mobile: Sticky Invest Button - Fixed at bottom on mobile */}
-        {!isSold && (
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg p-4 safe-area-inset-bottom">
-            <a 
-              href="https://calendly.com/sspdealflow/30min" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block w-full"
-            >
-              <Button 
-                className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all"
-                disabled={!isAvailable}
-                data-testid="button-invest-mobile-sticky"
-              >
-                {isAvailable ? (
-                  <>
-                    Commit to Invest
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </>
-                ) : (
-                  'Funding Secured'
-                )}
-              </Button>
-            </a>
+            {hasComps && (
+              <section className="py-10 border-b border-[var(--line)]">
+                {sectionLabel("Location & Comps")}
+                <div className="rounded-[16px] overflow-hidden h-[280px] border border-[var(--line)] mb-6">
+                  <CompsMap
+                    subjectAddress={property.address}
+                    subjectCity={property.city}
+                    subjectState={property.state}
+                    subjectZip={property.zip}
+                    comps={compsForMap}
+                  />
+                </div>
+                <div className="w-full border border-[var(--line)] rounded-[14px] overflow-hidden">
+                  <table className="w-full text-left">
+                    <thead className="bg-[var(--surface-2-hex)]">
+                      <tr>
+                        {["Address", "Beds·Baths", "Sq.Ft.", "Sale Price", "Sold"].map((h) => (
+                          <th
+                            key={h}
+                            className="px-4 py-3 text-[10px] uppercase tracking-[0.1em] font-semibold text-[var(--text-tertiary)] border-b border-[var(--line)]"
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="bg-[var(--surface-hex)] border-b border-[var(--line)] hover:bg-[var(--surface-2-hex)] transition-colors">
+                        <td className="px-4 py-3.5 text-[13px]">
+                          <span className="text-[var(--text-primary)] font-medium">{property.address}</span>
+                          <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded ml-2">Subject</span>
+                        </td>
+                        <td className="px-4 py-3.5 text-[13px] text-[var(--text-secondary)]">
+                          {property.beds}·{property.baths}
+                        </td>
+                        <td className="px-4 py-3.5 text-[13px] text-[var(--text-secondary)]">
+                          {(property.squareFeet ?? 0).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3.5 text-[13px] text-primary font-mono font-medium">
+                          ${purchasePrice.toLocaleString()} <span className="text-[11px] font-sans">(acq.)</span>
+                        </td>
+                        <td className="px-4 py-3.5 text-[13px] text-[var(--text-secondary)]">—</td>
+                      </tr>
+                      {comps.map((comp, idx) => (
+                        <tr
+                          key={comp.id ?? idx}
+                          className="bg-[var(--surface-hex)] hover:bg-[var(--surface-2-hex)] border-b border-[var(--line)] last:border-b-0 transition-colors"
+                        >
+                          <td className="px-4 py-3.5 text-[13px] text-[var(--text-secondary)]">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--text-tertiary)] mr-2 align-middle" />
+                            {comp.address?.split(",")[0]}
+                          </td>
+                          <td className="px-4 py-3.5 text-[13px] text-[var(--text-secondary)]">
+                            {comp.beds}·{comp.baths}
+                          </td>
+                          <td className="px-4 py-3.5 text-[13px] text-[var(--text-secondary)]">
+                            {comp.sqft?.toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3.5 font-mono text-[13px] text-[var(--text-primary)]">${comp.price?.toLocaleString()}</td>
+                          <td className="px-4 py-3.5 text-[13px] text-[var(--text-secondary)]">
+                            {comp.soldDate ? new Date(comp.soldDate).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
+
+            {(isAvailable || isCommitted) && (
+              <section className="py-10 border-b border-[var(--line)]">
+                {sectionLabel("Deal Timeline")}
+                <div className="relative pl-2">
+                  <div className="absolute left-[11px] top-3 bottom-3 w-px bg-[var(--line)]" />
+                  {[
+                    {
+                      title: "Deal Sourced Off-Market",
+                      meta: "HUD acquisition, clear title",
+                      state: "done" as const,
+                    },
+                    {
+                      title: isAvailable ? "Funding Open" : "Funding Committed",
+                      meta: `Seeking full capital commitment · ${closingDaysRemaining} days remaining`,
+                      state: "active" as const,
+                    },
+                    {
+                      title: "Closing",
+                      meta: property.closingDate
+                        ? new Date(property.closingDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                        : "TBD",
+                      state: "future" as const,
+                    },
+                    {
+                      title: "Renovation & Listing",
+                      meta: "Cosmetic update, list on market",
+                      state: "future" as const,
+                    },
+                    {
+                      title: "Exit & Profit Distribution",
+                      meta: "Capital + profit returned to investor",
+                      state: "future" as const,
+                    },
+                  ].map((step, i) => (
+                    <div
+                      key={i}
+                      className={`relative flex gap-5 pb-8 last:pb-0 ${step.state === "future" ? "opacity-40" : ""}`}
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-full grid place-items-center flex-shrink-0 z-10 ${
+                          step.state === "done"
+                            ? "bg-[var(--green-muted)] border-2 border-[var(--green-border)]"
+                            : step.state === "active"
+                              ? "bg-[var(--accent-muted)] border-2 border-primary/30"
+                              : "bg-[var(--surface-2-hex)] border-2 border-[var(--line)]"
+                        }`}
+                      >
+                        {step.state === "done" && (
+                          <svg className="w-3 h-3 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        )}
+                        {step.state === "active" && <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />}
+                        {step.state === "future" && <span className="w-2 h-2 bg-[var(--text-tertiary)] rounded-full" />}
+                      </div>
+                      <div className="pt-0.5">
+                        <p className="text-[15px] font-semibold text-[var(--text-primary)]">
+                          {step.title}
+                          {step.state === "active" && (
+                            <span className="text-[10px] text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full ml-2 font-semibold">
+                              You Are Here
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-[12px] text-[var(--text-tertiary)] mt-1">{step.meta}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <section className="py-10">
+              {sectionLabel("Documents")}
+              {documents.length > 0 ? (
+                <div>
+                  {documents.map((doc, idx) => (
+                    <a
+                      key={idx}
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3.5 bg-[var(--surface-hex)] border border-[var(--line)] rounded-[10px] hover:border-[var(--line-light)] hover:bg-[var(--surface-2-hex)] transition-all cursor-pointer group mb-2"
+                    >
+                      <div className="w-9 h-9 bg-[var(--surface-2-hex)] rounded-[8px] grid place-items-center text-primary flex-shrink-0">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-medium text-[var(--text-primary)] group-hover:text-primary transition-colors truncate">
+                          {doc.name}
+                        </p>
+                        <p className="text-[11px] text-[var(--text-tertiary)]">
+                          {doc.type || "PDF"} {doc.size ? `· ${(doc.size / 1024).toFixed(1)} KB` : ""}
+                        </p>
+                      </div>
+                      <ArrowRight className="ml-auto h-4 w-4 text-[var(--text-tertiary)] group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[14px] p-10 text-center">
+                  <FileText className="h-9 w-9 text-[var(--line-light)] mx-auto mb-3" />
+                  <p className="text-[13px] text-[var(--text-tertiary)]">No documents uploaded yet</p>
+                  <p className="text-[11px] mt-1 opacity-60 text-[var(--text-tertiary)]">Documents appear here once uploaded</p>
+                </div>
+              )}
+            </section>
           </div>
-        )}
+
+          <aside className="hidden lg:flex flex-col gap-4 sticky top-[80px]">
+            {sidebarCommitCard}
+
+            <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6">
+              <div className="flex items-center flex-wrap gap-2 mb-2">
+                <span className="text-[13px] font-semibold text-[var(--text-primary)]">Deal Terms</span>
+                <span className="text-[10px] bg-[var(--surface-2-hex)] border border-[var(--line)] text-[var(--text-tertiary)] px-2 py-0.5 rounded-[4px]">
+                  50/50 JV
+                </span>
+              </div>
+              {[
+                { Icon: Shield, label: "Structure", value: "Deal-by-deal JV partnership" },
+                { Icon: TrendingUp, label: "Profit Split", value: "50% investor / 50% SSP at sale" },
+                { Icon: DollarSign, label: "Fees", value: "No fees. 100% transparent." },
+                { Icon: Lock, label: "Security", value: "First-position lien on title" },
+                { Icon: Calendar, label: "Est. Hold Period", value: "90–120 days" },
+              ].map(({ Icon, label, value }, i) => (
+                <div key={i} className="flex items-start gap-3 py-3 border-b border-[var(--line)] last:border-b-0">
+                  <div className="w-7 h-7 bg-[var(--surface-2-hex)] rounded-[6px] grid place-items-center text-[var(--text-tertiary)] flex-shrink-0">
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.04em] font-semibold text-[var(--text-tertiary)] mb-0.5">{label}</p>
+                    <p className="text-[13px] font-medium text-[var(--text-primary)]">{value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {profitCalculatorCard}
+
+            <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6 text-center">
+              <p className="text-[14px] font-semibold text-[var(--text-primary)] mb-2">Questions before committing?</p>
+              <p className="text-[12px] text-[var(--text-tertiary)] leading-[1.6] mb-5">
+                Most investors go from curious to committed after one 30-minute call. No pressure, just a real conversation.
+              </p>
+              <a href="https://calendly.com/sspdealflow/30min" target="_blank" rel="noopener noreferrer" className="block">
+                <button
+                  type="button"
+                  className="w-full border border-[var(--line-light)] text-[var(--text-secondary)] hover:border-[var(--text-tertiary)] hover:text-[var(--text-primary)] rounded-[8px] py-3 text-[13px] font-medium transition-all flex items-center justify-center gap-2 bg-transparent cursor-pointer"
+                >
+                  <Calendar className="h-4 w-4" />
+                  Book a 30-min Intro Call
+                </button>
+              </a>
+            </div>
+          </aside>
+        </div>
       </div>
+
+      {!isSold && (
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--bg-hex)] border-t border-[var(--line)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {isAvailable ? (
+            <a
+              href="https://calendly.com/sspdealflow/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all rounded-md flex items-center justify-center gap-2"
+              data-testid="button-invest-mobile-sticky"
+              onClick={handleInvestClick}
+            >
+              Commit to Invest
+              <ArrowRight className="w-5 h-5" />
+            </a>
+          ) : (
+            <Button
+              className="w-full h-14 text-base font-semibold opacity-50 cursor-not-allowed"
+              disabled
+              data-testid="button-invest-mobile-sticky"
+            >
+              Funding Secured
+            </Button>
+          )}
+        </div>
+      )}
     </Layout>
   );
 }
