@@ -25,7 +25,7 @@ function NavLogo() {
         lineHeight: "1",
         letterSpacing: "0.04em",
         padding: "0 2px",
-      }}>SSP</span>
+      }}>SSP DEAL FLOW</span>
       <span style={{
         fontFamily: "'DM Sans', sans-serif",
         fontSize: "28px",
@@ -59,7 +59,7 @@ function FooterLogo() {
         lineHeight: "1",
         letterSpacing: "0.04em",
         padding: "0 2px",
-      }}>SSP</span>
+      }}>SSP DEAL FLOW</span>
       <span style={{
         fontFamily: "'DM Sans', sans-serif",
         fontSize: "22px",
