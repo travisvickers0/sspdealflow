@@ -211,11 +211,11 @@ export default function Home() {
               Investors
             </h1>
 
-            <p className="my-5 max-w-[400px] border-l-2 border-[#2a2724] pl-4 text-[15px] leading-[1.8] text-[#a89e91]">
+            <p className="my-8 max-w-[400px] border-l-2 border-[#2a2724] pl-4 text-[15px] leading-[1.8] text-[#a89e91]">
               Vetted off-market acquisitions. 50/50 profit split at sale. No fees — deal-by-deal JV structure built for accredited investors.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-10">
               {[
                 "10+ Years Verified Exits",
                 "Deal-by-Deal JV Structure",
