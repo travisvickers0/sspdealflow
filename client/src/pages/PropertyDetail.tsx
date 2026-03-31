@@ -722,7 +722,7 @@ export default function PropertyDetail() {
   return (
     <Layout transparentNav>
       <div className="relative w-full overflow-hidden lg:h-[92vh] lg:max-h-[900px]">
-        <div className="relative w-full h-[56vw] min-h-[260px] max-h-[420px] lg:absolute lg:inset-0 lg:h-full lg:min-h-0 group">
+        <div className="relative w-full h-[45vw] min-h-[320px] max-h-[600px] lg:h-[70vh] lg:min-h-[500px] lg:max-h-[700px] lg:absolute lg:inset-0 group">
           <Link
             href="/properties"
             className="absolute top-6 left-12 z-20 flex items-center gap-1.5 text-white/60 hover:text-white/90 text-[13px] font-medium transition-colors pointer-events-auto group"
@@ -735,7 +735,8 @@ export default function PropertyDetail() {
               <img
                 src={allImages[selectedImage]}
                 alt=""
-                className="absolute inset-0 w-full h-full object-cover brightness-75"
+                className="absolute inset-0 w-full h-full object-cover object-center brightness-75"
+                style={{ objectPosition: "50% 40%" }}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-hex)] via-[var(--surface-2-hex)] to-[var(--bg-hex)]">
@@ -771,7 +772,7 @@ export default function PropertyDetail() {
               <button
                 type="button"
                 onClick={handlePreviousImage}
-                className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100"
                 aria-label="Previous image"
               >
                 <ChevronLeft className="h-4 w-4 lg:h-6 lg:w-6" />
@@ -779,7 +780,7 @@ export default function PropertyDetail() {
               <button
                 type="button"
                 onClick={handleNextImage}
-                className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100"
                 aria-label="Next image"
               >
                 <ChevronRight className="h-4 w-4 lg:h-6 lg:w-6" />
@@ -788,7 +789,7 @@ export default function PropertyDetail() {
           )}
         </div>
 
-        <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 pt-3 lg:pt-0 lg:px-12 lg:pb-12 bg-[var(--bg-hex)] lg:bg-transparent z-10">
+        <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 pt-0 lg:pt-0 lg:px-12 lg:pb-12 bg-[var(--bg-hex)] lg:bg-transparent z-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end">
             <div>
               <div className="flex lg:hidden items-center justify-between px-5 py-3 bg-[var(--bg-hex)] border-b border-[var(--line)]">

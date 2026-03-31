@@ -1,0 +1,79 @@
+In client/src/pages/PropertyDetail.tsx, fix the 
+hero photo section. No logic changes.
+
+PROBLEMS VISIBLE:
+1. Photo shows only top strip of house — wrong crop
+2. Massive black void between photo and content
+3. Photo height is too short on desktop
+
+FIX 1 — Hero photo height and crop:
+Find the hero outer container div.
+It currently has something like:
+  h-[56vw] min-h-[260px] max-h-[420px]
+  or a style with fixed height
+
+Change to:
+  className="relative w-full overflow-hidden
+    h-[45vw] min-h-[320px] max-h-[600px]
+    lg:h-[70vh] lg:min-h-[500px] lg:max-h-[700px]"
+
+FIX 2 — Photo object position:
+The img tag inside the hero likely has
+object-fit: cover but object-position defaults
+to "center" which crops the top of the house.
+
+Find the hero img tag and change/add:
+  className="... object-cover object-center"
+  
+Change object-position to show the house properly:
+  style={{ objectPosition: "50% 40%" }}
+
+This shifts the crop slightly upward so the full
+front of the house is visible instead of just
+the roofline.
+
+FIX 3 — Remove the black void below photo:
+The black gap between the photo and the content
+below it is caused by the hero container being
+taller than the photo content or having extra
+margin/padding below it.
+
+Find the element immediately after the hero div
+and remove any mt-* or pt-* that's creating
+the gap on mobile:
+  Change: mt-12 or mt-16 or pt-12 → mt-0
+
+Also check if the hero div itself has mb-* — 
+remove it.
+
+FIX 4 — Desktop stat pills position:
+The 3 stat pills (Purchase Price / Est Equity / ARV)
+in the top right of the hero should be:
+  position: absolute
+  top: 80px (below nav)
+  right: 48px
+  flex-col gap-2
+
+Ensure they have: className="hidden lg:flex
+  flex-col gap-2 absolute top-20 right-12 z-20"
+
+Each pill:
+  bg-[rgba(0,0,0,0.65)] backdrop-blur-sm
+  border border-[var(--line)]
+  rounded-[8px] px-4 py-2.5
+  text-right
+
+FIX 5 — Navigation arrows always visible:
+The prev/next arrows should show on all screen
+sizes not just on hover.
+
+Find the arrow buttons and change:
+  From: opacity-0 group-hover:opacity-100
+  To:   opacity-100
+
+Reduce size on mobile:
+  className="... w-9 h-9 lg:w-11 lg:h-11"
+
+Do not change any logic, data fetching,
+or other sections of the page.
+Do not run tsc.
