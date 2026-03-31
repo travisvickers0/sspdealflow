@@ -194,16 +194,16 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 mx-auto hidden max-w-[1280px] grid-cols-[1fr_380px] items-start gap-24 px-4 pb-8 pt-8 sm:px-8 lg:grid lg:px-12 lg:pb-20 lg:pt-14">
-          <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
+        <section className="relative z-10 hidden lg:grid lg:min-h-[calc(100vh-72px)] lg:grid-cols-[minmax(540px,640px)_420px] lg:items-center lg:justify-center lg:gap-x-[72px] lg:px-16">
+          <div className="max-w-[620px] flex flex-col justify-center">
+            <div className="mb-[18px] inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
               <span className="font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-[#22c55e]">
                 Accredited Investors Only
               </span>
             </div>
 
-            <h1 className="font-['Bebas_Neue',sans-serif] text-[clamp(72px,8.5vw,116px)] font-normal leading-[0.92] tracking-[0.025em] text-[#f0ebe3]">
+            <h1 className="mb-6 font-['Bebas_Neue',sans-serif] text-[clamp(72px,8.5vw,116px)] font-normal leading-[0.90] tracking-[0.025em] text-[#f0ebe3]">
               Real Estate
               <br />
               <span className="text-[#e8432d]">Built for</span>
@@ -211,11 +211,11 @@ export default function Home() {
               Investors
             </h1>
 
-            <p className="my-5 max-w-[400px] border-l-2 border-[#2a2724] pl-4 text-[15px] leading-[1.8] text-[#a89e91]">
+            <p className="mb-6 max-w-[520px] border-l-2 border-[#2a2724] pl-4 text-[15px] leading-[1.8] text-[#a89e91]">
               Vetted off-market acquisitions. 50/50 profit split at sale. No fees — deal-by-deal JV structure built for accredited investors.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-7">
               {[
                 "10+ Years Verified Exits",
                 "Deal-by-Deal JV Structure",
@@ -231,7 +231,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="mb-8 grid grid-cols-4 overflow-hidden rounded-[10px] border border-[#2a2724] bg-[#181614]">
+            <div className="mb-6 grid grid-cols-4 overflow-hidden rounded-[10px] border border-[#2a2724] bg-[#181614]">
               {[
                 { v: "119", l: "Deals Closed" },
                 { v: "94d", l: "Avg Hold" },
@@ -249,7 +249,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="mb-5 flex gap-3">
+            <div className="mb-3.5 flex gap-3">
               <button
                 type="button"
                 onClick={() => setLocation("/properties")}
@@ -273,8 +273,9 @@ export default function Home() {
             </div>
           </div>
 
+        <div className="flex items-center justify-center">
           <div
-            className="relative h-[460px] overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
+            className="relative w-[380px] h-[460px] -translate-x-3 translate-y-2 overflow-hidden rounded-[16px] border border-[#2a2724] bg-[#181614]"
             style={{
               maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
               WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
@@ -335,6 +336,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </section>
 
         <div className="relative z-10 block px-5 pb-0 pt-8 lg:hidden">
           <div className="mb-4 inline-flex items-center gap-2 rounded-[4px] border border-[#353129] px-3 py-1.5">
