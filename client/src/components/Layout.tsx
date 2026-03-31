@@ -7,12 +7,8 @@ import { posthog } from "@/lib/posthog";
 
 function LogoMark() {
   return (
-    <div className="flex items-center gap-2.5 font-semibold text-[15px] tracking-tight text-[var(--text-primary)] no-underline">
-      <div className="w-7 h-7 bg-primary rounded-[6px] grid place-items-center text-[13px] font-bold text-white flex-shrink-0">
-        S
-      </div>
-      <span className="hidden min-[400px]:inline">SSP Deal Flow</span>
-      <span className="inline min-[400px]:hidden">SSP</span>
+    <div className="flex items-center no-underline">
+      <img src="/ssp-logo.png" alt="SSP" className="h-8" />
     </div>
   );
 }
