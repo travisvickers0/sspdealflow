@@ -211,11 +211,11 @@ export default function Home() {
               Investors
             </h1>
 
-            <p className="my-8 max-w-[400px] border-l-2 border-[#2a2724] pl-4 text-[15px] leading-[1.8] text-[#a89e91]">
+            <p className="my-5 max-w-[400px] border-l-2 border-[#2a2724] pl-4 text-[15px] leading-[1.8] text-[#a89e91]">
               Vetted off-market acquisitions. 50/50 profit split at sale. No fees — deal-by-deal JV structure built for accredited investors.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8">
               {[
                 "10+ Years Verified Exits",
                 "Deal-by-Deal JV Structure",
@@ -344,7 +344,7 @@ export default function Home() {
             </span>
           </div>
 
-          <h1 className="font-['Bebas_Neue',sans-serif] text-[72px] font-normal leading-[0.9] tracking-[0.02em] text-[#f0ebe3]">
+          <h1 className="mb-6 font-['Bebas_Neue',sans-serif] text-[72px] font-normal leading-[0.9] tracking-[0.02em] text-[#f0ebe3]">
             Real Estate
             <br />
             <span className="text-[#e8432d]">Built for</span>
@@ -356,7 +356,7 @@ export default function Home() {
             Vetted off-market acquisitions. 50/50 profit split. No fees, no funds.
           </p>
 
-          <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-8">
+          <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mb-10">
             {[
               "10+ Years Verified Exits",
               "Deal-by-Deal JV Structure",
@@ -372,7 +372,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mb-5 grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-[#2a2724] bg-[#2a2724]">
+          <div className="mb-6 grid grid-cols-2 gap-px overflow-hidden rounded-[10px] border border-[#2a2724] bg-[#2a2724]">
             {[
               { v: "119", l: "Deals Closed" },
               { v: "94d", l: "Avg Hold" },
