@@ -5,11 +5,71 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { posthog } from "@/lib/posthog";
 
-function LogoMark() {
+function NavLogo() {
   return (
-    <div className="flex items-center no-underline">
-      <img src="/ssp-logo.png" alt="SSP" className="h-10" />
-    </div>
+    <span className="flex items-center gap-0 flex-shrink-0">
+      <span style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "28px",
+        fontWeight: "700",
+        color: "#e8432d",
+        lineHeight: "1",
+        letterSpacing: "-0.02em",
+        marginRight: "-2px",
+      }}>[</span>
+      <span style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "20px",
+        fontWeight: "700",
+        color: "#f0ebe3",
+        lineHeight: "1",
+        letterSpacing: "0.04em",
+        padding: "0 2px",
+      }}>SSP</span>
+      <span style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "28px",
+        fontWeight: "700",
+        color: "#e8432d",
+        lineHeight: "1",
+        letterSpacing: "-0.02em",
+        marginLeft: "-2px",
+      }}>]</span>
+    </span>
+  );
+}
+
+function FooterLogo() {
+  return (
+    <span className="flex items-center gap-0 flex-shrink-0">
+      <span style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "22px",
+        fontWeight: "700",
+        color: "#e8432d",
+        lineHeight: "1",
+        letterSpacing: "-0.02em",
+        marginRight: "-2px",
+      }}>[</span>
+      <span style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "16px",
+        fontWeight: "700",
+        color: "#f0ebe3",
+        lineHeight: "1",
+        letterSpacing: "0.04em",
+        padding: "0 2px",
+      }}>SSP</span>
+      <span style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: "22px",
+        fontWeight: "700",
+        color: "#e8432d",
+        lineHeight: "1",
+        letterSpacing: "-0.02em",
+        marginLeft: "-2px",
+      }}>]</span>
+    </span>
   );
 }
 
@@ -68,8 +128,8 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
       >
         <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">
           <div className="flex items-center gap-4 sm:gap-8">
-            <Link href="/">
-              <LogoMark />
+            <Link href="/" className="flex items-center gap-0 flex-shrink-0">
+              <NavLogo />
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link href="/properties" className={navLinkClass(location === "/properties")}>
@@ -201,7 +261,7 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
         <div className="container mx-auto px-4 sm:px-8 flex flex-col md:flex-row justify-between gap-8">
           <div>
             <div className="mb-2">
-              <LogoMark />
+              <FooterLogo />
             </div>
             <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-[0.1em] font-semibold mb-4">
               A Division of Southern Specialty Properties
