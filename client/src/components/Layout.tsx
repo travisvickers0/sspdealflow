@@ -9,27 +9,27 @@ function NavLogo() {
   return (
     <span className="flex items-center gap-0 flex-shrink-0">
       <span style={{
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Bebas Neue', sans-serif",
         fontSize: "28px",
-        fontWeight: "700",
+        fontWeight: "400",
         color: "#e8432d",
         lineHeight: "1",
         letterSpacing: "-0.02em",
         marginRight: "-2px",
       }}>[</span>
       <span style={{
-        fontFamily: "'DM Sans', sans-serif",
-        fontSize: "20px",
-        fontWeight: "700",
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: "22px",
+        fontWeight: "400",
         color: "#f0ebe3",
         lineHeight: "1",
-        letterSpacing: "0.04em",
-        padding: "0 2px",
+        letterSpacing: "0.08em",
+        padding: "0 3px",
       }}>SSP DEAL FLOW</span>
       <span style={{
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Bebas Neue', sans-serif",
         fontSize: "28px",
-        fontWeight: "700",
+        fontWeight: "400",
         color: "#e8432d",
         lineHeight: "1",
         letterSpacing: "-0.02em",
@@ -43,27 +43,27 @@ function FooterLogo() {
   return (
     <span className="flex items-center gap-0 flex-shrink-0">
       <span style={{
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Bebas Neue', sans-serif",
         fontSize: "22px",
-        fontWeight: "700",
+        fontWeight: "400",
         color: "#e8432d",
         lineHeight: "1",
         letterSpacing: "-0.02em",
         marginRight: "-2px",
       }}>[</span>
       <span style={{
-        fontFamily: "'DM Sans', sans-serif",
-        fontSize: "16px",
-        fontWeight: "700",
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: "17px",
+        fontWeight: "400",
         color: "#f0ebe3",
         lineHeight: "1",
-        letterSpacing: "0.04em",
-        padding: "0 2px",
+        letterSpacing: "0.08em",
+        padding: "0 3px",
       }}>SSP DEAL FLOW</span>
       <span style={{
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Bebas Neue', sans-serif",
         fontSize: "22px",
-        fontWeight: "700",
+        fontWeight: "400",
         color: "#e8432d",
         lineHeight: "1",
         letterSpacing: "-0.02em",
