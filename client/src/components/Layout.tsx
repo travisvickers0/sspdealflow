@@ -8,7 +8,7 @@ import { posthog } from "@/lib/posthog";
 function LogoMark() {
   return (
     <div className="flex items-center no-underline">
-      <img src="/ssp-logo.png" alt="SSP" className="h-12" />
+      <img src="/ssp-logo.png" alt="SSP" className="h-10" />
     </div>
   );
 }
