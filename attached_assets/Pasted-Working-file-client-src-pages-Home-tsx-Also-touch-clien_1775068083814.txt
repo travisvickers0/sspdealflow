@@ -1,0 +1,486 @@
+Working file: client/src/pages/Home.tsx
+Also touch: client/src/index.css for keyframes
+            client/src/components/Layout.tsx for nav
+
+Do NOT change any other files.
+
+PRESERVE EXACTLY:
+- All imports and hooks
+- sortedProperties, featuredProperties, totalEquity,
+  formatMoney, normalizeStatus, getPropertyImage
+- handleLeadSubmit, formData, formSuccess, formError
+- goToProperty, isAuthenticated guards
+- All PostHog tracking calls
+- Lead capture section JSX (keep completely unchanged)
+- CTA section and footer (via Layout)
+- Loading states
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1 — index.css: add keyframe
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Add inside @layer utilities:
+
+@keyframes tape-scroll-h {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+(Only add if not already present — check first)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2 — Layout.tsx: nav color on light bg
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The nav currently uses white/cream text on a
+transparent background. On the new cream hero
+background (#f7f4ef) the white text is invisible.
+
+In Layout.tsx, find the nav component.
+Add a prop transparentNavDark (boolean, default false)
+that switches the nav text to dark when on a
+light background:
+
+When transparentNavDark is true AND not scrolled:
+  Logo text: text-[#0d0c0b]
+  Logo brackets: text-[#e8432d] (keep red)
+  Nav links: text-[rgba(13,12,11,0.5)]
+    hover: text-[#0d0c0b]
+  Sign in button: border-[rgba(13,12,11,0.15)]
+    text-[rgba(13,12,11,0.6)]
+    hover: text-[#0d0c0b] border-[rgba(13,12,11,0.3)]
+  Get started button: bg-[#0d0c0b] text-[#f7f4ef]
+    hover: bg-[#e8432d]
+
+When scrolled (existing .scrolled state):
+  Revert to existing dark glass style regardless
+  of transparentNavDark prop
+
+Pass transparentNavDark to Layout in Home.tsx:
+  <Layout transparentNavDark>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 3 — Replace hero section in Home.tsx
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Remove the existing hero div entirely (the one
+with bg-[#0a0908] and the ticker background,
+both desktop and mobile versions).
+
+Replace with:
+
+<section className="bg-[#f7f4ef]">
+  <div className="max-w-[1360px] mx-auto
+    px-6 sm:px-10 lg:px-14
+    pt-28 pb-16 lg:pt-32 lg:pb-20
+    grid grid-cols-1 lg:grid-cols-2
+    gap-12 lg:gap-16 items-center">
+
+    {/* ── LEFT ── */}
+    <div className="flex flex-col gap-0">
+
+      {/* Badge */}
+      <div className="inline-flex items-center gap-2
+        bg-[rgba(232,67,45,0.06)]
+        border border-[rgba(232,67,45,0.18)]
+        rounded-full px-3.5 py-1.5 mb-6 w-fit">
+        <span className="w-1.5 h-1.5 bg-[#e8432d]
+          rounded-full animate-pulse flex-shrink-0" />
+        <span className="font-mono text-[10px] font-medium
+          tracking-[0.1em] uppercase text-[#e8432d]">
+          Accredited Investors Only
+        </span>
+      </div>
+
+      {/* Headline */}
+      <h1 className="font-bold leading-[.92]
+        tracking-[-0.03em] text-[#0d0c0b] mb-4"
+        style={{ fontSize: "clamp(52px,6vw,76px)" }}>
+        Real estate<br/>
+        <em className="not-italic"
+          style={{ fontFamily: "'Instrument Serif',Georgia,serif",
+                   fontStyle: "italic", fontWeight: 400,
+                   color: "#e8432d", display: "block" }}>
+          built for
+        </em>
+        investors
+      </h1>
+
+      {/* Sub */}
+      <p className="text-[16px] text-[rgba(13,12,11,0.5)]
+        leading-[1.75] max-w-[380px] mb-9">
+        Vetted off-market acquisitions across the Southeast.
+        50/50 profit split at sale. No fees, no pooled capital.
+      </p>
+
+      {/* CTAs */}
+      <div className="flex gap-3 items-center mb-10">
+        <button
+          type="button"
+          onClick={() => setLocation("/properties")}
+          className="bg-[#0d0c0b] hover:bg-[#e8432d]
+            text-[#f7f4ef] font-semibold text-[14px]
+            px-7 py-3.5 rounded-[12px]
+            flex items-center gap-2 transition-all
+            hover:-translate-y-px">
+          Explore Properties
+          <ArrowRight className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setLocation("/how-it-works")}
+          className="bg-white text-[rgba(13,12,11,0.65)]
+            border border-[rgba(13,12,11,0.1)]
+            hover:border-[rgba(13,12,11,0.25)]
+            hover:text-[#0d0c0b]
+            font-medium text-[14px]
+            px-6 py-3.5 rounded-[12px]
+            transition-all hidden sm:block">
+          View Structure
+        </button>
+      </div>
+
+      {/* State pills */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-[12px] font-medium
+          text-[rgba(13,12,11,0.35)]">
+          Active across
+        </span>
+        {["Georgia","Tennessee","Florida","Texas"].map(s => (
+          <span key={s}
+            className="bg-white border border-[rgba(13,12,11,0.08)]
+              rounded-full px-3 py-1
+              text-[11px] font-semibold
+              text-[rgba(13,12,11,0.45)]
+              shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+            {s}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* ── RIGHT: 2×2 GRID ── */}
+    <div className="grid grid-cols-2 gap-3
+      h-[460px] lg:h-[500px]">
+
+      {/* CELL 1: Property photo — left col, spans 2 rows */}
+      {(() => {
+        const heroProperty = sortedProperties
+          .find(p => p.mainPhotoUrl) ?? sortedProperties[0];
+        const heroPhoto = heroProperty
+          ? getPropertyImage(heroProperty) : null;
+        return (
+          <div
+            className="col-span-1 row-span-2
+              rounded-[20px] overflow-hidden relative
+              cursor-pointer group bg-[#1a2018]"
+            onClick={() => heroProperty
+              && goToProperty(heroProperty)}
+          >
+            {heroPhoto && (
+              <img
+                src={heroPhoto}
+                alt={heroProperty?.address}
+                className="w-full h-full object-cover
+                  object-[50%_40%]
+                  transition-transform duration-500
+                  group-hover:scale-[1.03]"
+              />
+            )}
+            {!heroPhoto && (
+              <div className="w-full h-full
+                bg-gradient-to-br
+                from-[#1e2a18] to-[#253520]" />
+            )}
+
+            {/* Overlay gradient */}
+            <div className="absolute inset-0"
+              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 45%, transparent 70%)" }} />
+
+            {/* Top badges */}
+            <div className="absolute top-3 left-3
+              right-3 z-10 flex items-center
+              justify-between">
+              <span className="bg-[#e8432d] text-white
+                text-[8px] font-bold tracking-[0.07em]
+                uppercase px-2.5 py-1 rounded-[5px]">
+                Open · Needs Funding
+              </span>
+              <span className="bg-[rgba(255,255,255,0.15)]
+                backdrop-blur-sm
+                border border-[rgba(255,255,255,0.2)]
+                text-white text-[10px] font-semibold
+                px-2.5 py-1 rounded-[5px]">
+                Zillow →
+              </span>
+            </div>
+
+            {/* Bottom info */}
+            <div className="absolute bottom-0 left-0
+              right-0 z-10 p-3.5">
+              <div className="text-[15px] font-semibold
+                text-white mb-0.5">
+                {heroProperty?.address ?? "121 Inata Cir"}
+              </div>
+              <div className="text-[10px]
+                text-[rgba(255,255,255,0.55)] mb-2.5">
+                {heroProperty
+                  ? `${heroProperty.city}, ${heroProperty.state} · ${heroProperty.beds}bd · ${heroProperty.baths}ba`
+                  : "Loudon, TN · 3bd · 3ba"}
+              </div>
+              {/* Mini stat grid */}
+              <div className="grid grid-cols-2 gap-px
+                bg-[rgba(255,255,255,0.1)]
+                rounded-[10px] overflow-hidden">
+                <div className="bg-[rgba(0,0,0,0.4)]
+                  backdrop-blur-sm px-3 py-2.5">
+                  <div className="text-[8px] font-semibold
+                    tracking-[0.09em] uppercase
+                    text-[rgba(255,255,255,0.4)] mb-1">
+                    Purchase Price
+                  </div>
+                  <div className="font-mono text-[14px]
+                    font-medium text-white">
+                    {heroProperty
+                      ? `$${heroProperty.purchasePrice.toLocaleString()}`
+                      : "$338,227"}
+                  </div>
+                </div>
+                <div className="bg-[rgba(0,0,0,0.4)]
+                  backdrop-blur-sm px-3 py-2.5">
+                  <div className="text-[8px] font-semibold
+                    tracking-[0.09em] uppercase
+                    text-[rgba(255,255,255,0.4)] mb-1">
+                    Est. Equity
+                  </div>
+                  <div className="font-mono text-[14px]
+                    font-medium text-[#4ade80]">
+                    +{heroProperty
+                      ? formatMoney(heroProperty.estimatedEquity ?? 0)
+                      : "$136,773"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* CELL 2: Deals closed — top right — WHITE */}
+      <div className="bg-white border border-[rgba(13,12,11,0.06)]
+        rounded-[20px] p-5 flex flex-col
+        justify-between
+        shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
+        <div>
+          <div className="font-mono text-[48px] font-medium
+            text-[#0d0c0b] leading-none
+            tracking-[-0.02em] mb-1.5">
+            119
+          </div>
+          <div className="text-[10px] font-semibold
+            tracking-[0.1em] uppercase
+            text-[rgba(13,12,11,0.35)]">
+            Deals Closed
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 bg-[#22c55e]
+            rounded-full animate-pulse flex-shrink-0" />
+          <span className="text-[11px] font-semibold
+            text-[#16a34a] tracking-[0.06em] uppercase">
+            Live Platform
+          </span>
+        </div>
+      </div>
+
+      {/* CELL 3: Total equity — bottom right — RED */}
+      <div className="bg-[#e8432d] rounded-[20px] p-5
+        flex flex-col justify-between relative overflow-hidden">
+        {/* Decorative circle */}
+        <div className="absolute -bottom-8 -right-8
+          w-24 h-24 bg-[rgba(255,255,255,0.08)]
+          rounded-full pointer-events-none" />
+        <div>
+          <div className="font-mono text-[44px] font-medium
+            text-white leading-none tracking-[-0.02em] mb-1.5">
+            {formatMoney(totalEquity) === "$0"
+              ? "$6.1M"
+              : formatMoney(totalEquity)}
+          </div>
+          <div className="text-[10px] font-semibold
+            tracking-[0.1em] uppercase
+            text-[rgba(255,255,255,0.55)] mb-2">
+            Total Equity
+          </div>
+          <div className="text-[11px] text-[rgba(255,255,255,0.45)]
+            leading-[1.5]">
+            Generated for investors across all closed deals
+          </div>
+        </div>
+        {/* Avatar stack */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center">
+            {["B","G","J","M"].map((l, i) => (
+              <div key={l}
+                className="w-6 h-6 rounded-full
+                  bg-[rgba(255,255,255,0.2)]
+                  border-2 border-[#e8432d]
+                  flex items-center justify-center
+                  text-[8px] font-bold text-white
+                  flex-shrink-0"
+                style={{ marginLeft: i === 0 ? 0 : -6 }}>
+                {l}
+              </div>
+            ))}
+          </div>
+          <span className="text-[11px] font-semibold
+            text-[rgba(255,255,255,0.6)]">
+            250+ investors
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 4 — State ticker strip (below hero)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Add this section immediately after the hero
+section closing tag and before the featured
+deals section:
+
+<div className="bg-[#f7f4ef] border-t
+  border-[rgba(13,12,11,0.06)] py-5 overflow-hidden">
+  <div className="max-w-[1360px] mx-auto
+    px-6 sm:px-10 lg:px-14
+    flex items-center gap-8">
+    <span className="text-[11px] font-medium
+      text-[rgba(13,12,11,0.3)] flex-shrink-0">
+      Active across
+    </span>
+    <div className="overflow-hidden flex-1">
+      <div className="flex gap-10 w-max"
+        style={{ animation: "tape-scroll-h 28s linear infinite" }}>
+        {[
+          "Georgia","Tennessee","Florida","Texas",
+          "Kentucky","Virginia","Alabama","Mississippi",
+          "North Carolina","Arizona",
+          "Georgia","Tennessee","Florida","Texas",
+          "Kentucky","Virginia","Alabama","Mississippi",
+          "North Carolina","Arizona",
+        ].map((state, i) => (
+          <span key={i}
+            className="text-[11px] font-semibold
+              text-[rgba(13,12,11,0.25)]
+              uppercase tracking-[0.04em]
+              flex items-center gap-2 whitespace-nowrap">
+            {state}
+            <span className="w-1 h-1 bg-[rgba(13,12,11,0.15)]
+              rounded-full" />
+          </span>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 5 — Featured deals section reskin
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Find the existing featured deals section
+(the one with "Current Opportunities" eyebrow
+and the property cards grid).
+
+Change ONLY the section wrapper and header
+styling — do NOT touch the card mapping logic
+or goToProperty calls:
+
+Section outer wrapper:
+  Change: bg-[#0f0e0d] or bg-[var(--surface-hex)]
+  To: bg-[#f7f4ef]
+
+Section inner padding: keep existing px/py values
+
+Eyebrow text:
+  Keep: text-primary (red) — unchanged
+
+H2 headline:
+  Change: text-[var(--text-primary)]
+  To: text-[#0d0c0b]
+  Add italic Instrument Serif to "deals" word:
+  "Featured " + <em style={{ fontStyle:"italic",
+    fontFamily:"'Instrument Serif',Georgia,serif",
+    fontWeight:400 }}>deals</em>
+
+"View All" link:
+  Change to match new style:
+  className="text-[13px] font-semibold text-[#0d0c0b]
+    border border-[rgba(13,12,11,0.12)]
+    px-4 py-2 rounded-full flex items-center gap-2
+    hover:bg-[#0d0c0b] hover:text-white transition-all"
+
+Property cards:
+  Change card background:
+    From: bg-[var(--bg-hex)] or bg-[#181614]
+    To: bg-white
+  Change card border:
+    From: border-[var(--line)]
+    To: border-[rgba(13,12,11,0.06)]
+  Add: shadow-[0_2px_8px_rgba(0,0,0,0.04)]
+  Hover: hover:shadow-[0_20px_48px_rgba(0,0,0,0.10)]
+         hover:border-[rgba(13,12,11,0.12)]
+
+  Inside card body:
+    Address text: text-[#0d0c0b]
+    Location text: text-[rgba(13,12,11,0.4)]
+    Label text: text-[rgba(13,12,11,0.35)]
+    Value text: text-[#0d0c0b]
+    Equity value: text-[#16a34a] (green)
+    Specs/footer text: text-[rgba(13,12,11,0.4)]
+    Border dividers: border-[rgba(13,12,11,0.06)]
+
+  CTA button inside card:
+    From: bg-primary hover:bg-primary/90
+    To: bg-[#0d0c0b] hover:bg-[#e8432d] text-white
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 6 — Lead capture section
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The lead capture section STAYS DARK.
+Do NOT change bg-[var(--bg-hex)] or the
+dark background on the lead section.
+Only change the section border-top:
+
+  Change: border-t border-[var(--line)]
+  To: border-t-4 border-[#e8432d]
+
+This red border creates a visual break between
+the cream featured section and the dark lead
+section — signals a transition.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPORTANT NOTES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Add Instrument Serif to Google Fonts in
+   client/index.html if not already present:
+   add &family=Instrument+Serif:ital@0;1 to
+   the existing Google Fonts URL
+
+2. The hero property photo must use real data:
+   sortedProperties.find(p => p.mainPhotoUrl)
+   falls back gracefully if no photo exists
+
+3. The 2×2 grid on mobile collapses:
+   - Photo cell: col-span-2 (full width) h-[220px]
+   - Stat cards: side by side in one row below
+
+4. totalEquity may be 0 before properties load —
+   show "$6.1M" as fallback if totalEquity is 0
+   (same for the "119" deals count)
+
+5. The tape-scroll-h animation must be applied
+   via style prop since Tailwind arbitrary
+   animation values are unreliable
+
+After changes: npx tsc --noEmit
+Fix any type errors. Do not modify any other files.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

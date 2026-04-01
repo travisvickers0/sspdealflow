@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { posthog } from "@/lib/posthog";
 
-function NavLogo() {
+function NavLogo({ dark = false }: { dark?: boolean }) {
+  const textColor = dark ? "#0d0c0b" : "#f0ebe3";
   return (
     <span className="flex items-center gap-0 flex-shrink-0">
       <span style={{
@@ -16,15 +17,17 @@ function NavLogo() {
         lineHeight: "1",
         letterSpacing: "-0.02em",
         marginRight: "-2px",
+        transition: "color 0.3s",
       }}>[</span>
       <span style={{
         fontFamily: "'Bebas Neue', sans-serif",
         fontSize: "22px",
         fontWeight: "400",
-        color: "#f0ebe3",
+        color: textColor,
         lineHeight: "1",
         letterSpacing: "0.08em",
         padding: "0 3px",
+        transition: "color 0.3s",
       }}>SSP DEAL FLOW</span>
       <span style={{
         fontFamily: "'Bebas Neue', sans-serif",
@@ -34,6 +37,7 @@ function NavLogo() {
         lineHeight: "1",
         letterSpacing: "-0.02em",
         marginLeft: "-2px",
+        transition: "color 0.3s",
       }}>]</span>
     </span>
   );
@@ -76,11 +80,13 @@ function FooterLogo() {
 interface LayoutProps {
   children: React.ReactNode;
   transparentNav?: boolean;
+  transparentNavDark?: boolean;
 }
 
-export function Layout({ children, transparentNav = false }: LayoutProps) {
+export function Layout({ children, transparentNav = false, transparentNavDark = false }: LayoutProps) {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
   const { user, isAuthenticated, isAdmin, isLoading } = useAuth();
 
   useEffect(() => {
@@ -112,12 +118,14 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
   }, [isLoading, isAuthenticated, user, isAdmin]);
 
   useEffect(() => {
-    if (!transparentNav) {
+    if (!transparentNav && !transparentNavDark) {
       document.documentElement.removeAttribute("data-nav-scrolled");
+      setNavScrolled(false);
       return;
     }
     const onScroll = () => {
       const scrolled = window.scrollY > 60;
+      setNavScrolled(scrolled);
       document.documentElement.setAttribute("data-nav-scrolled", String(scrolled));
     };
     onScroll();
@@ -125,14 +133,17 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
     return () => {
       window.removeEventListener("scroll", onScroll);
       document.documentElement.removeAttribute("data-nav-scrolled");
+      setNavScrolled(false);
     };
-  }, [transparentNav]);
+  }, [transparentNav, transparentNavDark]);
+
+  const isDarkText = transparentNavDark && !navScrolled;
 
   const navLinkClass = (active: boolean) =>
     `text-sm font-medium transition-colors ${
-      active
-        ? "text-[var(--text-primary)]"
-        : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+      isDarkText
+        ? (active ? "text-[#0d0c0b]" : "text-[rgba(13,12,11,0.5)] hover:text-[#0d0c0b]")
+        : (active ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]")
     }`;
 
   const mobileNavLinkClass = (active: boolean) =>
@@ -141,12 +152,13 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground overflow-x-hidden">
       <header
-        className={`sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[rgba(15,14,13,0.92)] backdrop-blur-[16px] pt-[env(safe-area-inset-top)] ${transparentNav ? "nav-transparent" : ""}`}
+        className={`sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[rgba(15,14,13,0.92)] backdrop-blur-[16px] pt-[env(safe-area-inset-top)] ${transparentNav || transparentNavDark ? "nav-transparent" : ""}`}
+        style={{ transition: "background 0.5s, border-color 0.5s, backdrop-filter 0.5s" }}
       >
         <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">
           <div className="flex items-center gap-4 sm:gap-8">
             <Link href="/" className="flex items-center gap-0 flex-shrink-0">
-              <NavLogo />
+              <NavLogo dark={isDarkText} />
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link href="/properties" className={navLinkClass(location === "/properties")}>
@@ -177,7 +189,7 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="hidden sm:flex cursor-pointer gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                      className={`hidden sm:flex cursor-pointer gap-2 transition-colors ${isDarkText ? "text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
                     >
                       <LogOut className="h-4 w-4" />
                       Log out
@@ -189,7 +201,7 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
                   <a href="/signin">
                     <Button
                       size="sm"
-                      className="h-9 rounded-full px-5 border border-[var(--line-light)] bg-transparent text-[var(--text-secondary)] text-[13px] font-medium hover:border-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
+                      className={`h-9 rounded-full px-5 bg-transparent text-[13px] font-medium transition-all cursor-pointer ${isDarkText ? "border border-[rgba(13,12,11,0.15)] text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b] hover:border-[rgba(13,12,11,0.3)]" : "border border-[var(--line-light)] text-[var(--text-secondary)] hover:border-[var(--text-tertiary)] hover:text-[var(--text-primary)]"}`}
                     >
                       Sign in
                     </Button>
@@ -197,7 +209,7 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
                   <a href="/signup">
                     <Button
                       size="sm"
-                      className="h-9 rounded-full px-5 bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-all cursor-pointer active:scale-95"
+                      className={`h-9 rounded-full px-5 text-[13px] font-semibold transition-all cursor-pointer active:scale-95 ${isDarkText ? "bg-[#0d0c0b] text-[#f7f4ef] hover:bg-[#e8432d]" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
                     >
                       Sign up
                     </Button>
@@ -208,7 +220,7 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden h-9 w-9 cursor-pointer active:scale-95 text-[var(--text-secondary)]"
+              className={`md:hidden h-9 w-9 cursor-pointer active:scale-95 ${isDarkText ? "text-[#0d0c0b]" : "text-[var(--text-secondary)]"}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu className="h-5 w-5" />

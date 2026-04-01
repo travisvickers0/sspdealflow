@@ -191,6 +191,11 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  @keyframes tape-scroll-h {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
   .glass-panel {
     @apply bg-white/80 dark:bg-black/80 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm;
   }

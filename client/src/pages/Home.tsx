@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Link, useLocation } from "wouter";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowRight, TrendingUp, ShieldCheck, Loader2 } from "lucide-react";
+import { ArrowRight, TrendingUp, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { posthog } from "@/lib/posthog";
@@ -89,136 +89,37 @@ export default function Home() {
   const inputClass =
     "w-full bg-[var(--surface-hex)] border border-[var(--line-light)] rounded-[8px] text-[var(--text-primary)] text-[14px] px-4 py-3 outline-none placeholder:text-[var(--text-tertiary)] focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all";
 
-  const statusBadgeClass = (open: boolean) =>
-    open
-      ? "text-[8px] font-bold tracking-[0.07em] uppercase px-1.5 py-0.5 rounded-[3px] flex-shrink-0 bg-[rgba(232,67,45,0.12)] text-[#e8432d] border border-[rgba(232,67,45,0.22)]"
-      : "text-[8px] font-bold tracking-[0.07em] uppercase px-1.5 py-0.5 rounded-[3px] flex-shrink-0 bg-[rgba(59,130,246,0.10)] text-[#3b82f6] border border-[rgba(59,130,246,0.2)]";
-
   return (
-    <Layout transparentNav>
-      <div className="relative min-h-screen overflow-hidden flex flex-col justify-end bg-[#0a0908]">
+    <Layout transparentNavDark>
+      <section className="bg-[#f7f4ef]">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-28 pb-16 lg:pt-32 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-        <div className="absolute inset-0 z-0">
-          {(() => {
-            const heroPhoto = sortedProperties.find(p => p.mainPhotoUrl)?.mainPhotoUrl ?? null;
-            return heroPhoto ? (
-              <img
-                src={heroPhoto}
-                alt="Featured property"
-                className="w-full h-full object-cover object-[50%_40%]"
-                style={{ animation: "ken-burns 16s ease-out forwards" }}
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#1a2018] via-[#151210] to-[#0a0908]" />
-            );
-          })()}
-        </div>
+          <div className="flex flex-col gap-0">
 
-        <div
-          className="absolute inset-0 z-[1]"
-          style={{
-            background: `
-              linear-gradient(to right,
-                rgba(8,7,6,0.95) 0%,
-                rgba(8,7,6,0.88) 30%,
-                rgba(8,7,6,0.55) 58%,
-                rgba(8,7,6,0.12) 100%
-              ),
-              linear-gradient(to top,
-                rgba(8,7,6,1.0) 0%,
-                rgba(8,7,6,0.7) 14%,
-                transparent 40%
-              ),
-              linear-gradient(to bottom,
-                rgba(8,7,6,0.55) 0%,
-                transparent 22%
-              )
-            `
-          }}
-        />
-
-        <div
-          className="hidden lg:flex flex-col gap-2 absolute right-14 top-1/2 -translate-y-1/2 z-10 w-[300px]"
-          style={{ animation: "fade-up 0.9s ease 0.2s both" }}
-        >
-          <div className="flex items-center justify-between mb-1">
-            <span className="font-mono text-[9px] font-medium tracking-[0.14em] uppercase text-[#6b6158]">
-              Live Deal Flow
-            </span>
-            <div className="flex items-center gap-1 font-mono text-[9px] font-semibold tracking-[0.1em] uppercase text-[#22c55e]">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse flex-shrink-0" />
-              {properties?.length ?? 0} Active
-            </div>
-          </div>
-
-          {sortedProperties.slice(0, 6).map((property) => {
-            const open = normalizeStatus(property.status) === "AVAILABLE";
-            return (
-              <div
-                key={property.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => goToProperty(property)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    goToProperty(property);
-                  }
-                }}
-                className="flex items-center justify-between gap-2.5 bg-[rgba(24,22,20,0.82)] backdrop-blur-md border border-[#2a2724] rounded-[10px] px-3.5 py-2.5 cursor-pointer hover:border-[#353129] hover:bg-[rgba(30,28,25,0.9)] transition-all"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="text-[13px] font-semibold text-[#f0ebe3] truncate">
-                    {property.address}
-                  </div>
-                  <div className="text-[10px] text-[#6b6158] mt-0.5">
-                    {property.city}, {property.state}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="font-mono text-[13px] font-medium text-[#22c55e]">
-                    {formatMoney(property.estimatedEquity ?? 0)}
-                  </span>
-                  <span className={statusBadgeClass(open)}>
-                    {open ? "Open" : "Funded"}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div
-          className="relative z-10 max-w-[1280px] mx-auto w-full px-6 sm:px-10 lg:px-14 pb-[100px] lg:pb-[110px] pt-28"
-          style={{ animation: "fade-up 0.8s ease both" }}
-        >
-          <div className="max-w-[580px]">
-
-            <div className="inline-flex items-center gap-2 border border-[rgba(34,197,94,0.25)] bg-[rgba(34,197,94,0.06)] rounded-[4px] px-3 py-1.5 mb-5">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse flex-shrink-0" />
-              <span className="font-mono text-[10px] font-medium tracking-[0.12em] uppercase text-[#22c55e]">
+            <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.18)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
+              <span className="w-1.5 h-1.5 bg-[#e8432d] rounded-full animate-pulse flex-shrink-0" />
+              <span className="font-mono text-[10px] font-medium tracking-[0.1em] uppercase text-[#e8432d]">
                 Accredited Investors Only
               </span>
             </div>
 
-            <h1
-              className="font-['Bebas_Neue',sans-serif] text-[clamp(64px,8vw,108px)] leading-[0.9] tracking-[0.02em] text-[#f0ebe3] mb-5"
-              style={{ textShadow: "0 2px 40px rgba(0,0,0,0.4)" }}
-            >
-              Real Estate<br />
-              <span className="text-[#e8432d]">Built for</span><br />
-              Investors
+            <h1 className="font-bold leading-[.92] tracking-[-0.03em] text-[#0d0c0b] mb-4" style={{ fontSize: "clamp(52px,6vw,76px)" }}>
+              Real estate<br />
+              <em className="not-italic" style={{ fontFamily: "'Instrument Serif',Georgia,serif", fontStyle: "italic", fontWeight: 400, color: "#e8432d", display: "block" }}>
+                built for
+              </em>
+              investors
             </h1>
 
-            <p className="text-[15px] text-[rgba(240,235,227,0.72)] leading-[1.75] max-w-[440px] mb-7 border-l-2 border-[rgba(232,67,45,0.4)] pl-3.5">
-              Vetted off-market acquisitions. 50/50 profit split at sale. No fees — deal-by-deal JV structure built for accredited investors.
+            <p className="text-[16px] text-[rgba(13,12,11,0.5)] leading-[1.75] max-w-[380px] mb-9">
+              Vetted off-market acquisitions across the Southeast. 50/50 profit split at sale. No fees, no pooled capital.
             </p>
 
-            <div className="flex gap-3 items-center mb-6">
+            <div className="flex gap-3 items-center mb-10">
               <button
                 type="button"
                 onClick={() => setLocation("/properties")}
-                className="bg-[#e8432d] hover:bg-[#d63520] text-white font-semibold text-[14px] px-7 py-3.5 rounded-[8px] flex items-center gap-2 transition-all hover:-translate-y-px shadow-[0_8px_24px_rgba(232,67,45,0.3)] hover:shadow-[0_12px_32px_rgba(232,67,45,0.4)]"
+                className="bg-[#0d0c0b] hover:bg-[#e8432d] text-[#f7f4ef] font-semibold text-[14px] px-7 py-3.5 rounded-[12px] flex items-center gap-2 transition-all hover:-translate-y-px"
               >
                 Explore Properties
                 <ArrowRight className="h-4 w-4" />
@@ -226,56 +127,163 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setLocation("/how-it-works")}
-                className="bg-[rgba(240,235,227,0.06)] backdrop-blur-sm text-[#f0ebe3] font-medium text-[14px] px-6 py-3.5 rounded-[8px] border border-[rgba(240,235,227,0.2)] hover:bg-[rgba(240,235,227,0.12)] hover:border-[rgba(240,235,227,0.4)] transition-all hidden sm:flex"
+                className="bg-white text-[rgba(13,12,11,0.65)] border border-[rgba(13,12,11,0.1)] hover:border-[rgba(13,12,11,0.25)] hover:text-[#0d0c0b] font-medium text-[14px] px-6 py-3.5 rounded-[12px] transition-all hidden sm:block"
               >
-                View Partnership Structure
+                View Structure
               </button>
             </div>
 
-            <div className="items-center gap-2 text-[11px] text-[#6b6158] hidden sm:flex">
-              <ShieldCheck className="h-3 w-3 flex-shrink-0" />
-              Secured by First-Position Lien Structure
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[12px] font-medium text-[rgba(13,12,11,0.35)]">
+                Active across
+              </span>
+              {["Georgia", "Tennessee", "Florida", "Texas"].map(s => (
+                <span key={s} className="bg-white border border-[rgba(13,12,11,0.08)] rounded-full px-3 py-1 text-[11px] font-semibold text-[rgba(13,12,11,0.45)] shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 h-[460px] lg:h-[500px]">
+
+            {(() => {
+              const heroProperty = sortedProperties.find(p => p.mainPhotoUrl) ?? sortedProperties[0];
+              const heroPhoto = heroProperty ? getPropertyImage(heroProperty) : null;
+              return (
+                <div
+                  className="col-span-1 row-span-2 rounded-[20px] overflow-hidden relative cursor-pointer group bg-[#1a2018]"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => heroProperty && goToProperty(heroProperty)}
+                  onKeyDown={(e) => {
+                    if ((e.key === "Enter" || e.key === " ") && heroProperty) {
+                      e.preventDefault();
+                      goToProperty(heroProperty);
+                    }
+                  }}
+                >
+                  {heroPhoto && (
+                    <img
+                      src={heroPhoto}
+                      alt={heroProperty?.address}
+                      className="w-full h-full object-cover object-[50%_40%] transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                  )}
+                  {!heroPhoto && (
+                    <div className="w-full h-full bg-gradient-to-br from-[#1e2a18] to-[#253520]" />
+                  )}
+
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 45%, transparent 70%)" }} />
+
+                  <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between">
+                    <span className="bg-[#e8432d] text-white text-[8px] font-bold tracking-[0.07em] uppercase px-2.5 py-1 rounded-[5px]">
+                      {heroProperty && normalizeStatus(heroProperty.status) === "AVAILABLE" ? "Open · Needs Funding" : "Funded"}
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 z-10 p-3.5">
+                    <div className="text-[15px] font-semibold text-white mb-0.5">
+                      {heroProperty?.address ?? "Property"}
+                    </div>
+                    <div className="text-[10px] text-[rgba(255,255,255,0.55)] mb-2.5">
+                      {heroProperty
+                        ? `${heroProperty.city}, ${heroProperty.state} · ${heroProperty.beds}bd · ${heroProperty.baths}ba`
+                        : ""}
+                    </div>
+                    <div className="grid grid-cols-2 gap-px bg-[rgba(255,255,255,0.1)] rounded-[10px] overflow-hidden">
+                      <div className="bg-[rgba(0,0,0,0.4)] backdrop-blur-sm px-3 py-2.5">
+                        <div className="text-[8px] font-semibold tracking-[0.09em] uppercase text-[rgba(255,255,255,0.4)] mb-1">Purchase Price</div>
+                        <div className="font-mono text-[14px] font-medium text-white">
+                          {heroProperty ? `$${heroProperty.purchasePrice.toLocaleString()}` : "—"}
+                        </div>
+                      </div>
+                      <div className="bg-[rgba(0,0,0,0.4)] backdrop-blur-sm px-3 py-2.5">
+                        <div className="text-[8px] font-semibold tracking-[0.09em] uppercase text-[rgba(255,255,255,0.4)] mb-1">Est. Equity</div>
+                        <div className="font-mono text-[14px] font-medium text-[#4ade80]">
+                          +{heroProperty ? formatMoney(heroProperty.estimatedEquity ?? 0) : "—"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            <div className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
+              <div>
+                <div className="font-mono text-[48px] font-medium text-[#0d0c0b] leading-none tracking-[-0.02em] mb-1.5">119</div>
+                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(13,12,11,0.35)]">Deals Closed</div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse flex-shrink-0" />
+                <span className="text-[11px] font-semibold text-[#16a34a] tracking-[0.06em] uppercase">Live Platform</span>
+              </div>
+            </div>
+
+            <div className="bg-[#e8432d] rounded-[20px] p-5 flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-[rgba(255,255,255,0.08)] rounded-full pointer-events-none" />
+              <div>
+                <div className="font-mono text-[44px] font-medium text-white leading-none tracking-[-0.02em] mb-1.5">
+                  {formatMoney(totalEquity) === "$0" ? "$6.1M" : formatMoney(totalEquity)}
+                </div>
+                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.55)] mb-2">Total Equity</div>
+                <div className="text-[11px] text-[rgba(255,255,255,0.45)] leading-[1.5]">
+                  Generated for investors across all closed deals
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  {["B", "G", "J", "M"].map((l, i) => (
+                    <div key={l} className="w-6 h-6 rounded-full bg-[rgba(255,255,255,0.2)] border-2 border-[#e8432d] flex items-center justify-center text-[8px] font-bold text-white flex-shrink-0" style={{ marginLeft: i === 0 ? 0 : -6 }}>
+                      {l}
+                    </div>
+                  ))}
+                </div>
+                <span className="text-[11px] font-semibold text-[rgba(255,255,255,0.6)]">250+ investors</span>
+              </div>
             </div>
 
           </div>
         </div>
+      </section>
 
-        <div className="absolute bottom-0 left-0 right-0 z-20 bg-[rgba(8,7,6,0.88)] backdrop-blur-2xl border-t border-[#2a2724]">
-          <div className="max-w-[1280px] mx-auto px-6 sm:px-10 lg:px-14">
-            <div className="grid grid-cols-3 lg:grid-cols-5">
+      <div className="bg-[#f7f4ef] border-t border-[rgba(13,12,11,0.06)] py-5 overflow-hidden">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 flex items-center gap-8">
+          <span className="text-[11px] font-medium text-[rgba(13,12,11,0.3)] flex-shrink-0">
+            Active across
+          </span>
+          <div className="overflow-hidden flex-1">
+            <div className="flex gap-10 w-max" style={{ animation: "tape-scroll-h 28s linear infinite" }}>
               {[
-                { v: "119", l: "Deals Closed", g: false },
-                { v: "94d", l: "Avg Hold Time", g: false },
-                { v: formatMoney(totalEquity), l: "Total Equity", g: true },
-                { v: "250+", l: "Active Investors", g: false },
-                { v: "50/50", l: "Profit Split", g: false },
-              ].map((s, i) => (
-                <div
-                  key={s.l}
-                  className={`py-4 lg:py-5 border-r border-[#2a2724] last:border-r-0 ${i === 0 ? "pl-0 pr-6 lg:pr-8" : "px-6 lg:px-8"} ${i >= 3 ? "hidden lg:block" : ""}`}
-                >
-                  <div className={`font-mono text-[22px] lg:text-[26px] font-medium leading-none tracking-[-0.02em] mb-1 ${s.g ? "text-[#22c55e]" : "text-[#f0ebe3]"}`}>
-                    {s.v}
-                  </div>
-                  <div className="text-[9px] font-semibold tracking-[0.11em] uppercase text-[#6b6158]">
-                    {s.l}
-                  </div>
-                </div>
+                "Georgia", "Tennessee", "Florida", "Texas",
+                "Kentucky", "Virginia", "Alabama", "Mississippi",
+                "North Carolina", "Arizona",
+                "Georgia", "Tennessee", "Florida", "Texas",
+                "Kentucky", "Virginia", "Alabama", "Mississippi",
+                "North Carolina", "Arizona",
+              ].map((state, i) => (
+                <span key={i} className="text-[11px] font-semibold text-[rgba(13,12,11,0.25)] uppercase tracking-[0.04em] flex items-center gap-2 whitespace-nowrap">
+                  {state}
+                  <span className="w-1 h-1 bg-[rgba(13,12,11,0.15)] rounded-full" />
+                </span>
               ))}
             </div>
           </div>
         </div>
-
       </div>
 
-      <section className="pt-4 pb-20 sm:pt-28 sm:pb-28 bg-[#0f0e0d] lg:bg-[var(--surface-hex)] border-t border-[var(--line)]">
+      <section className="pt-4 pb-20 sm:pt-28 sm:pb-28 bg-[#f7f4ef]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-4 lg:mb-12">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-2 lg:mb-3">Current Opportunities</p>
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[var(--text-primary)] leading-tight">Featured Deals</h2>
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[#0d0c0b] leading-tight">
+                Featured{" "}
+                <em style={{ fontStyle: "italic", fontFamily: "'Instrument Serif',Georgia,serif", fontWeight: 400 }}>deals</em>
+              </h2>
             </div>
-            <Link href="/properties" className="text-[13px] text-primary font-medium hover:gap-3 transition-all flex items-center gap-2">
+            <Link href="/properties" className="text-[13px] font-semibold text-[#0d0c0b] border border-[rgba(13,12,11,0.12)] px-4 py-2 rounded-full flex items-center gap-2 hover:bg-[#0d0c0b] hover:text-white transition-all">
               View All
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -304,9 +312,9 @@ export default function Home() {
                         goToProperty(property);
                       }
                     }}
-                    className="group block bg-[var(--bg-hex)] border border-[var(--line)] rounded-[18px] overflow-hidden transition-all hover:-translate-y-[3px] hover:shadow-2xl hover:border-[var(--line-light)] cursor-pointer"
+                    className="group block bg-white border border-[rgba(13,12,11,0.06)] rounded-[18px] overflow-hidden transition-all hover:-translate-y-[3px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_48px_rgba(0,0,0,0.10)] hover:border-[rgba(13,12,11,0.12)] cursor-pointer"
                   >
-                    <div className="relative aspect-[16/10] bg-[var(--surface-2-hex)] overflow-hidden">
+                    <div className="relative aspect-[16/10] bg-[#f0ede8] overflow-hidden">
                       {img ? (
                         <img
                           src={img}
@@ -325,37 +333,37 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="p-5">
-                      <h3 className="text-[16px] font-semibold text-[var(--text-primary)] truncate mb-1">{property.address}</h3>
-                      <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+                      <h3 className="text-[16px] font-semibold text-[#0d0c0b] truncate mb-1">{property.address}</h3>
+                      <p className="text-[12px] text-[rgba(13,12,11,0.4)] mb-4">
                         {property.city}, {property.state}
                       </p>
-                      <div className="grid grid-cols-2 pb-3 mb-3 border-b border-[var(--line)]">
+                      <div className="grid grid-cols-2 pb-3 mb-3 border-b border-[rgba(13,12,11,0.06)]">
                         <div>
-                          <div className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-1">Purchase Price</div>
-                          <div className="font-mono text-[17px] font-medium text-[var(--text-primary)]">
+                          <div className="text-[10px] uppercase tracking-wide text-[rgba(13,12,11,0.35)] mb-1">Purchase Price</div>
+                          <div className="font-mono text-[17px] font-medium text-[#0d0c0b]">
                             ${property.purchasePrice.toLocaleString()}
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-1">Est. Equity</div>
-                          <div className="font-mono text-[17px] font-medium text-green-400">
+                          <div className="text-[10px] uppercase tracking-wide text-[rgba(13,12,11,0.35)] mb-1">Est. Equity</div>
+                          <div className="font-mono text-[17px] font-medium text-[#16a34a]">
                             +${(property.estimatedEquity || 0).toLocaleString()}
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-3 items-center text-[12px] text-[var(--text-tertiary)] mb-3">
+                      <div className="flex gap-3 items-center text-[12px] text-[rgba(13,12,11,0.4)] mb-3">
                         {property.beds} bed · {property.baths} bath · {(property.squareFeet || 0).toLocaleString()} sqft
                       </div>
-                      <div className="flex items-center justify-between pt-3 border-t border-[var(--line)]">
-                        <span className="text-[11px] text-[var(--text-tertiary)]">Closes {closeDate}</span>
+                      <div className="flex items-center justify-between pt-3 border-t border-[rgba(13,12,11,0.06)]">
+                        <span className="text-[11px] text-[rgba(13,12,11,0.4)]">Closes {closeDate}</span>
                         {property.bpoValue != null ? (
-                          <span className="flex items-center gap-1 text-[11px] text-green-400 font-medium">
+                          <span className="flex items-center gap-1 text-[11px] text-[#16a34a] font-medium">
                             <TrendingUp className="h-3 w-3" />
                             BPO: ${property.bpoValue.toLocaleString()}
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-4 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-[13px] py-2.5 rounded-[7px] flex items-center justify-center gap-1.5 pointer-events-none">
+                      <div className="mt-4 w-full bg-[#0d0c0b] hover:bg-[#e8432d] text-white font-semibold text-[13px] py-2.5 rounded-[7px] flex items-center justify-center gap-1.5 pointer-events-none">
                         View Details
                         <ArrowRight className="h-3.5 w-3.5" />
                       </div>
@@ -364,7 +372,7 @@ export default function Home() {
                 );
               })}
               {featuredProperties.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-[var(--text-tertiary)]">
+                <div className="col-span-full text-center py-12 text-[rgba(13,12,11,0.4)]">
                   No properties available yet. Check back soon!
                 </div>
               ) : null}
@@ -373,7 +381,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-[var(--bg-hex)] border-t border-[var(--line)]">
+      <section className="py-20 bg-[var(--bg-hex)] border-t-4 border-[#e8432d]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border border-[var(--line)] rounded-[28px] overflow-hidden grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
             <div className="p-12 lg:p-16 flex flex-col justify-center bg-[var(--surface-hex)] border-b lg:border-b-0 lg:border-r border-[var(--line)]">
