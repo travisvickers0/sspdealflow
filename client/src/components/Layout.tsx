@@ -119,20 +119,16 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
 
   useEffect(() => {
     if (!transparentNav && !transparentNavDark) {
-      document.documentElement.removeAttribute("data-nav-scrolled");
       setNavScrolled(false);
       return;
     }
     const onScroll = () => {
-      const scrolled = window.scrollY > 60;
-      setNavScrolled(scrolled);
-      document.documentElement.setAttribute("data-nav-scrolled", String(scrolled));
+      setNavScrolled(window.scrollY > 60);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
-      document.documentElement.removeAttribute("data-nav-scrolled");
       setNavScrolled(false);
     };
   }, [transparentNav, transparentNavDark]);
@@ -152,7 +148,11 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground overflow-x-hidden">
       <header
-        className={`sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[rgba(15,14,13,0.92)] backdrop-blur-[16px] pt-[env(safe-area-inset-top)] ${transparentNav || transparentNavDark ? "nav-transparent" : ""}`}
+        className={`sticky top-0 z-50 w-full pt-[env(safe-area-inset-top)] ${
+          (transparentNav || transparentNavDark) && !navScrolled
+            ? "border-b border-transparent bg-transparent"
+            : "border-b border-[var(--line)] bg-[rgba(15,14,13,0.92)] backdrop-blur-[16px]"
+        }`}
         style={{ transition: "background 0.5s, border-color 0.5s, backdrop-filter 0.5s" }}
       >
         <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">

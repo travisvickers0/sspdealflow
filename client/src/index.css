@@ -203,21 +203,6 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
   }
-  .nav-transparent header,
-  header.nav-transparent {
-    background: transparent !important;
-    border-bottom-color: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    transition: background 0.5s, border-bottom-color 0.5s, backdrop-filter 0.5s, -webkit-backdrop-filter 0.5s;
-  }
-
-  [data-nav-scrolled="true"] header.nav-transparent {
-    background: rgba(15, 14, 13, 0.92) !important;
-    border-bottom-color: var(--line) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-  }
 
   @keyframes ticker-left {
     from {
