@@ -1,0 +1,135 @@
+11:16 AMPerfect — tight and focused. Here's the audit + clean Cursor prompt:
+Working files:
+  client/src/pages/PropertyDetail.tsx
+  client/src/pages/Properties.tsx (or Marketplace)
+  client/src/lib/posthog.ts
+
+Read each file before making changes.
+Do NOT change any logic, UI, or styling.
+Only add/update posthog.capture() calls.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AUDIT FIRST — check these exist and are correct:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In PropertyDetail.tsx:
+1. Find the useEffect with [property?.id] dependency.
+   Confirm it fires posthog.capture('property_viewed').
+   If it exists and looks correct, leave it alone.
+   If missing, add:
+
+   useEffect(() => {
+     if (!property) return;
+     posthog.capture('property_viewed', {
+       property_id: property.id,
+       property_address: property.address,
+       property_city: property.city,
+       property_state: property.state,
+       property_status: property.status,
+       purchase_price: property.purchasePrice,
+       estimated_equity: property.estimatedEquity,
+     });
+   }, [property?.id]);
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TRACK 1 — "I'm In" full funnel (3 steps)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+In PropertyDetail.tsx, find the 3 states of the
+"I'm In — Contact Me" flow:
+
+STEP A — Button click (interestOpen becomes true):
+Find the onClick that sets setInterestOpen(true).
+Add immediately after:
+
+  posthog.capture('invest_form_opened', {
+    property_id: property.id,
+    property_address: property.address,
+    estimated_equity: property.estimatedEquity,
+    purchase_price: property.purchasePrice,
+  });
+
+STEP B — Form submitted (handleInterestSubmit):
+Find the handleInterestSubmit function.
+After the successful API call (after setInterestSuccess(true))
+REPLACE any existing invest_clicked or invest_submitted
+event with this cleaner version:
+
+  posthog.capture('invest_submitted', {
+    property_id: property.id,
+    property_address: property.address,
+    estimated_equity: property.estimatedEquity,
+    purchase_price: property.purchasePrice,
+    investor_name: interestForm.fullName,
+    has_phone: Boolean(interestForm.phone),
+    has_message: Boolean(interestForm.message),
+  });
+
+  if (typeof window.gtag !== 'undefined') {
+    window.gtag('event', 'begin_checkout', {
+      items: [{
+        item_id: String(property.id),
+        item_name: property.address,
+        price: property.purchasePrice,
+      }]
+    });
+  }
+
+REMOVE any old invest_clicked event that was on
+a Calendly link — that flow no longer exists.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TRACK 2 — Property card clicks (Marketplace)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+In Properties.tsx (the marketplace page):
+
+Find every place a property card is clicked
+(onClick or role="button" on property cards).
+There may be multiple — DealCard, FeaturedDealCard,
+list view rows, etc.
+
+For EACH card click handler, add:
+
+  posthog.capture('property_card_clicked', {
+    property_id: property.id,
+    property_address: property.address,
+    property_status: property.status,
+    estimated_equity: property.estimatedEquity,
+    card_type: 'featured' | 'grid' | 'list',
+    // set card_type based on which card component it is
+  });
+
+Add this BEFORE the navigate/setLocation call
+so it fires even if navigation is fast.
+
+Import posthog at the top if not already imported:
+  import { posthog } from '@/lib/posthog';
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ALSO — suppress SVG autocapture noise:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+In client/src/lib/posthog.ts, find posthog.init()
+and add/update the autocapture config:
+
+posthog.init(key, {
+  // keep all existing options
+  autocapture: {
+    dom_event_allowlist: ['click'],
+    element_allowlist: [
+      'a', 'button', 'input',
+      'select', 'textarea'
+    ],
+  },
+});
+
+This stops the "clicked svg" spam you saw in
+PostHog while keeping real button/link tracking.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+After changes: npx tsc --noEmit
+Fix any type errors.
+Do not modify any other files.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After this runs you'll have a clean 4-event funnel:
+EventFires whenproperty_viewedSomeone opens a property detail pageproperty_card_clickedSomeone clicks a card in the marketplaceinvest_form_openedSomeone clicks "I'm In — Contact Me"invest_submittedSomeone actually fills and submits the form
+The gap between invest_form_opened and invest_submitted is your most valuable metric — it tells you how many people intend to invest but bail on the form. If that number is high, the form has friction.

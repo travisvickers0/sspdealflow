@@ -7,6 +7,10 @@ if (key) {
     capture_pageview: false,
     capture_pageleave: true,
     persistence: "localStorage",
+    autocapture: {
+      dom_event_allowlist: ['click'],
+      element_allowlist: ['a', 'button', 'input', 'select', 'textarea'],
+    },
     loaded: (ph) => {
       if (import.meta.env.DEV) ph.opt_out_capturing();
     },

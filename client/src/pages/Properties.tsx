@@ -1,5 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { useProperties } from "@/hooks/useProperties";
+import { posthog } from "@/lib/posthog";
 import {
   Select,
   SelectContent,
@@ -622,6 +623,13 @@ function DealCard({ property, isAuthenticated }: DealCardProps) {
     property.mainPhotoUrl || property.galleryPhotoUrls?.[0] || null;
 
   const handleClick = () => {
+    posthog.capture('property_card_clicked', {
+      property_id: property.id,
+      property_address: property.address,
+      property_status: property.status,
+      estimated_equity: property.estimatedEquity,
+      card_type: 'grid',
+    });
     if (isAuthenticated) {
       setLocation(`/property/${property.slug || property.id}`);
     } else {
@@ -759,6 +767,13 @@ function FeaturedDealCard({
     property.mainPhotoUrl || property.galleryPhotoUrls?.[0] || null;
 
   const handleClick = () => {
+    posthog.capture('property_card_clicked', {
+      property_id: property.id,
+      property_address: property.address,
+      property_status: property.status,
+      estimated_equity: property.estimatedEquity,
+      card_type: 'featured',
+    });
     if (isAuthenticated) {
       setLocation(`/property/${property.slug || property.id}`);
     } else {

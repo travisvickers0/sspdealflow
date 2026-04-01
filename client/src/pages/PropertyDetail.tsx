@@ -245,14 +245,22 @@ export default function PropertyDetail() {
       });
       setInterestSuccess(true);
 
-      posthog.capture("invest_clicked", {
+      posthog.capture('invest_submitted', {
         property_id: property.id,
         property_address: property.address,
+        estimated_equity: property.estimatedEquity,
         purchase_price: property.purchasePrice,
+        investor_name: interestForm.fullName,
+        has_phone: Boolean(interestForm.phone),
+        has_message: Boolean(interestForm.message),
       });
-      if (typeof window.gtag !== "undefined") {
-        window.gtag("event", "begin_checkout", {
-          items: [{ item_id: String(property.id), item_name: property.address }],
+      if (typeof window.gtag !== 'undefined') {
+        window.gtag('event', 'begin_checkout', {
+          items: [{
+            item_id: String(property.id),
+            item_name: property.address,
+            price: property.purchasePrice,
+          }],
         });
       }
     } catch (err) {
@@ -602,7 +610,15 @@ export default function PropertyDetail() {
                 {!interestOpen ? (
                   <button
                     type="button"
-                    onClick={() => setInterestOpen(true)}
+                    onClick={() => {
+                      setInterestOpen(true);
+                      posthog.capture('invest_form_opened', {
+                        property_id: property.id,
+                        property_address: property.address,
+                        estimated_equity: property.estimatedEquity,
+                        purchase_price: property.purchasePrice,
+                      });
+                    }}
                     className={investButtonClass}
                     data-testid="button-invest"
                   >
@@ -1381,7 +1397,15 @@ export default function PropertyDetail() {
               {!interestOpen ? (
                 <button
                   type="button"
-                  onClick={() => setInterestOpen(true)}
+                  onClick={() => {
+                    setInterestOpen(true);
+                    posthog.capture('invest_form_opened', {
+                      property_id: property.id,
+                      property_address: property.address,
+                      estimated_equity: property.estimatedEquity,
+                      purchase_price: property.purchasePrice,
+                    });
+                  }}
                   className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all rounded-md flex items-center justify-center gap-2"
                   data-testid="button-invest-mobile-sticky"
                 >
