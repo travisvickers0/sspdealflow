@@ -180,7 +180,17 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
+  @keyframes ken-burns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   .glass-panel {
     @apply bg-white/80 dark:bg-black/80 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-sm;
   }
@@ -194,9 +204,10 @@
     border-bottom-color: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    transition: background 0.5s, border-bottom-color 0.5s, backdrop-filter 0.5s, -webkit-backdrop-filter 0.5s;
   }
 
-  [data-nav-scrolled="true"] header {
+  [data-nav-scrolled="true"] header.nav-transparent {
     background: rgba(15, 14, 13, 0.92) !important;
     border-bottom-color: var(--line) !important;
     backdrop-filter: blur(16px) !important;

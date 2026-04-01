@@ -1,0 +1,341 @@
+Working file: client/src/pages/Home.tsx only.
+Also touch: client/src/index.css for new keyframes.
+Do NOT change any other files.
+
+PRESERVE EXACTLY:
+- All imports (useProperties, useAuth, useLocation, Layout, etc.)
+- All data logic: sortedProperties, featuredProperties,
+  totalEquity, formatMoney, normalizeStatus, getPropertyImage
+- Lead capture section (formData, handleLeadSubmit,
+  formSuccess, formError state + JSX) — keep intact
+- CTA section and footer (via Layout)
+- All PostHog tracking calls
+- isAuthenticated navigation guards
+- Loading states (Loader2 spinner)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1 — Add keyframes to client/src/index.css
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Inside @layer utilities, add:
+
+@keyframes ken-burns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2 — Replace the entire hero section JSX
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Remove: the existing hero div (the one with
+  bg-[#0a0908] lg:min-h-screen — both the
+  desktop grid version and the mobile version
+  and the horizontal deal tape strip)
+
+Replace with this single hero div that handles
+both desktop and mobile:
+
+<div className="relative min-h-screen overflow-hidden
+  flex flex-col justify-end bg-[#0a0908]">
+
+  {/* ── FULL BLEED BACKGROUND PHOTO ── */}
+  <div className="absolute inset-0 z-0">
+    {(() => {
+      const heroPhoto = sortedProperties
+        .find(p => p.mainPhotoUrl)?.mainPhotoUrl ?? null;
+      return heroPhoto ? (
+        <img
+          src={heroPhoto}
+          alt="Featured property"
+          className="w-full h-full object-cover object-[50%_40%]"
+          style={{ animation: "ken-burns 16s ease-out forwards" }}
+        />
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br
+          from-[#1a2018] via-[#151210] to-[#0a0908]" />
+      );
+    })()}
+  </div>
+
+  {/* ── GRADIENT OVERLAY (multi-layer) ── */}
+  <div
+    className="absolute inset-0 z-[1]"
+    style={{
+      background: `
+        linear-gradient(to right,
+          rgba(8,7,6,0.95) 0%,
+          rgba(8,7,6,0.88) 30%,
+          rgba(8,7,6,0.55) 58%,
+          rgba(8,7,6,0.12) 100%
+        ),
+        linear-gradient(to top,
+          rgba(8,7,6,1.0) 0%,
+          rgba(8,7,6,0.7) 14%,
+          transparent 40%
+        ),
+        linear-gradient(to bottom,
+          rgba(8,7,6,0.55) 0%,
+          transparent 22%
+        )
+      `
+    }}
+  />
+
+  {/* ── FLOATING DEAL CARDS — desktop right side ── */}
+  <div className="hidden lg:flex flex-col gap-2
+    absolute right-14 top-1/2 -translate-y-1/2
+    z-10 w-[300px]"
+    style={{ animation: "fade-up 0.9s ease 0.2s both" }}>
+
+    {/* Header */}
+    <div className="flex items-center justify-between mb-1">
+      <span className="font-mono text-[9px] font-medium
+        tracking-[0.14em] uppercase text-[#6b6158]">
+        Live Deal Flow
+      </span>
+      <div className="flex items-center gap-1 font-mono
+        text-[9px] font-semibold tracking-[0.1em]
+        uppercase text-[#22c55e]">
+        <span className="w-1.5 h-1.5 bg-green-500
+          rounded-full animate-pulse flex-shrink-0" />
+        {properties?.length ?? 0} Active
+      </div>
+    </div>
+
+    {/* Deal rows — use sortedProperties first 6 */}
+    {sortedProperties.slice(0, 6).map((property) => {
+      const open = normalizeStatus(property.status) === "AVAILABLE";
+      return (
+        <div
+          key={property.id}
+          role="button"
+          tabIndex={0}
+          onClick={() => goToProperty(property)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              goToProperty(property);
+            }
+          }}
+          className="flex items-center justify-between gap-2.5
+            bg-[rgba(24,22,20,0.82)] backdrop-blur-md
+            border border-[#2a2724] rounded-[10px]
+            px-3.5 py-2.5 cursor-pointer
+            hover:border-[#353129] hover:bg-[rgba(30,28,25,0.9)]
+            transition-all"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="text-[13px] font-semibold
+              text-[#f0ebe3] truncate">
+              {property.address}
+            </div>
+            <div className="text-[10px] text-[#6b6158] mt-0.5">
+              {property.city}, {property.state}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="font-mono text-[13px] font-medium
+              text-[#22c55e]">
+              {formatMoney(property.estimatedEquity ?? 0)}
+            </span>
+            <span className={open
+              ? "text-[8px] font-bold tracking-[0.07em] uppercase px-1.5 py-0.5 rounded-[3px] bg-[rgba(232,67,45,0.12)] text-[#e8432d] border border-[rgba(232,67,45,0.22)]"
+              : "text-[8px] font-bold tracking-[0.07em] uppercase px-1.5 py-0.5 rounded-[3px] bg-[rgba(59,130,246,0.10)] text-[#3b82f6] border border-[rgba(59,130,246,0.2)]"
+            }>
+              {open ? "Open" : "Funded"}
+            </span>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  {/* ── HERO CONTENT — bottom left ── */}
+  <div
+    className="relative z-10 max-w-[1280px] mx-auto w-full
+      px-6 sm:px-10 lg:px-14
+      pb-[100px] lg:pb-[110px]
+      pt-28"
+    style={{ animation: "fade-up 0.8s ease both" }}
+  >
+    <div className="max-w-[580px]">
+
+      {/* Badge */}
+      <div className="inline-flex items-center gap-2
+        border border-[rgba(34,197,94,0.25)]
+        bg-[rgba(34,197,94,0.06)]
+        rounded-[4px] px-3 py-1.5 mb-5">
+        <span className="w-1.5 h-1.5 bg-green-500
+          rounded-full animate-pulse flex-shrink-0" />
+        <span className="font-mono text-[10px] font-medium
+          tracking-[0.12em] uppercase text-[#22c55e]">
+          Accredited Investors Only
+        </span>
+      </div>
+
+      {/* Headline */}
+      <h1 className="font-['Bebas_Neue',sans-serif]
+        text-[clamp(64px,8vw,108px)]
+        leading-[0.9] tracking-[0.02em]
+        text-[#f0ebe3] mb-5"
+        style={{ textShadow: "0 2px 40px rgba(0,0,0,0.4)" }}>
+        Real Estate<br/>
+        <span className="text-[#e8432d]">Built for</span><br/>
+        Investors
+      </h1>
+
+      {/* Sub */}
+      <p className="text-[15px] text-[rgba(240,235,227,0.72)]
+        leading-[1.75] max-w-[440px] mb-7
+        border-l-2 border-[rgba(232,67,45,0.4)] pl-3.5">
+        Vetted off-market acquisitions. 50/50 profit split
+        at sale. No fees — deal-by-deal JV structure built
+        for accredited investors.
+      </p>
+
+      {/* CTAs */}
+      <div className="flex gap-3 items-center mb-6">
+        <button
+          type="button"
+          onClick={() => setLocation("/properties")}
+          className="bg-[#e8432d] hover:bg-[#d63520]
+            text-white font-semibold text-[14px]
+            px-7 py-3.5 rounded-[8px]
+            flex items-center gap-2
+            transition-all hover:-translate-y-px
+            shadow-[0_8px_24px_rgba(232,67,45,0.3)]
+            hover:shadow-[0_12px_32px_rgba(232,67,45,0.4)]"
+        >
+          Explore Properties
+          <ArrowRight className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setLocation("/how-it-works")}
+          className="bg-[rgba(240,235,227,0.06)]
+            backdrop-blur-sm
+            text-[#f0ebe3] font-medium text-[14px]
+            px-6 py-3.5 rounded-[8px]
+            border border-[rgba(240,235,227,0.2)]
+            hover:bg-[rgba(240,235,227,0.12)]
+            hover:border-[rgba(240,235,227,0.4)]
+            transition-all hidden sm:flex"
+        >
+          View Partnership Structure
+        </button>
+      </div>
+
+      {/* Security note */}
+      <div className="flex items-center gap-2
+        text-[11px] text-[#6b6158] hidden sm:flex">
+        <ShieldCheck className="h-3 w-3 flex-shrink-0" />
+        Secured by First-Position Lien Structure
+      </div>
+
+    </div>
+  </div>
+
+  {/* ── STATS BAR — pinned to bottom ── */}
+  <div className="absolute bottom-0 left-0 right-0 z-20
+    bg-[rgba(8,7,6,0.88)] backdrop-blur-2xl
+    border-t border-[#2a2724]">
+    <div className="max-w-[1280px] mx-auto
+      px-6 sm:px-10 lg:px-14">
+      <div className="grid grid-cols-3 lg:grid-cols-5">
+
+        {[
+          { v: "119",    l: "Deals Closed",    g: false },
+          { v: "94d",    l: "Avg Hold Time",   g: false },
+          { v: formatMoney(totalEquity), l: "Total Equity", g: true },
+          { v: "250+",   l: "Active Investors",g: false },
+          { v: "50/50",  l: "Profit Split",    g: false },
+        ].map((s, i) => (
+          <div
+            key={s.l}
+            className={`py-4 lg:py-5
+              border-r border-[#2a2724] last:border-r-0
+              ${i === 0 ? "pl-0 pr-6 lg:pr-8" : "px-6 lg:px-8"}
+              ${i >= 3 ? "hidden lg:block" : ""}
+            `}
+          >
+            <div className={`font-mono text-[22px] lg:text-[26px]
+              font-medium leading-none tracking-[-0.02em] mb-1
+              ${s.g ? "text-[#22c55e]" : "text-[#f0ebe3]"}`}>
+              {s.v}
+            </div>
+            <div className="text-[9px] font-semibold
+              tracking-[0.11em] uppercase text-[#6b6158]">
+              {s.l}
+            </div>
+          </div>
+        ))}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 3 — Update Layout.tsx: transparentNav
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The new hero uses a full-bleed photo so the nav
+must start fully transparent and scroll in.
+
+In Layout.tsx, confirm the nav already supports
+the transparentNav prop and data-nav-scrolled
+pattern. If it does, pass transparentNav to
+the Layout wrapper in Home.tsx:
+
+  <Layout transparentNav>
+
+If Layout doesn't support this prop yet, add it:
+
+In Layout.tsx, find the nav className and add:
+  - Start: bg-transparent border-transparent
+  - On scroll (data-nav-scrolled on body or via
+    useEffect + state): bg-[rgba(8,7,6,0.92)]
+    backdrop-blur-[20px] border-[#2a2724]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IMPORTANT NOTES FOR CURSOR:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. The hero photo uses sortedProperties[0].mainPhotoUrl
+   — the first available property with a photo.
+   This means the hero photo updates automatically
+   as new properties are added. No hardcoding.
+
+2. The ken-burns animation must be applied via
+   style prop not className since Tailwind arbitrary
+   animation values may not resolve:
+   style={{ animation: "ken-burns 16s ease-out forwards" }}
+
+3. The multi-layer gradient must be applied via
+   style prop since Tailwind can't handle commas
+   in arbitrary background values reliably.
+
+4. The floating deal cards are hidden on mobile
+   (hidden lg:flex). On mobile the hero is just
+   the photo + content + stats bar — clean and fast.
+
+5. Keep the existing featured deals section,
+   lead capture section, and CTA section below
+   the hero completely unchanged.
+
+6. goToProperty function already exists — use it
+   for deal card clicks as shown above.
+
+After changes: npx tsc --noEmit
+Fix any type errors. Do not modify any other files.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+The key things that make this different from your current hero:
+
+Real property photo fills the entire viewport — automatically pulls from your first active listing so it always shows a real house
+Ken Burns slow zoom makes the photo feel alive without being distracting
+Deal cards float over the photo on the right instead of a contained panel — feels more premium
+Stats bar is glass/blur pinned to the bottom edge — always visible without taking up hero real estate
+Mobile is clean — just photo, content, stats bar, no floating cards cluttering a small screen

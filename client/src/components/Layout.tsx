@@ -111,6 +111,23 @@ export function Layout({ children, transparentNav = false }: LayoutProps) {
     }
   }, [isLoading, isAuthenticated, user, isAdmin]);
 
+  useEffect(() => {
+    if (!transparentNav) {
+      document.documentElement.removeAttribute("data-nav-scrolled");
+      return;
+    }
+    const onScroll = () => {
+      const scrolled = window.scrollY > 60;
+      document.documentElement.setAttribute("data-nav-scrolled", String(scrolled));
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.documentElement.removeAttribute("data-nav-scrolled");
+    };
+  }, [transparentNav]);
+
   const navLinkClass = (active: boolean) =>
     `text-sm font-medium transition-colors ${
       active
