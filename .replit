@@ -59,3 +59,7 @@ TEST_LOGIN_PASSWORD = "houses"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-5f7040d4-adee-452b-8b7e-d507aece2c4e"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 60000
