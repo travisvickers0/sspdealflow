@@ -28,6 +28,7 @@ import { useState, useEffect } from "react";
 import { posthog } from "@/lib/posthog";
 import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
+import { getPropertyDisplayStatus } from "@/lib/propertyStatus";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -141,14 +142,7 @@ export default function PropertyDetail() {
     );
   }
 
-  const normalizedStatus =
-    property.status === "needs_funding"
-      ? "AVAILABLE"
-      : property.status === "committed"
-        ? "COMMITTED"
-        : property.status === "funded" || property.status === "archived"
-          ? "FUNDED"
-          : property.status;
+  const normalizedStatus = getPropertyDisplayStatus(property.status);
 
   const isAvailable = normalizedStatus === "AVAILABLE";
   const isCommitted = normalizedStatus === "COMMITTED";

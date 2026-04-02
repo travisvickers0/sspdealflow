@@ -491,6 +491,178 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/contact", async (req: Request, res: Response) => {
+    const {
+      firstName, lastName, email,
+      phone, interests, message,
+    } = req.body;
+
+    if (!firstName || !email) {
+      return res.status(400).json({
+        error: "Name and email are required",
+      });
+    }
+
+    try {
+      const smtpUser = process.env.SMTP_USER?.trim();
+      const smtpPass = process.env.SMTP_PASS?.trim();
+      const notifyEmail = process.env.NOTIFY_EMAIL?.trim();
+
+      if (!notifyEmail) {
+        console.warn("[contact] NOTIFY_EMAIL not set - skipping notification");
+      } else if (!smtpUser || !smtpPass) {
+        console.warn("[contact] SMTP_USER or SMTP_PASS missing - skipping notification");
+      } else {
+        const transporter = nodemailer.createTransport({
+          host: "smtp.gmail.com",
+          port: 587,
+          secure: false,
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+        });
+
+        await transporter.sendMail({
+          from: smtpUser,
+          to: notifyEmail,
+          subject: `New Contact Form — ${firstName} ${lastName}`,
+          html: `
+        <div style="font-family:sans-serif;
+          max-width:600px;margin:0 auto;
+          background:#f7f4ef;padding:32px;
+          border-radius:12px">
+          <div style="background:#0d0c0b;
+            padding:20px 24px;border-radius:10px;
+            margin-bottom:24px">
+            <span style="color:#e8432d;
+              font-size:20px;font-weight:700">[</span>
+            <span style="color:white;
+              font-size:13px;font-weight:700;
+              letter-spacing:.05em">SSP DEAL FLOW</span>
+            <span style="color:#e8432d;
+              font-size:20px;font-weight:700">]</span>
+          </div>
+          <h2 style="color:#0d0c0b;
+            font-size:22px;margin-bottom:4px">
+            New Contact Form Submission
+          </h2>
+          <p style="color:rgba(13,12,11,0.5);
+            font-size:14px;margin-bottom:24px">
+            Someone filled out the contact form.
+            Reach out within 2 hours.
+          </p>
+          <div style="background:white;
+            border:1px solid rgba(13,12,11,0.08);
+            border-radius:10px;padding:20px;
+            margin-bottom:16px">
+            <div style="margin-bottom:12px">
+              <div style="font-size:10px;
+                font-weight:700;
+                letter-spacing:.1em;
+                text-transform:uppercase;
+                color:rgba(13,12,11,0.4);
+                margin-bottom:3px">Name</div>
+              <div style="font-size:15px;
+                font-weight:600;color:#0d0c0b">
+                ${firstName} ${lastName}
+              </div>
+            </div>
+            <div style="margin-bottom:12px">
+              <div style="font-size:10px;
+                font-weight:700;
+                letter-spacing:.1em;
+                text-transform:uppercase;
+                color:rgba(13,12,11,0.4);
+                margin-bottom:3px">Email</div>
+              <a href="mailto:${email}"
+                style="font-size:15px;
+                font-weight:600;
+                color:#e8432d">
+                ${email}
+              </a>
+            </div>
+            ${phone ? `
+            <div style="margin-bottom:12px">
+              <div style="font-size:10px;
+                font-weight:700;
+                letter-spacing:.1em;
+                text-transform:uppercase;
+                color:rgba(13,12,11,0.4);
+                margin-bottom:3px">Phone</div>
+              <a href="tel:${phone}"
+                style="font-size:15px;
+                font-weight:600;color:#0d0c0b">
+                ${phone}
+              </a>
+            </div>` : ""}
+            ${interests?.length ? `
+            <div style="margin-bottom:12px">
+              <div style="font-size:10px;
+                font-weight:700;
+                letter-spacing:.1em;
+                text-transform:uppercase;
+                color:rgba(13,12,11,0.4);
+                margin-bottom:6px">
+                Interested in
+              </div>
+              <div style="display:flex;
+                flex-wrap:wrap;gap:6px">
+                ${interests.map((i: string) => `
+                  <span style="background:
+                    rgba(232,67,45,0.08);
+                    border:1px solid
+                    rgba(232,67,45,0.2);
+                    color:#e8432d;
+                    font-size:11px;
+                    font-weight:600;
+                    padding:3px 10px;
+                    border-radius:999px">
+                    ${i}
+                  </span>`).join("")}
+              </div>
+            </div>` : ""}
+            ${message ? `
+            <div>
+              <div style="font-size:10px;
+                font-weight:700;
+                letter-spacing:.1em;
+                text-transform:uppercase;
+                color:rgba(13,12,11,0.4);
+                margin-bottom:3px">Message</div>
+              <div style="font-size:14px;
+                color:rgba(13,12,11,0.7);
+                line-height:1.6">
+                ${message}
+              </div>
+            </div>` : ""}
+          </div>
+          <div style="background:#e8432d;
+            border-radius:10px;padding:16px 20px;
+            text-align:center">
+            <div style="color:white;
+              font-weight:700;font-size:14px;
+              margin-bottom:4px">
+              Respond within 2 hours
+            </div>
+            <div style="color:rgba(255,255,255,0.7);
+              font-size:12px">
+              Best time to reach investors is
+              same-day
+            </div>
+          </div>
+        </div>
+      `,
+        });
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("[contact] Email error:", error);
+      res.json({ success: true });
+    }
+  });
+
   app.post("/api/property-interest", async (req: Request, res: Response) => {
     try {
       const { propertyId, propertyAddress, fullName, email, phone, message } = req.body;

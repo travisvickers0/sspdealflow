@@ -138,14 +138,20 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
   const usesCreamChrome = isDarkText || (creamShell && (!transparentNav || navScrolled));
 
   const navLinkClass = (active: boolean) =>
-    `text-sm font-medium transition-colors ${
+    `inline-flex items-center text-[14px] font-medium transition-colors ${
       usesCreamChrome
         ? (active ? "text-[#0d0c0b]" : "text-[rgba(13,12,11,0.5)] hover:text-[#0d0c0b]")
         : (active ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]")
     }`;
 
   const mobileNavLinkClass = (active: boolean) =>
-    `text-sm font-medium py-3 px-4 rounded-lg transition-colors ${navLinkClass(active)}`;
+    `text-sm font-medium py-3 px-4 rounded-full transition-all ${
+      active
+        ? "bg-[#e8432d] text-white shadow-[0_8px_24px_rgba(232,67,45,0.22)]"
+        : usesCreamChrome
+          ? "text-[rgba(13,12,11,0.5)] hover:text-[#0d0c0b]"
+          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+    }`;
 
   return (
     <div
@@ -165,50 +171,39 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
         }`}
         style={{ transition: "background 0.5s, border-color 0.5s, backdrop-filter 0.5s" }}
       >
-        <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">
-          <div className="flex items-center gap-4 sm:gap-8">
+        <div className="container mx-auto relative flex h-14 sm:h-16 items-center justify-between px-4 sm:px-8">
+          <div className="flex-shrink-0">
             <Link href="/" className="flex items-center gap-0 flex-shrink-0">
               <NavLogo dark={isDarkText} />
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/properties" className={navLinkClass(location === "/properties")}>
-                Marketplace
-              </Link>
-              <Link href="/how-it-works" className={navLinkClass(location === "/how-it-works")}>
-                How It Works
-              </Link>
-              <Link href="/track-record" className={navLinkClass(location === "/track-record")}>
-                Track Record
-              </Link>
-              {isAdmin && (
-                <Link href="/admin" className={navLinkClass(location.startsWith("/admin"))}>
-                  Admin
-                </Link>
-              )}
-            </nav>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="hidden md:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
+            <Link href="/properties" className={navLinkClass(location === "/properties")}>
+              Marketplace
+            </Link>
+            <Link href="/track-record" className={navLinkClass(location === "/track-record")}>
+              Track Record
+            </Link>
+            <Link href="/how-it-works" className={navLinkClass(location === "/how-it-works")}>
+              How It Works
+            </Link>
+            <Link href="/contact" className={navLinkClass(location === "/contact")}>
+              Contact
+            </Link>
+          </div>
+          <div className="flex-shrink-0 flex items-center gap-2 sm:gap-4 ml-auto">
             {!isLoading && (
               isAuthenticated ? (
-                <>
-                  {user?.profileImageUrl && (
-                    <img
-                      src={user.profileImageUrl}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full object-cover hidden sm:block"
-                    />
-                  )}
-                  <a href="/api/logout">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`hidden sm:flex cursor-pointer gap-2 transition-colors ${usesCreamChrome ? "text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Log out
-                    </Button>
-                  </a>
-                </>
+                <a href="/api/logout">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`hidden sm:flex cursor-pointer gap-2 transition-colors ${usesCreamChrome ? "text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Log out
+                  </Button>
+                </a>
               ) : (
                 <div className="hidden sm:flex gap-2 sm:gap-3">
                   <a href="/signin">
@@ -224,7 +219,7 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                       size="sm"
                       className={`h-9 rounded-full px-5 text-[13px] font-semibold transition-all cursor-pointer active:scale-95 ${usesCreamChrome ? "bg-[#0d0c0b] text-[var(--cream-base)] hover:bg-[#e8432d]" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
                     >
-                      Sign up
+                      Get started
                     </Button>
                   </a>
                 </div>
@@ -258,6 +253,13 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                 Marketplace
               </Link>
               <Link
+                href="/track-record"
+                onClick={() => setMobileMenuOpen(false)}
+                className={mobileNavLinkClass(location === "/track-record")}
+              >
+                Track Record
+              </Link>
+              <Link
                 href="/how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
                 className={mobileNavLinkClass(location === "/how-it-works")}
@@ -265,21 +267,12 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                 How It Works
               </Link>
               <Link
-                href="/track-record"
+                href="/contact"
                 onClick={() => setMobileMenuOpen(false)}
-                className={mobileNavLinkClass(location === "/track-record")}
+                className={mobileNavLinkClass(location === "/contact")}
               >
-                Track Record
+                Contact
               </Link>
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={mobileNavLinkClass(location.startsWith("/admin"))}
-                >
-                  Admin
-                </Link>
-              )}
               <div className={`my-2 ${usesCreamChrome ? "border-t border-[var(--cream-border)]" : "border-t border-[var(--line)]"}`} />
               {isAuthenticated ? (
                 <a href="/api/logout" className="w-full">
@@ -314,7 +307,7 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                         usesCreamChrome ? "bg-[#0d0c0b] text-[var(--cream-base)] hover:bg-[#e8432d]" : "bg-primary text-primary-foreground hover:bg-primary/90"
                       }`}
                     >
-                      Sign up
+                      Get started
                     </Button>
                   </a>
                 </div>

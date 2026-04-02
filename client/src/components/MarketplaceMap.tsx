@@ -3,6 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-map
 import { Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import type { Property } from "@shared/schema";
+import { getPropertyDisplayStatus, getPropertyStatusLabel } from "@/lib/propertyStatus";
 
 interface MarketplaceMapProps {
   properties: Property[];
@@ -52,11 +53,12 @@ const MapContent = memo(function MapContent({ properties, apiKey }: MapWrapperPr
   }, []);
 
   const getMarkerColor = (status: string) => {
-    switch (status) {
-      case "funded":
-      case "committed":
+    switch (getPropertyDisplayStatus(status)) {
+      case "COMMITTED":
+        return "#3b82f6";
+      case "FUNDED":
         return "#10b981";
-      case "needs_funding":
+      case "AVAILABLE":
       default:
         return "#3b82f6";
     }
@@ -159,13 +161,25 @@ const MapContent = memo(function MapContent({ properties, apiKey }: MapWrapperPr
               </p>
               <div className="flex justify-between items-center">
                 <p className="font-bold text-gray-900">${selectedProperty.purchasePrice?.toLocaleString()}</p>
+                {(() => {
+                  const displayStatus = getPropertyDisplayStatus(selectedProperty.status);
+                  const isAvailable = displayStatus === "AVAILABLE";
+                  const isCommitted = displayStatus === "COMMITTED";
+                  const isFunded = displayStatus === "FUNDED";
+                  return (
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  selectedProperty.status === "needs_funding" 
-                    ? "bg-blue-100 text-blue-700" 
-                    : "bg-green-100 text-green-700"
+                  isAvailable
+                    ? "bg-blue-100 text-blue-700"
+                    : isCommitted
+                      ? "bg-sky-100 text-sky-700"
+                      : isFunded
+                        ? "bg-green-100 text-green-700"
+                        : "bg-amber-100 text-amber-700"
                 }`}>
-                  {selectedProperty.status === "needs_funding" ? "Open" : "Funded"}
+                  {getPropertyStatusLabel(selectedProperty.status)}
                 </span>
+                  );
+                })()}
               </div>
               <p className="text-xs text-blue-600 mt-2 font-medium">Click to view details →</p>
             </div>
@@ -178,6 +192,10 @@ const MapContent = memo(function MapContent({ properties, apiKey }: MapWrapperPr
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow"></div>
             <span className="text-xs font-medium text-gray-700">Needs Funding</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-blue-400 rounded-full border-2 border-white shadow"></div>
+            <span className="text-xs font-medium text-gray-700">Funding Committed</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow"></div>

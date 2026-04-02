@@ -19,6 +19,7 @@ import type { Property, InsertProperty, UpdateProperty, PropertyStatus, Lead, Pr
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { getPropertyDisplayStatus, getPropertyStatusLabel } from "@/lib/propertyStatus";
 
 interface NewPropertyRow {
   id: string;
@@ -486,20 +487,15 @@ export default function Admin() {
                           </td>
                           <td className="px-4 py-4">
                             {(() => {
-                              const normalizeStatus = (status: string) => {
-                                if (status === "needs_funding" || status === "committed") return "AVAILABLE";
-                                if (status === "funded" || status === "archived") return "FUNDED";
-                                return status;
-                              };
-                              const s = normalizeStatus(property.status);
+                              const s = getPropertyDisplayStatus(property.status);
                               return (
                                 <Badge className={
                                   s === 'AVAILABLE' ? 'bg-[rgba(245,158,11,0.15)] text-amber-400 hover:bg-[rgba(245,158,11,0.15)]' :
+                                  s === 'COMMITTED' ? 'bg-[rgba(59,130,246,0.15)] text-blue-400 hover:bg-[rgba(59,130,246,0.15)]' :
                                   s === 'FUNDED' ? 'bg-[rgba(59,130,246,0.15)] text-blue-400 hover:bg-[rgba(59,130,246,0.15)]' :
                                   'bg-[rgba(245,158,11,0.25)] text-amber-300 hover:bg-[rgba(245,158,11,0.25)]'
                                 } data-testid={`badge-status-${property.id}`}>
-                                  {s === 'AVAILABLE' ? 'Needs Funding' :
-                                   s === 'FUNDED' ? 'Funded' : 'SOLD'}
+                                  {getPropertyStatusLabel(property.status)}
                                 </Badge>
                               );
                             })()}
@@ -568,20 +564,15 @@ export default function Admin() {
                             <div className="font-semibold text-[var(--text-primary)] text-sm truncate" data-testid={`text-address-${property.id}`}>{property.address}</div>
                             <div className="text-xs text-[var(--text-tertiary)] truncate">{property.city}, {property.state}</div>
                             {(() => {
-                              const normalizeStatus = (status: string) => {
-                                if (status === "needs_funding" || status === "committed") return "AVAILABLE";
-                                if (status === "funded" || status === "archived") return "FUNDED";
-                                return status;
-                              };
-                              const s = normalizeStatus(property.status);
+                              const s = getPropertyDisplayStatus(property.status);
                               return (
                                 <Badge className={`mt-1 ${
                                   s === 'AVAILABLE' ? 'bg-[rgba(245,158,11,0.15)] text-amber-400 hover:bg-[rgba(245,158,11,0.15)]' :
+                                  s === 'COMMITTED' ? 'bg-[rgba(59,130,246,0.15)] text-blue-400 hover:bg-[rgba(59,130,246,0.15)]' :
                                   s === 'FUNDED' ? 'bg-[rgba(59,130,246,0.15)] text-blue-400 hover:bg-[rgba(59,130,246,0.15)]' :
                                   'bg-[rgba(245,158,11,0.25)] text-amber-300 hover:bg-[rgba(245,158,11,0.25)]'
                                 }`} data-testid={`badge-status-${property.id}`}>
-                                  {s === 'AVAILABLE' ? 'Needs Funding' :
-                                   s === 'FUNDED' ? 'Funded' : 'SOLD'}
+                                  {getPropertyStatusLabel(property.status)}
                                 </Badge>
                               );
                             })()}

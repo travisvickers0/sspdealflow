@@ -28,6 +28,7 @@ import type { Property } from "@shared/schema";
 import { MarketplaceMap } from "@/components/MarketplaceMap";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
+import { getPropertyDisplayStatus } from "@/lib/propertyStatus";
 
 const normalizeStatus = (status: string): string => {
   if (status === "needs_funding" || status === "committed") return "AVAILABLE";
@@ -609,8 +610,9 @@ interface DealCardProps {
 
 function DealCard({ property, isAuthenticated }: DealCardProps) {
   const [, setLocation] = useLocation();
-  const status = normalizeStatus(property.status);
+  const status = getPropertyDisplayStatus(property.status);
   const isAvailable = status === "AVAILABLE";
+  const isCommitted = status === "COMMITTED";
   const isFunded = status === "FUNDED";
   const isSold = status === "SOLD";
 
@@ -668,6 +670,8 @@ function DealCard({ property, isAuthenticated }: DealCardProps) {
           className={`absolute top-3 left-3 px-2.5 py-1 rounded-[5px] text-[10px] font-bold uppercase tracking-wide ${
             isAvailable
               ? "bg-primary text-primary-foreground"
+              : isCommitted
+                ? "bg-blue-500 text-white"
               : isFunded
                 ? "bg-blue-500 text-white"
                 : "bg-green-500/15 text-green-400 border border-green-900/30"
@@ -675,6 +679,8 @@ function DealCard({ property, isAuthenticated }: DealCardProps) {
         >
           {isAvailable
             ? "Needs Funding"
+            : isCommitted
+              ? "Funding Committed"
             : isFunded
               ? "Funded"
               : "✓ Sold · Case Study"}
