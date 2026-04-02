@@ -352,7 +352,7 @@ export default function Home() {
       </div>
 
       <section className="pt-4 pb-20 sm:pt-28 sm:pb-28 bg-[#f7f4ef]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
           <div className="flex items-end justify-between mb-4 lg:mb-12">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-2 lg:mb-3">Current Opportunities</p>
@@ -460,7 +460,7 @@ export default function Home() {
       </section>
 
       <section className="py-20 bg-[var(--bg-hex)] border-t-4 border-[#e8432d]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
           <div className="border border-[var(--line)] rounded-[28px] overflow-hidden grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
             <div className="p-12 lg:p-16 flex flex-col justify-center bg-[var(--surface-hex)] border-b lg:border-b-0 lg:border-r border-[var(--line)]">
               <p className="text-[11px] uppercase tracking-[0.12em] font-semibold text-primary mb-4">Get Early Access</p>
