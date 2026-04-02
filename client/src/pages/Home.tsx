@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <Layout transparentNavDark>
       <section className="bg-[var(--cream-base)]">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-12 pb-6 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-16 items-center">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-6 pb-6 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-16 items-center">
           <div className="flex flex-col gap-0">
             <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.16)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
               <span className="w-1.5 h-1.5 bg-[#e8432d] rounded-full animate-pulse flex-shrink-0" />
