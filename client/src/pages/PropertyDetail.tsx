@@ -737,22 +737,24 @@ export default function PropertyDetail() {
 
   return (
     <Layout transparentNav>
-      <div className="relative w-full overflow-hidden lg:h-[92vh] lg:max-h-[900px]">
-        <div className="relative w-full h-[45vw] min-h-[320px] max-h-[600px] lg:h-[70vh] lg:min-h-[500px] lg:max-h-[700px] lg:absolute lg:inset-0 group">
+      <div className="relative w-full overflow-hidden">
+        <div className="relative w-full h-[55vw] min-h-[340px] max-h-[620px] lg:h-[620px] group">
           <Link
             href="/properties"
-            className="absolute top-6 left-12 z-20 flex items-center gap-1.5 text-white/60 hover:text-white/90 text-[13px] font-medium transition-colors pointer-events-auto group"
+            className="absolute top-6 left-6 lg:left-12 z-20 flex items-center gap-1.5 text-white/70 hover:text-white text-[13px] font-medium transition-colors pointer-events-auto group"
           >
             <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back to Marketplace
+            Back
           </Link>
-          <div className="absolute inset-0 aspect-[16/10] lg:aspect-auto lg:h-full w-full">
+
+          <div className="absolute inset-0 w-full h-full">
             {allImages[selectedImage] ? (
               <img
                 src={allImages[selectedImage]}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover object-center brightness-75"
+                alt={property.address}
+                className="absolute inset-0 w-full h-full object-cover object-center cursor-pointer"
                 style={{ objectPosition: "50% 40%" }}
+                onClick={() => setLightboxOpen(true)}
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-hex)] via-[var(--surface-2-hex)] to-[var(--bg-hex)]">
@@ -767,19 +769,18 @@ export default function PropertyDetail() {
               </div>
             )}
 
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-[var(--bg-hex)]" />
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/50 via-black/5 to-black/15" />
           </div>
 
           {allImages.length > 1 && (
             <button
               type="button"
-              className="absolute top-3 right-3 lg:bottom-[120px] lg:right-12 lg:top-auto flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2.5 bg-black/60 backdrop-blur-sm border border-white/10 text-white text-[11px] lg:text-[13px] font-medium rounded-[6px] hover:bg-black/80 transition-all cursor-pointer z-20"
+              className="absolute top-5 right-5 lg:top-6 lg:right-12 flex items-center gap-2 px-3.5 py-2 bg-black/40 backdrop-blur-md border border-white/15 text-white text-[12px] font-medium rounded-full hover:bg-black/60 transition-all cursor-pointer z-20"
               onClick={() => setLightboxOpen(true)}
               data-testid="button-open-gallery"
             >
-              <Images className="h-4 w-4" />
-              View all {allImages.length} photos
+              <Images className="h-3.5 w-3.5" />
+              View all photos ({allImages.length})
             </button>
           )}
 
@@ -788,141 +789,184 @@ export default function PropertyDetail() {
               <button
                 type="button"
                 onClick={handlePreviousImage}
-                className="absolute left-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100"
+                className="absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/15 grid place-items-center text-white/80 hover:bg-black/50 hover:text-white transition-all"
                 aria-label="Previous image"
               >
-                <ChevronLeft className="h-4 w-4 lg:h-6 lg:w-6" />
+                <ChevronLeft className="h-4 w-4 lg:h-5 lg:w-5" />
               </button>
               <button
                 type="button"
                 onClick={handleNextImage}
-                className="absolute right-8 top-1/2 -translate-y-1/2 z-20 w-9 h-9 lg:w-11 lg:h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 grid place-items-center text-white hover:bg-black/70 transition-all opacity-100"
+                className="absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/15 grid place-items-center text-white/80 hover:bg-black/50 hover:text-white transition-all"
                 aria-label="Next image"
               >
-                <ChevronRight className="h-4 w-4 lg:h-6 lg:w-6" />
+                <ChevronRight className="h-4 w-4 lg:h-5 lg:w-5" />
               </button>
             </>
           )}
-        </div>
 
-        <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 pt-0 lg:pt-0 lg:px-12 lg:pb-12 bg-[var(--bg-hex)] lg:bg-transparent z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end">
-            <div>
-              <div className="flex lg:hidden items-center justify-between px-5 py-3 bg-[var(--bg-hex)] border-b border-[var(--line)]">
-                <div className="flex flex-wrap items-center gap-2 min-w-0">
+          <div className="absolute bottom-0 left-0 right-0 z-10 px-5 lg:px-12 pb-5 lg:pb-6">
+            <div className="flex items-end justify-between gap-6">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
                   {isAvailable && (
-                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/15 border border-green-500/20 text-green-400">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/20 backdrop-blur-sm border border-green-500/25 text-green-300">
+                      <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                       Open for Funding
                     </span>
                   )}
                   {isCommitted && (
-                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/20 backdrop-blur-sm border border-blue-500/25 text-blue-300">
                       Funding Committed
                     </span>
                   )}
                   {isFunded && (
-                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/20 backdrop-blur-sm border border-blue-500/25 text-blue-300">
                       Funded
                     </span>
                   )}
                   {isSold && (
-                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/15 border border-amber-500/20 text-amber-400">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/20 backdrop-blur-sm border border-amber-500/25 text-amber-300">
                       <Check className="h-3 w-3" />
-                      Sold · Case Study
+                      Sold
                     </span>
                   )}
                   <a
                     href={zillowHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 bg-[#006AFF] hover:bg-[#0055CC] text-white text-[12px] font-bold rounded-[6px] transition-colors shrink-0"
+                    className="px-2.5 py-1 bg-[#006AFF]/90 hover:bg-[#006AFF] text-white text-[11px] font-bold rounded-full transition-colors shrink-0"
                     data-testid="link-zillow"
                   >
                     Zillow
                   </a>
                 </div>
-                <div className="flex gap-2 shrink-0 ml-2">
-                  <button
-                    type="button"
-                    className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-                    title="Share"
-                  >
-                    <Share2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    className="p-2.5 rounded-[8px] border border-white/15 bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-                    title="Save"
-                  >
-                    <Heart className="h-4 w-4" />
-                  </button>
+
+                <h1
+                  className="font-serif text-3xl sm:text-4xl lg:text-[52px] leading-[1.05] tracking-tight text-white mb-2 break-words"
+                  data-testid="text-property-address"
+                >
+                  {property.address}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-2 text-white/70 text-[14px]">
+                  <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>
+                    {property.city}, {property.state} {property.zip}
+                    {isSold && <span className="text-white/40"> · Exited</span>}
+                  </span>
                 </div>
               </div>
 
-              <div className="hidden lg:flex flex-wrap items-center gap-3 mb-5">
-                {isAvailable && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/15 border border-green-500/20 text-green-400">
-                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    Open for Funding
-                  </span>
-                )}
-                {isCommitted && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
-                    Funding Committed
-                  </span>
-                )}
-                {isFunded && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
-                    Funded
-                  </span>
-                )}
-                {isSold && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/15 border border-amber-500/20 text-amber-400">
-                    <Check className="h-3 w-3" />
-                    Sold · Case Study
-                  </span>
-                )}
-                <a
-                  href={zillowHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 bg-[#006AFF] hover:bg-[#0055CC] text-white text-[12px] font-bold rounded-[6px] transition-colors"
-                  data-testid="link-zillow"
-                >
-                  Zillow
-                </a>
-              </div>
-
-              <h1
-                className="font-serif text-5xl sm:text-6xl lg:text-[68px] leading-[1.0] tracking-tight text-white px-5 pt-3 pb-1 lg:px-0 lg:pt-0 lg:pb-0 mb-0 lg:mb-3 break-words"
-                data-testid="text-property-address"
-              >
-                {property.address}
-              </h1>
-
-              <div className="flex flex-wrap items-center gap-2 text-white/70 text-[16px] px-5 pb-4 border-b border-[var(--line)] lg:px-0 lg:pb-0 lg:border-0">
-                <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span>
-                  {property.city}, {property.state} {property.zip}
-                  {isSold && <span className="text-white/50"> · Exited Investment</span>}
-                </span>
+              <div className="hidden lg:flex items-center gap-3 shrink-0">
+                <div className="bg-black/35 backdrop-blur-md border border-white/10 rounded-[10px] px-4 py-3 text-right">
+                  <p className="text-[9px] uppercase tracking-[0.1em] font-semibold text-white/45 mb-0.5">Purchase</p>
+                  <p className="font-mono text-[18px] font-medium text-white leading-none">${purchasePrice.toLocaleString()}</p>
+                </div>
+                <div className="bg-black/35 backdrop-blur-md border border-white/10 rounded-[10px] px-4 py-3 text-right">
+                  <p className="text-[9px] uppercase tracking-[0.1em] font-semibold text-white/45 mb-0.5">Equity</p>
+                  <p className="font-mono text-[18px] font-medium text-green-400 leading-none">${estimatedEquityVal.toLocaleString()}</p>
+                </div>
+                <div className="bg-black/35 backdrop-blur-md border border-white/10 rounded-[10px] px-4 py-3 text-right">
+                  <p className="text-[9px] uppercase tracking-[0.1em] font-semibold text-white/45 mb-0.5">ARV</p>
+                  <p className="font-mono text-[18px] font-medium text-white leading-none">${bpoValue.toLocaleString()}</p>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="hidden lg:flex flex-col gap-3 items-end">
-              <div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3.5 text-right min-w-[190px]">
-                <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-white/40 mb-1">Purchase Price</p>
-                <p className="font-mono text-[22px] font-medium text-white leading-none">${purchasePrice.toLocaleString()}</p>
-              </div>
-              <div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3.5 text-right min-w-[190px]">
-                <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-white/40 mb-1">Est. Equity</p>
-                <p className="font-mono text-[22px] font-medium text-green-400 leading-none">${estimatedEquityVal.toLocaleString()}</p>
-              </div>
-              <div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-[12px] px-5 py-3.5 text-right min-w-[190px]">
-                <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-white/40 mb-1">After Repair Value</p>
-                <p className="font-mono text-[22px] font-medium text-white leading-none">${bpoValue.toLocaleString()}</p>
-              </div>
+          {allImages.length > 1 && (
+            <div className="hidden lg:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-20 gap-1.5 bg-black/30 backdrop-blur-md rounded-lg p-1.5 border border-white/10">
+              {allImages.slice(0, 6).map((img, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSelectedImage(idx)}
+                  className={`relative w-16 h-11 rounded-md overflow-hidden transition-all cursor-pointer ${
+                    selectedImage === idx
+                      ? "ring-2 ring-white ring-offset-1 ring-offset-black/50 opacity-100"
+                      : "opacity-60 hover:opacity-90"
+                  }`}
+                >
+                  <img src={img} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+              {allImages.length > 6 && (
+                <button
+                  type="button"
+                  onClick={() => setLightboxOpen(true)}
+                  className="w-16 h-11 rounded-md bg-black/50 backdrop-blur-sm text-white/80 text-[11px] font-semibold grid place-items-center hover:bg-black/70 transition-all cursor-pointer"
+                >
+                  +{allImages.length - 6}
+                </button>
+              )}
+            </div>
+          )}
+
+          {allImages.length > 1 && (
+            <div className="flex lg:hidden absolute bottom-20 left-1/2 -translate-x-1/2 z-20">
+              <span className="bg-black/40 backdrop-blur-sm text-white/80 text-[11px] font-medium px-3 py-1 rounded-full border border-white/10">
+                {selectedImage + 1} / {allImages.length}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="lg:hidden bg-[var(--bg-hex)]">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--line)]">
+            <div className="flex flex-wrap items-center gap-2 min-w-0">
+              {isAvailable && (
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/15 border border-green-500/20 text-green-400">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  Open
+                </span>
+              )}
+              {isCommitted && (
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                  Committed
+                </span>
+              )}
+              {isFunded && (
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
+                  Funded
+                </span>
+              )}
+              {isSold && (
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/15 border border-amber-500/20 text-amber-400">
+                  Sold
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2 shrink-0 ml-2">
+              <a
+                href={zillowHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-[8px] bg-[#006AFF] text-white hover:bg-[#0055CC] transition-colors"
+                data-testid="link-zillow"
+              >
+                <span className="text-[11px] font-bold">Z</span>
+              </a>
+              <button
+                type="button"
+                className="p-2.5 rounded-[8px] border border-[var(--line)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
+                title="Share"
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="px-5 pt-4 pb-5">
+            <h1
+              className="font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight text-[var(--text-primary)] mb-2"
+              data-testid="text-property-address"
+            >
+              {property.address}
+            </h1>
+            <div className="flex items-center gap-2 text-[var(--text-secondary)] text-[14px]">
+              <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+              <span>{property.city}, {property.state} {property.zip}</span>
             </div>
           </div>
         </div>

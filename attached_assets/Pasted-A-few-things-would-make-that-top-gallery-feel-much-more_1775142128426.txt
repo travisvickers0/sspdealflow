@@ -1,0 +1,109 @@
+A few things would make that top gallery feel much more premium and easier to use.
+
+Right now the image is doing the job of a hero, but the gallery itself feels hidden. It reads more like a dark banner with arrows than a property photo experience.
+
+What I would change:
+
+1. Make the first image brighter and crisper
+The current dark overlay is too heavy, so the house loses detail. Keep some gradient for text legibility, but lighten it a lot. Let the property sell itself.
+
+2. Separate “hero image” from “gallery controls”
+At the moment everything blends together. Treat it like:
+
+big main photo
+small thumbnail rail or photo counter
+clean navigation controls
+
+That instantly makes it feel intentional.
+
+3. Add a thumbnail strip
+On desktop, put 4 to 6 thumbnails along the bottom of the hero image or in a vertical stack on the right.
+That gives users immediate proof there are real photos and lets them jump around without clicking arrows.
+
+Best setup:
+
+main large image
+bottom thumbnail row with subtle border on active image
+“+4 more” on last thumbnail if there are extra photos
+
+4. Improve the arrows
+The arrows feel a little generic and float too loosely. Make them:
+
+smaller
+on soft dark glass circles
+vertically centered within the image only
+appear stronger on hover
+
+That makes the interaction feel tighter.
+
+5. Move the “View all 8 photos” into a stronger position
+That button is too disconnected on the right. Put it inside the image area, top right or bottom right, as a glass button. Example:
+
+View all photos (8)
+
+This should open a full screen lightbox.
+
+6. Use a better crop
+The current photo crop cuts the house in a way that feels slightly awkward. Try to ensure the first image shows:
+
+full front elevation
+entry if possible
+a more balanced composition
+
+The first image should feel like a listing cover, not just a random gallery frame.
+
+7. Add a proper lightbox / fullscreen mode
+When clicked, the gallery should open into a polished viewer with:
+
+larger photo
+thumbnails underneath
+keyboard arrow support
+swipe on mobile
+photo count like 1 / 8
+
+That alone would make the site feel much more high end.
+
+8. Tighten the text overlap
+Your address and badges are sitting pretty low and disconnected from the image. I would anchor the title area more intentionally in the lower left with better spacing, so it feels like part of the hero instead of floating under it.
+
+9. Consider a split layout on desktop
+A strong 2026 style pattern would be:
+
+left: large featured image
+right: stacked mini images or stat cards
+
+That would work especially well since you already have the price/equity/ARV cards on the right. The whole top could become more editorial and less like a dark slider.
+
+10. Make it feel more like a real estate product
+Take cues from Airbnb, Zillow luxury listings, and modern developer sites:
+
+less black haze
+sharper image presentation
+cleaner corners
+visible photo navigation
+stronger sense of image hierarchy
+
+My recommended layout for your page:
+
+Desktop
+
+full width hero image, around 620 to 700px tall
+bottom thumbnail strip
+top right View all photos (8)
+bottom left property title and location
+right side stacked stat cards remain, but align cleaner to image height
+
+Mobile
+
+swipeable image
+photo count pill in corner
+thumbnails optional, or just dots
+tap opens fullscreen gallery
+
+If I were prioritizing the biggest wins first, I would do these 3:
+
+lighten the overlay
+add thumbnails
+build a fullscreen lightbox
+
+Those three changes would dramatically upgrade the section.
