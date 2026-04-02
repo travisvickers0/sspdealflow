@@ -78,15 +78,19 @@ async function sendDealAlertEmails(property: any) {
 
         return transporter.sendMail({
           from: `"SSP Deal Flow" <${process.env.SMTP_USER}>`,
-          to: user.email,
+          to: user.email!,
           subject: `🏠 New Deal Available — ${property.address}`,
           html: `
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0908;border-radius:12px;overflow:hidden">
 
     <!-- Header -->
-    <div style="background:#e8432d;padding:20px 28px;display:flex;align-items:center;gap:10px">
-      <div style="width:28px;height:28px;background:rgba(255,255,255,0.2);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:13px;flex-shrink:0">S</div>
-      <span style="color:white;font-weight:600;font-size:15px">SSP Deal Flow</span>
+    <div style="background:#0a0908;padding:20px 28px;border-bottom:1px solid #2a2724">
+      <!--[if mso]><table><tr><td><![endif]-->
+      <span style="font-family:'Bebas Neue',Impact,'Arial Narrow',Arial,sans-serif;font-size:28px;font-weight:400;color:#e8432d;line-height:1;letter-spacing:-0.02em">[</span><!--
+      --><span style="font-family:'Bebas Neue',Impact,'Arial Narrow',Arial,sans-serif;font-size:22px;font-weight:400;color:#f0ebe3;line-height:1;letter-spacing:0.08em;padding:0 3px">SSP DEAL FLOW</span><!--
+      --><span style="font-family:'Bebas Neue',Impact,'Arial Narrow',Arial,sans-serif;font-size:28px;font-weight:400;color:#e8432d;line-height:1;letter-spacing:-0.02em">]</span>
+      <!--[if mso]></td></tr></table><![endif]-->
     </div>
 
 ${photoUrl ? `
@@ -231,9 +235,10 @@ ${photoUrl ? `
 
     <!-- Footer -->
     <div style="padding:16px 28px 24px;background:#0f0e0d;border-top:1px solid #2a2724;text-align:center">
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px">
-        <div style="width:20px;height:20px;background:#e8432d;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white">S</div>
-        <span style="font-size:13px;font-weight:600;color:#a89e91">SSP Deal Flow</span>
+      <div style="margin-bottom:10px">
+        <span style="font-family:'Bebas Neue',Impact,'Arial Narrow',Arial,sans-serif;font-size:20px;font-weight:400;color:#e8432d;line-height:1;letter-spacing:-0.02em">[</span><!--
+        --><span style="font-family:'Bebas Neue',Impact,'Arial Narrow',Arial,sans-serif;font-size:16px;font-weight:400;color:#a89e91;line-height:1;letter-spacing:0.08em;padding:0 2px">SSP DEAL FLOW</span><!--
+        --><span style="font-family:'Bebas Neue',Impact,'Arial Narrow',Arial,sans-serif;font-size:20px;font-weight:400;color:#e8432d;line-height:1;letter-spacing:-0.02em">]</span>
       </div>
       <p style="margin:0 0 8px;font-size:11px;color:#6b6158;line-height:1.6">
         Deal-by-deal joint venture partnerships. Not a Fund. No pooled capital.<br/>
