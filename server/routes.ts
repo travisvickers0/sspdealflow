@@ -71,8 +71,10 @@ async function sendDealAlertEmails(property: any) {
         })
       : "TBD";
 
+    const testEmail = (process.env.TEST_LOGIN_EMAIL || "test@ssp.com").toLowerCase();
+
     const emailPromises = allUsers
-      .filter(u => u.email)
+      .filter(u => u.email && u.email.toLowerCase() !== testEmail)
       .map(user => {
         const firstName = user.firstName ?? "Investor";
 
