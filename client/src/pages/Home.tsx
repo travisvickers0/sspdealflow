@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <Layout transparentNavDark>
       <section className="bg-[var(--cream-base)]">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-10 pb-0 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-12 pb-8 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="flex flex-col gap-0">
             <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.16)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
               <span className="w-1.5 h-1.5 bg-[#e8432d] rounded-full animate-pulse flex-shrink-0" />
@@ -164,7 +164,7 @@ export default function Home() {
                     WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
                   }}
                 >
-                  <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 24s linear infinite" }}>
+                  <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 40s linear infinite" }}>
                     {[0, 1].map((copy) => (
                       <div key={copy} className="flex items-center flex-shrink-0" aria-hidden={copy === 1}>
                         {tickerStates.map((state, i) => (
@@ -346,7 +346,7 @@ export default function Home() {
             WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
           }}
         >
-          <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 24s linear infinite" }}>
+          <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 40s linear infinite" }}>
             {[0, 1].map((copy) => (
               <div key={copy} className="flex items-center flex-shrink-0" aria-hidden={copy === 1}>
                 {tickerStates.map((state, i) => (
@@ -364,7 +364,7 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="bg-[var(--cream-alt)] py-20 px-6 sm:px-10 lg:px-14" data-featured-pool-size={featuredProperties.length}>
+      <section className="bg-[var(--cream-alt)] pt-10 pb-20 lg:py-20 px-6 sm:px-10 lg:px-14" data-featured-pool-size={featuredProperties.length}>
         <div className="max-w-[1360px] mx-auto">
           <div className="flex items-end justify-between mb-10">
             <div>
