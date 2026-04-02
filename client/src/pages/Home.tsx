@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <Layout transparentNavDark>
       <section className="bg-[var(--cream-base)]">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-20 pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-10 pb-0 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="flex flex-col gap-0">
             <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.16)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
               <span className="w-1.5 h-1.5 bg-[#e8432d] rounded-full animate-pulse flex-shrink-0" />
@@ -140,7 +140,7 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="hidden sm:flex items-center gap-2 flex-wrap">
               <span className="text-[12px] font-medium text-[rgba(13,12,11,0.35)]">Active across</span>
               {["Georgia", "Tennessee", "Florida", "Texas"].map((s) => (
                 <span
@@ -150,6 +150,37 @@ export default function Home() {
                   {s}
                 </span>
               ))}
+            </div>
+
+            <div className="sm:hidden -mx-6 mb-6">
+              <div className="bg-[#0d0c0b] py-3 overflow-hidden flex items-center rounded-none">
+                <div className="flex-shrink-0 px-4 font-mono text-[9px] font-medium tracking-[0.14em] uppercase text-[rgba(255,255,255,0.25)] border-r border-[rgba(255,255,255,0.07)] mr-4 whitespace-nowrap">
+                  Active across
+                </div>
+                <div
+                  className="overflow-hidden flex-1"
+                  style={{
+                    maskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
+                    WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
+                  }}
+                >
+                  <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 24s linear infinite" }}>
+                    {[0, 1].map((copy) => (
+                      <div key={copy} className="flex items-center flex-shrink-0" aria-hidden={copy === 1}>
+                        {tickerStates.map((state, i) => (
+                          <div
+                            key={`${copy}-${state}-${i}`}
+                            className="flex items-center gap-2 px-4 text-[11px] font-semibold text-[rgba(255,255,255,0.42)] tracking-[0.05em] uppercase whitespace-nowrap border-r border-[rgba(255,255,255,0.06)]"
+                          >
+                            <span className="w-1 h-1 bg-[#e8432d] rounded-full flex-shrink-0" />
+                            {state}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -304,7 +335,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="bg-[#0d0c0b] py-3.5 overflow-hidden flex items-center">
+      <div className="hidden sm:flex bg-[#0d0c0b] py-3.5 overflow-hidden items-center">
         <div className="flex-shrink-0 px-6 font-mono text-[9px] font-medium tracking-[0.14em] uppercase text-[rgba(255,255,255,0.25)] border-r border-[rgba(255,255,255,0.07)] mr-5 whitespace-nowrap">
           Active across
         </div>
