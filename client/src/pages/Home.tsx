@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, TrendingUp, Loader2 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { posthog } from "@/lib/posthog";
 
@@ -11,69 +11,6 @@ function CheckIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-  );
-}
-
-function useCountUp(end: number, duration = 1800, prefix = "", suffix = "") {
-  const [display, setDisplay] = useState(prefix + "0" + suffix);
-  const ref = useRef<HTMLDivElement>(null);
-  const triggered = useRef(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !triggered.current) {
-          triggered.current = true;
-          const start = performance.now();
-          const tick = (now: number) => {
-            const t = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - t, 3);
-            const val = Math.round(eased * end);
-            if (end >= 1000000) {
-              setDisplay(prefix + (val / 1000000).toFixed(1) + "M" + suffix);
-            } else {
-              setDisplay(prefix + val.toLocaleString() + suffix);
-            }
-            if (t < 1) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [end, duration, prefix, suffix]);
-
-  return { ref, display };
-}
-
-function Sparkline() {
-  const points = [12, 18, 15, 22, 20, 28, 25, 32, 30, 38, 35, 42];
-  const w = 120, h = 32, px = 4, py = 4;
-  const max = Math.max(...points);
-  const min = Math.min(...points);
-  const coords = points.map((v, i) => {
-    const x = px + (i / (points.length - 1)) * (w - 2 * px);
-    const y = py + ((max - v) / (max - min)) * (h - 2 * py);
-    return `${x},${y}`;
-  });
-  const line = coords.join(" ");
-  const areaPath = `M${coords[0]} ${coords.join(" L")} L${w - px},${h} L${px},${h} Z`;
-
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 w-full" preserveAspectRatio="none" style={{ height: `${h}px` }}>
-      <defs>
-        <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#22c55e" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={areaPath} fill="url(#sparkFill)" />
-      <polyline points={line} fill="none" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -117,9 +54,6 @@ export default function Home() {
     return `$${amount}`;
   };
 
-  const dealsCountUp = useCountUp(119);
-  const equityCountUp = useCountUp(6100000, 2000, "$");
-
   const handleLeadSubmit = async () => {
     if (!formData.firstName || !formData.email) return;
     setFormError("");
@@ -158,34 +92,39 @@ export default function Home() {
   return (
     <Layout transparentNavDark>
       <section className="bg-[#f7f4ef]">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-12 sm:pt-16 lg:pt-20 pb-16 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-20 pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="flex flex-col gap-0">
-
-            <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.18)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
+            <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.16)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
               <span className="w-1.5 h-1.5 bg-[#e8432d] rounded-full animate-pulse flex-shrink-0" />
-              <span className="font-mono text-[10px] font-medium tracking-[0.1em] uppercase text-[#e8432d]">
-                Accredited Investors Only
-              </span>
+              <span className="font-mono text-[10px] font-medium tracking-[0.1em] uppercase text-[#e8432d]">Accredited Investors Only</span>
             </div>
 
-            <h1 className="font-bold leading-[.92] tracking-[-0.03em] text-[#0d0c0b] mb-4" style={{ fontSize: "clamp(52px,6vw,76px)" }}>
-              Real estate<br />
-              <em className="not-italic" style={{ fontFamily: "'Instrument Serif',Georgia,serif", fontStyle: "italic", fontWeight: 400, color: "#e8432d", display: "block" }}>
+            <h1 className="font-bold tracking-[-0.03em] text-[#0d0c0b] mb-4 leading-[0.92]" style={{ fontSize: "clamp(52px,6vw,76px)" }}>
+              Real estate
+              <br />
+              <em
+                className="not-italic block"
+                style={{
+                  fontFamily: "'Instrument Serif',Georgia,serif",
+                  fontStyle: "italic",
+                  fontWeight: 400,
+                  color: "#e8432d",
+                }}
+              >
                 built for
               </em>
               investors
             </h1>
 
-            <p className="text-[16px] text-[rgba(13,12,11,0.5)] leading-[1.75] max-w-[380px] mb-9">
+            <p className="text-[15px] text-[rgba(13,12,11,0.48)] leading-[1.75] max-w-[380px] mb-8">
               Vetted off-market acquisitions across the Southeast. 50/50 profit split at sale. No fees, no pooled capital.
             </p>
 
-            <div className="flex gap-3 items-center mb-10">
+            <div className="flex gap-3 items-center mb-9">
               <button
                 type="button"
                 onClick={() => setLocation("/properties")}
-                className="bg-[#0d0c0b] hover:bg-[#e8432d] text-[#f7f4ef] font-semibold text-[14px] px-7 py-3.5 rounded-[12px] flex items-center gap-2 transition-all hover:-translate-y-px"
+                className="bg-[#0d0c0b] hover:bg-[#e8432d] text-white font-semibold text-[14px] px-7 py-3.5 rounded-[12px] flex items-center gap-2 transition-all hover:-translate-y-px"
               >
                 Explore Properties
                 <ArrowRight className="h-4 w-4" />
@@ -195,16 +134,17 @@ export default function Home() {
                 onClick={() => setLocation("/how-it-works")}
                 className="bg-white text-[rgba(13,12,11,0.65)] border border-[rgba(13,12,11,0.1)] hover:border-[rgba(13,12,11,0.25)] hover:text-[#0d0c0b] font-medium text-[14px] px-6 py-3.5 rounded-[12px] transition-all hidden sm:block"
               >
-                View Structure
+                How It Works
               </button>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[12px] font-medium text-[rgba(13,12,11,0.35)]">
-                Active across
-              </span>
-              {["Georgia", "Tennessee", "Florida", "Texas"].map(s => (
-                <span key={s} className="bg-white border border-[rgba(13,12,11,0.08)] rounded-full px-3 py-1 text-[11px] font-semibold text-[rgba(13,12,11,0.45)] shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+              <span className="text-[12px] font-medium text-[rgba(13,12,11,0.35)]">Active across</span>
+              {["Georgia", "Tennessee", "Florida", "Texas"].map((s) => (
+                <span
+                  key={s}
+                  className="bg-white border border-[rgba(13,12,11,0.08)] rounded-full px-3 py-1.5 text-[11px] font-semibold text-[rgba(13,12,11,0.45)] shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
+                >
                   {s}
                 </span>
               ))}
@@ -212,13 +152,16 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 h-[460px] lg:h-[500px]">
-
             {(() => {
-              const heroProperty = sortedProperties.find(p => p.mainPhotoUrl) ?? sortedProperties[0];
+              const heroProperty = sortedProperties.find((p) => p.mainPhotoUrl) ?? sortedProperties[0];
               const heroPhoto = heroProperty ? getPropertyImage(heroProperty) : null;
+              const zillowHref =
+                heroProperty && typeof heroProperty === "object" && "zillowUrl" in heroProperty
+                  ? String((heroProperty as { zillowUrl?: string }).zillowUrl ?? "#")
+                  : "#";
               return (
                 <div
-                  className="col-span-1 row-span-2 rounded-[20px] overflow-hidden relative cursor-pointer group bg-[#1a2018]"
+                  className="col-span-1 row-span-2 lg:row-span-2 max-lg:col-span-2 max-lg:row-span-1 max-lg:h-[220px] rounded-[20px] overflow-hidden relative cursor-pointer group bg-[#1a2018]"
                   role="button"
                   tabIndex={0}
                   onClick={() => heroProperty && goToProperty(heroProperty)}
@@ -236,35 +179,41 @@ export default function Home() {
                       className="w-full h-full object-cover object-[50%_40%] transition-transform duration-500 group-hover:scale-[1.03]"
                     />
                   )}
-                  {!heroPhoto && (
-                    <div className="w-full h-full bg-gradient-to-br from-[#1e2a18] to-[#253520]" />
-                  )}
-
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 45%, transparent 70%)" }} />
-
+                  {!heroPhoto && <div className="w-full h-full bg-gradient-to-br from-[#1e2a18] to-[#253520]" />}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.18) 48%, transparent 70%)",
+                    }}
+                  />
                   <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between">
                     <span className="bg-[#e8432d] text-white text-[8px] font-bold tracking-[0.07em] uppercase px-2.5 py-1 rounded-[5px]">
                       {heroProperty && normalizeStatus(heroProperty.status) === "AVAILABLE" ? "Open · Needs Funding" : "Funded"}
                     </span>
+                    <a
+                      href={zillowHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-[rgba(255,255,255,0.15)] backdrop-blur-sm border border-[rgba(255,255,255,0.2)] text-white text-[10px] font-semibold px-2.5 py-1 rounded-[5px] hover:bg-[rgba(255,255,255,0.25)] transition-all"
+                    >
+                      Zillow →
+                    </a>
                   </div>
-
                   <div className="absolute bottom-0 left-0 right-0 z-10 p-3.5">
-                    <div className="text-[15px] font-semibold text-white mb-0.5">
-                      {heroProperty?.address ?? "Property"}
-                    </div>
+                    <div className="text-[15px] font-semibold text-white mb-0.5">{heroProperty?.address ?? "—"}</div>
                     <div className="text-[10px] text-[rgba(255,255,255,0.55)] mb-2.5">
-                      {heroProperty
-                        ? `${heroProperty.city}, ${heroProperty.state} · ${heroProperty.beds}bd · ${heroProperty.baths}ba`
-                        : ""}
+                      {heroProperty ? `${heroProperty.city}, ${heroProperty.state}` : "—"}
+                      {heroProperty?.beds ? ` · ${heroProperty.beds}bd · ${heroProperty.baths}ba` : ""}
                     </div>
                     <div className="grid grid-cols-2 gap-px bg-[rgba(255,255,255,0.1)] rounded-[10px] overflow-hidden">
-                      <div className="bg-[rgba(0,0,0,0.4)] backdrop-blur-sm px-3 py-2.5">
+                      <div className="bg-[rgba(0,0,0,0.42)] backdrop-blur-sm px-3 py-2.5">
                         <div className="text-[8px] font-semibold tracking-[0.09em] uppercase text-[rgba(255,255,255,0.4)] mb-1">Purchase Price</div>
                         <div className="font-mono text-[14px] font-medium text-white">
                           {heroProperty ? `$${heroProperty.purchasePrice.toLocaleString()}` : "—"}
                         </div>
                       </div>
-                      <div className="bg-[rgba(0,0,0,0.4)] backdrop-blur-sm px-3 py-2.5">
+                      <div className="bg-[rgba(0,0,0,0.42)] backdrop-blur-sm px-3 py-2.5">
                         <div className="text-[8px] font-semibold tracking-[0.09em] uppercase text-[rgba(255,255,255,0.4)] mb-1">Est. Equity</div>
                         <div className="font-mono text-[14px] font-medium text-[#4ade80]">
                           +{heroProperty ? formatMoney(heroProperty.estimatedEquity ?? 0) : "—"}
@@ -276,107 +225,147 @@ export default function Home() {
               );
             })()}
 
-            <div ref={dealsCountUp.ref} className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] cursor-default" data-testid="card-deals-closed">
+            <div
+              className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)]"
+              data-testid="card-deals-closed"
+            >
               <div>
-                <div className="font-mono text-[48px] font-medium text-[#0d0c0b] leading-none tracking-[-0.02em] mb-1.5" data-testid="text-deals-count">{dealsCountUp.display}</div>
-                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(13,12,11,0.35)]">Deals Closed</div>
-                <div className="text-[11px] font-semibold text-[#16a34a] mt-1" data-testid="text-deals-secondary">+12 this quarter</div>
-                <Sparkline />
+                <div
+                  className="font-mono text-[clamp(36px,3.5vw,48px)] font-medium text-[#0d0c0b] leading-none tracking-[-0.02em] mb-1.5"
+                  data-testid="text-deals-count"
+                >
+                  {properties?.length
+                    ? properties.filter((p) => p.status === "needs_funding" || p.status === "committed").length +
+                      (properties.length -
+                        properties.filter((p) => p.status === "needs_funding" || p.status === "committed").length)
+                    : 119}
+                </div>
+                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(13,12,11,0.3)]">Deals Closed</div>
               </div>
-              <div className="flex items-center gap-1.5 mt-2">
+              <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse flex-shrink-0" />
-                <span className="text-[11px] font-semibold text-[#16a34a] tracking-[0.06em] uppercase">Live Platform</span>
+                <span className="text-[10px] font-semibold text-[#16a34a] tracking-[0.06em] uppercase">Live Platform</span>
               </div>
             </div>
 
-            <div ref={equityCountUp.ref} className="bg-[#e8432d] rounded-[20px] p-5 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(232,67,45,0.35)] cursor-default" data-testid="card-total-equity">
-              <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <pattern id="topoGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#topoGrid)" />
-              </svg>
-              <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[rgba(255,255,255,0.04)] rounded-full pointer-events-none" />
-              <div className="absolute -top-8 -left-8 w-20 h-20 bg-[rgba(255,255,255,0.04)] rounded-full pointer-events-none" />
-              <div className="relative z-10">
-                <div className="font-mono text-[44px] font-medium text-white leading-none tracking-[-0.02em] mb-1.5" data-testid="text-equity-amount">
-                  {equityCountUp.display}
+            <div className="bg-[#e8432d] rounded-[20px] p-5 flex flex-col justify-between relative overflow-hidden" data-testid="card-total-equity">
+              <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-[rgba(255,255,255,0.07)] rounded-full pointer-events-none" />
+              <div>
+                <div
+                  className="font-mono text-[clamp(32px,3.2vw,44px)] font-medium text-white leading-none tracking-[-0.02em] mb-1.5"
+                  data-testid="text-equity-amount"
+                >
+                  {formatMoney(totalEquity) === "$0" ? "$6.1M" : formatMoney(totalEquity)}
                 </div>
-                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.55)] mb-1">Total Equity</div>
-                <div className="text-[11px] font-semibold text-[rgba(255,255,255,0.7)]" data-testid="text-equity-secondary">Avg $51K per deal</div>
-                <div className="text-[11px] text-[rgba(255,255,255,0.45)] leading-[1.5] mt-1">
-                  Generated for investors across all closed deals
-                </div>
+                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.55)] mb-2">Total Equity</div>
+                <div className="text-[11px] text-[rgba(255,255,255,0.4)] leading-[1.5]">Generated for investors across all closed deals</div>
               </div>
-              <div className="flex items-center gap-2 relative z-10">
+              <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   {["B", "G", "J", "M"].map((l, i) => (
-                    <div key={l} className="w-6 h-6 rounded-full bg-[rgba(255,255,255,0.2)] border-2 border-[#e8432d] flex items-center justify-center text-[8px] font-bold text-white flex-shrink-0" style={{ marginLeft: i === 0 ? 0 : -6 }}>
+                    <div
+                      key={l}
+                      className="w-5 h-5 rounded-full bg-[rgba(255,255,255,0.2)] border-[1.5px] border-[#e8432d] flex items-center justify-center text-[6px] font-bold text-white flex-shrink-0"
+                      style={{ marginLeft: i === 0 ? 0 : -4 }}
+                    >
                       {l}
                     </div>
                   ))}
                 </div>
-                <span className="text-[11px] font-semibold text-[rgba(255,255,255,0.6)]">250+ investors</span>
+                <span className="text-[10px] font-semibold text-[rgba(255,255,255,0.55)]">250+ investors</span>
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
-      <div className="bg-[#f7f4ef] border-t border-[rgba(13,12,11,0.06)] py-5 overflow-hidden">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 flex items-center gap-8">
-          <span className="text-[11px] font-medium text-[rgba(13,12,11,0.3)] flex-shrink-0">
-            Active across
-          </span>
-          <div className="overflow-hidden flex-1">
-            <div className="flex gap-10 w-max" style={{ animation: "tape-scroll-h 28s linear infinite" }}>
-              {[
-                "Georgia", "Tennessee", "Florida", "Texas",
-                "Kentucky", "Virginia", "Alabama", "Mississippi",
-                "North Carolina", "Arizona",
-                "Georgia", "Tennessee", "Florida", "Texas",
-                "Kentucky", "Virginia", "Alabama", "Mississippi",
-                "North Carolina", "Arizona",
-              ].map((state, i) => (
-                <span key={i} className="text-[11px] font-semibold text-[rgba(13,12,11,0.25)] uppercase tracking-[0.04em] flex items-center gap-2 whitespace-nowrap">
-                  {state}
-                  <span className="w-1 h-1 bg-[rgba(13,12,11,0.15)] rounded-full" />
-                </span>
-              ))}
-            </div>
+      <div className="bg-[#0d0c0b] py-3.5 overflow-hidden flex items-center">
+        <div className="flex-shrink-0 px-6 font-mono text-[9px] font-medium tracking-[0.14em] uppercase text-[rgba(255,255,255,0.25)] border-r border-[rgba(255,255,255,0.07)] mr-5 whitespace-nowrap">
+          Active across
+        </div>
+        <div
+          className="overflow-hidden flex-1"
+          style={{
+            maskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
+          }}
+        >
+          <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 28s linear infinite" }}>
+            {[
+              "Georgia",
+              "Tennessee",
+              "Florida",
+              "Texas",
+              "Kentucky",
+              "Virginia",
+              "Alabama",
+              "Mississippi",
+              "North Carolina",
+              "Arizona",
+              "Georgia",
+              "Tennessee",
+              "Florida",
+              "Texas",
+              "Kentucky",
+              "Virginia",
+              "Alabama",
+              "Mississippi",
+              "North Carolina",
+              "Arizona",
+            ].map((state, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 px-5 text-[11px] font-semibold text-[rgba(255,255,255,0.42)] tracking-[0.05em] uppercase whitespace-nowrap border-r border-[rgba(255,255,255,0.06)]"
+              >
+                <span className="w-1 h-1 bg-[#e8432d] rounded-full flex-shrink-0" />
+                {state}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      <section className="pt-4 pb-20 sm:pt-28 sm:pb-28 bg-[#f7f4ef]">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
-          <div className="flex items-end justify-between mb-4 lg:mb-12">
+      <section className="bg-[#ede9e1] py-20 px-6 sm:px-10 lg:px-14" data-featured-pool-size={featuredProperties.length}>
+        <div className="max-w-[1360px] mx-auto">
+          <div className="flex items-end justify-between mb-10">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary mb-2 lg:mb-3">Current Opportunities</p>
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl text-[#0d0c0b] leading-tight">
+              <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#e8432d] mb-2.5">Current Opportunities</p>
+              <h2 className="text-[clamp(36px,4vw,50px)] font-bold tracking-[-0.025em] text-[#0d0c0b] leading-none">
                 Featured{" "}
-                <em style={{ fontStyle: "italic", fontFamily: "'Instrument Serif',Georgia,serif", fontWeight: 400 }}>deals</em>
+                <em
+                  style={{
+                    fontStyle: "italic",
+                    fontFamily: "'Instrument Serif',Georgia,serif",
+                    fontWeight: 400,
+                  }}
+                >
+                  deals
+                </em>
               </h2>
             </div>
-            <Link href="/properties" className="text-[13px] font-semibold text-[#0d0c0b] border border-[rgba(13,12,11,0.12)] px-4 py-2 rounded-full flex items-center gap-2 hover:bg-[#0d0c0b] hover:text-white transition-all">
+            <Link
+              href="/properties"
+              className="text-[13px] font-semibold text-[#0d0c0b] border border-[rgba(13,12,11,0.12)] px-4 py-2.5 rounded-full flex items-center gap-2 hover:bg-[#0d0c0b] hover:text-white transition-all whitespace-nowrap"
+            >
               View All
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           {isLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Loader2 className="h-8 w-8 animate-spin text-[#e8432d]" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {featuredProperties.map((property) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {needsFundingProperties.slice(0, 6).map((property) => {
                 const img = getPropertyImage(property);
                 const closeDate = property.closingDate
-                  ? new Date(property.closingDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                  ? new Date(property.closingDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
                   : "TBD";
                 return (
                   <div
@@ -390,66 +379,69 @@ export default function Home() {
                         goToProperty(property);
                       }
                     }}
-                    className="group block bg-white border border-[rgba(13,12,11,0.06)] rounded-[18px] overflow-hidden transition-all hover:-translate-y-[3px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_48px_rgba(0,0,0,0.10)] hover:border-[rgba(13,12,11,0.12)] cursor-pointer"
+                    className="group bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] overflow-hidden cursor-pointer transition-all hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(0,0,0,0.1)] hover:border-[rgba(13,12,11,0.12)] shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                   >
-                    <div className="relative aspect-[16/10] bg-[#f0ede8] overflow-hidden">
+                    <div className="relative aspect-[16/10] overflow-hidden bg-[#c8d8b0]">
                       {img ? (
                         <img
                           src={img}
                           alt={property.address}
-                          className="w-full h-full object-cover brightness-[0.85] saturate-[0.9] transition-transform group-hover:scale-[1.03]"
-                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
                         />
                       ) : null}
-                      {property.status === "needs_funding" ? (
-                        <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-[4px]">
-                          Needs Funding
-                        </div>
-                      ) : null}
-                      <div className="absolute bottom-3 right-3 bg-[rgba(15,14,13,0.82)] backdrop-blur-sm border border-green-900/30 text-green-400 font-mono text-[13px] font-medium px-2.5 py-1 rounded-[7px]">
-                        +${((property.estimatedEquity || 0) / 1000).toFixed(0)}k
+                      <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.25)] to-transparent" />
+                      <div className="absolute top-2.5 left-2.5 bg-[#e8432d] text-white text-[8px] font-bold tracking-[0.07em] uppercase px-2.5 py-1 rounded-[5px] z-10">
+                        Needs Funding
+                      </div>
+                      <div className="absolute bottom-2.5 right-2.5 bg-white text-[#16a34a] font-mono text-[12px] font-medium px-2.5 py-1 rounded-[7px] z-10">
+                        +{formatMoney(property.estimatedEquity ?? 0)}
                       </div>
                     </div>
-                    <div className="p-5">
-                      <h3 className="text-[16px] font-semibold text-[#0d0c0b] truncate mb-1">{property.address}</h3>
-                      <p className="text-[12px] text-[rgba(13,12,11,0.4)] mb-4">
+
+                    <div className="p-4">
+                      <div className="text-[15px] font-semibold text-[#0d0c0b] mb-0.5 truncate">{property.address}</div>
+                      <div className="text-[11px] text-[rgba(13,12,11,0.4)] mb-3">
                         {property.city}, {property.state}
-                      </p>
+                      </div>
                       <div className="grid grid-cols-2 pb-3 mb-3 border-b border-[rgba(13,12,11,0.06)]">
                         <div>
-                          <div className="text-[10px] uppercase tracking-wide text-[rgba(13,12,11,0.35)] mb-1">Purchase Price</div>
-                          <div className="font-mono text-[17px] font-medium text-[#0d0c0b]">
-                            ${property.purchasePrice.toLocaleString()}
-                          </div>
+                          <div className="text-[9px] font-semibold tracking-[0.09em] uppercase text-[rgba(13,12,11,0.35)] mb-1">Purchase</div>
+                          <div className="font-mono text-[15px] font-medium text-[#0d0c0b]">${property.purchasePrice.toLocaleString()}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-[10px] uppercase tracking-wide text-[rgba(13,12,11,0.35)] mb-1">Est. Equity</div>
-                          <div className="font-mono text-[17px] font-medium text-[#16a34a]">
-                            +${(property.estimatedEquity || 0).toLocaleString()}
+                          <div className="text-[9px] font-semibold tracking-[0.09em] uppercase text-[rgba(13,12,11,0.35)] mb-1">Est. Equity</div>
+                          <div className="font-mono text-[15px] font-medium text-[#16a34a]">
+                            +${(property.estimatedEquity ?? 0).toLocaleString()}
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-3 items-center text-[12px] text-[rgba(13,12,11,0.4)] mb-3">
-                        {property.beds} bed · {property.baths} bath · {(property.squareFeet || 0).toLocaleString()} sqft
+                      <div className="text-[11px] text-[rgba(13,12,11,0.4)] mb-2.5">
+                        {property.beds} bed · {property.baths} bath · {(property.squareFeet ?? 0).toLocaleString()} sqft
                       </div>
-                      <div className="flex items-center justify-between pt-3 border-t border-[rgba(13,12,11,0.06)]">
-                        <span className="text-[11px] text-[rgba(13,12,11,0.4)]">Closes {closeDate}</span>
-                        {property.bpoValue != null ? (
-                          <span className="flex items-center gap-1 text-[11px] text-[#16a34a] font-medium">
+                      <div className="flex items-center justify-between text-[10px] text-[rgba(13,12,11,0.4)] pt-2.5 mb-3 border-t border-[rgba(13,12,11,0.06)]">
+                        <span>Closes {closeDate}</span>
+                        {property.bpoValue ? (
+                          <span className="flex items-center gap-1 text-[#16a34a] font-medium">
                             <TrendingUp className="h-3 w-3" />
-                            BPO: ${property.bpoValue.toLocaleString()}
+                            BPO ${property.bpoValue.toLocaleString()}
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-4 w-full bg-[#0d0c0b] hover:bg-[#e8432d] text-white font-semibold text-[13px] py-2.5 rounded-[7px] flex items-center justify-center gap-1.5 pointer-events-none">
-                        View Details
+                      <button
+                        type="button"
+                        className="w-full bg-[#0d0c0b] hover:bg-[#e8432d] text-white font-semibold text-[13px] py-2.5 rounded-[10px] flex items-center justify-center gap-1.5 transition-colors pointer-events-none"
+                      >
+                        View Deal Room
                         <ArrowRight className="h-3.5 w-3.5" />
-                      </div>
+                      </button>
                     </div>
                   </div>
                 );
               })}
-              {featuredProperties.length === 0 ? (
+              {needsFundingProperties.length === 0 ? (
                 <div className="col-span-full text-center py-12 text-[rgba(13,12,11,0.4)]">
                   No properties available yet. Check back soon!
                 </div>
@@ -459,7 +451,142 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-[var(--bg-hex)] border-t-4 border-[#e8432d]">
+      <section className="bg-[#f7f4ef] border-t border-[rgba(13,12,11,0.07)] py-20 px-6 sm:px-10 lg:px-14">
+        <div className="max-w-[1360px] mx-auto">
+          <div className="mb-14">
+            <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#e8432d] mb-3">How It Works</p>
+            <h2 className="text-[clamp(36px,4vw,50px)] font-bold tracking-[-0.025em] text-[#0d0c0b] leading-none">
+              Simple{" "}
+              <em
+                style={{
+                  fontStyle: "italic",
+                  fontFamily: "'Instrument Serif',Georgia,serif",
+                  fontWeight: 400,
+                }}
+              >
+                by design
+              </em>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                num: "01",
+                title: "We source the deal",
+                desc: "SSP identifies and acquires vetted HUD and off-market properties across the Southeast. Every deal is underwritten before it hits the platform — you see the numbers before committing a dollar.",
+                tags: "HUD · Off-market · Pre-underwritten",
+              },
+              {
+                num: "02",
+                title: "You fund the purchase",
+                desc: "You commit capital to a specific property — not a fund. You're on title as a JV partner with first-position lien protection on your investment. Deal-by-deal, no pooled capital.",
+                tags: "Deal-by-deal · On title · 1st lien",
+              },
+              {
+                num: "03",
+                title: "We split the profit",
+                desc: "SSP handles renovation, management, and the sale. When the property sells, profit is split exactly 50/50. Your original capital comes back plus your share — no fees, no surprises.",
+                tags: "50/50 split · Capital returned · No fees",
+              },
+            ].map((step) => (
+              <div
+                key={step.num}
+                className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-8 flex flex-col gap-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,0.08)] hover:border-[rgba(13,12,11,0.12)] transition-all"
+              >
+                <div>
+                  <div className="font-mono text-[12px] font-medium text-[#e8432d] tracking-[0.1em] mb-3">{step.num}</div>
+                  <div className="w-10 h-[2px] bg-[#e8432d] rounded-full opacity-50 mb-5" />
+                  <h3 className="text-[20px] font-bold tracking-[-0.02em] text-[#0d0c0b] leading-[1.1] mb-3">{step.title}</h3>
+                  <p className="text-[14px] text-[rgba(13,12,11,0.5)] leading-[1.75]">{step.desc}</p>
+                </div>
+                <div className="font-mono text-[9px] font-medium tracking-[0.1em] text-[rgba(13,12,11,0.3)] uppercase border-t border-[rgba(13,12,11,0.06)] pt-4">
+                  {step.tags}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#ede9e1] border-t border-[rgba(13,12,11,0.07)] py-20 px-6 sm:px-10 lg:px-14">
+        <div className="max-w-[1360px] mx-auto">
+          <div className="mb-10">
+            <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#e8432d] mb-3">Track Record</p>
+            <h2 className="text-[clamp(36px,4vw,50px)] font-bold tracking-[-0.025em] text-[#0d0c0b] leading-none">
+              10+ years of{" "}
+              <em
+                style={{
+                  fontStyle: "italic",
+                  fontFamily: "'Instrument Serif',Georgia,serif",
+                  fontWeight: 400,
+                }}
+              >
+                verified exits
+              </em>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[rgba(13,12,11,0.08)] rounded-[16px] overflow-hidden mb-10">
+            {[
+              {
+                val: "119",
+                label: "Deals Closed",
+                sub: "Since 2014",
+                green: false,
+              },
+              {
+                val: formatMoney(totalEquity) === "$0" ? "$6.1M" : formatMoney(totalEquity),
+                label: "Total Equity Generated",
+                sub: "For investors",
+                green: true,
+              },
+              {
+                val: "94d",
+                label: "Average Hold Time",
+                sub: "Close to exit",
+                green: false,
+              },
+              {
+                val: "50/50",
+                label: "Profit Split",
+                sub: "Every single deal",
+                green: false,
+              },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-white px-7 py-9 flex flex-col gap-3">
+                <div
+                  className={`font-mono leading-none tracking-[-0.02em] ${stat.green ? "text-[#16a34a]" : "text-[#0d0c0b]"}`}
+                  style={{ fontSize: "clamp(36px,3.5vw,52px)" }}
+                >
+                  {stat.val}
+                </div>
+                <div>
+                  <div className="text-[13px] font-semibold text-[#0d0c0b] mb-1">{stat.label}</div>
+                  <div className="text-[12px] text-[rgba(13,12,11,0.4)]">{stat.sub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <p className="text-[14px] text-[rgba(13,12,11,0.45)] max-w-[480px] leading-[1.75]">
+              10+ years of verified exits across Georgia, Tennessee, Florida, and 7 other states. Deal-by-deal JV only — no pooled capital, no fund,
+              no management fees.
+            </p>
+            <button
+              type="button"
+              onClick={() => setLocation("/properties")}
+              className="bg-[#0d0c0b] hover:bg-[#e8432d] text-white font-semibold text-[14px] px-7 py-3.5 rounded-[12px] flex items-center gap-2 transition-all hover:-translate-y-px flex-shrink-0"
+            >
+              View All Deals
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-[#181614]">
         <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14">
           <div className="border border-[var(--line)] rounded-[28px] overflow-hidden grid grid-cols-1 lg:grid-cols-2 min-h-[400px]">
             <div className="p-12 lg:p-16 flex flex-col justify-center bg-[var(--surface-hex)] border-b lg:border-b-0 lg:border-r border-[var(--line)]">
@@ -470,8 +597,8 @@ export default function Home() {
                 <em className="italic text-primary">Every Week</em>
               </h2>
               <p className="text-[14px] text-[var(--text-secondary)] leading-[1.8] mb-8 max-w-sm">
-                Our best opportunities fund within days. Leave your info and we&apos;ll reach out directly — no spam, no mass emails, just a
-                real conversation.
+                Our best opportunities fund within days. Leave your info and we&apos;ll reach out directly — no spam, no mass emails, just a real
+                conversation.
               </p>
               <div className="flex flex-col gap-3">
                 {[
@@ -586,26 +713,29 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-[var(--surface-hex)] border-t border-[var(--line)]">
+      <section className="py-20 bg-[#0f0e0d] border-t border-[var(--line)]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative border border-[var(--line)] rounded-[20px] overflow-hidden p-10 sm:p-20 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="relative border border-[var(--line)] rounded-[20px] overflow-hidden p-10 sm:p-20 flex flex-col gap-10 lg:gap-12">
             <div className="absolute top-[-80px] right-[-80px] w-[320px] h-[320px] bg-primary/8 rounded-full filter blur-[80px] pointer-events-none" />
-            <div className="relative text-center lg:text-left">
-              <p className="text-[11px] uppercase tracking-[0.1em] font-semibold text-primary mb-4">Ready to invest?</p>
-              <h2 className="font-serif text-3xl sm:text-4xl text-[var(--text-primary)] mb-4 tracking-tight">Start Investing Today</h2>
-              <p className="text-[15px] text-[var(--text-secondary)] leading-[1.7] max-w-md mx-auto lg:mx-0">
-                Join our community of accredited investors and access exclusive real estate opportunities.
-              </p>
-            </div>
-            <div className="relative flex flex-col items-center lg:items-end gap-3">
-              <Link
-                href="/properties"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 h-12 rounded-xl text-[15px] inline-flex items-center gap-2 shadow-[0_8px_24px_rgba(232,67,45,0.2)] hover:shadow-[0_12px_32px_rgba(232,67,45,0.3)] hover:-translate-y-0.5 transition-all"
-              >
-                Explore Properties
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <p className="text-[11px] text-[var(--text-tertiary)]">No fees. No funds. Deal-by-deal JV only.</p>
+            <div className="w-[60px] h-[3px] bg-[#e8432d] rounded-full opacity-60 shrink-0 relative z-10" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
+              <div className="relative z-20 text-center lg:text-left">
+                <p className="text-[11px] uppercase tracking-[0.1em] font-semibold text-[#e8432d] mb-4">Ready to invest?</p>
+                <h2 className="font-serif text-4xl sm:text-5xl text-[#f0ebe3] mb-4 tracking-tight leading-none">Start Investing Today</h2>
+                <p className="text-[15px] text-[rgba(240,235,227,0.68)] leading-[1.7] max-w-md mx-auto lg:mx-0">
+                  Join our community of accredited investors and access exclusive real estate opportunities.
+                </p>
+              </div>
+              <div className="relative z-20 flex flex-col items-center lg:items-end gap-3">
+                <Link
+                  href="/properties"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 h-12 rounded-xl text-[15px] inline-flex items-center gap-2 shadow-[0_8px_24px_rgba(232,67,45,0.2)] hover:shadow-[0_12px_32px_rgba(232,67,45,0.3)] hover:-translate-y-0.5 transition-all"
+                >
+                  Explore Properties
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <p className="text-[11px] text-[rgba(240,235,227,0.4)]">No fees. No funds. Deal-by-deal JV only.</p>
+              </div>
             </div>
           </div>
         </div>
