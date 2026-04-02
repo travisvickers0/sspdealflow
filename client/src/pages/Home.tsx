@@ -194,7 +194,7 @@ export default function Home() {
                   : "#";
               return (
                 <div
-                  className="col-span-1 row-span-2 lg:row-span-2 max-lg:col-span-2 max-lg:row-span-1 max-lg:h-[220px] rounded-[20px] overflow-hidden relative cursor-pointer group bg-[#1a2018]"
+                  className="col-span-1 row-span-2 lg:row-span-2 max-lg:col-span-2 max-lg:row-span-1 max-lg:h-[220px] rounded-[20px] overflow-hidden relative cursor-pointer group bg-[#1a2018] order-3 lg:order-1"
                   role="button"
                   tabIndex={0}
                   onClick={() => heroProperty && goToProperty(heroProperty)}
@@ -259,7 +259,7 @@ export default function Home() {
             })()}
 
             <div
-              className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)]"
+              className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)] order-1 lg:order-2"
               data-testid="card-deals-closed"
             >
               <div>
@@ -295,7 +295,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-[#e8432d] rounded-[20px] p-5 flex flex-col justify-between relative overflow-hidden" data-testid="card-total-equity">
+            <div className="bg-[#e8432d] rounded-[20px] p-5 flex flex-col justify-between relative overflow-hidden order-2 lg:order-3" data-testid="card-total-equity">
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-[rgba(255,255,255,0.07)] rounded-full pointer-events-none" />
               <div>
                 <div
