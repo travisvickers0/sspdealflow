@@ -101,7 +101,7 @@ export default function Home() {
               <span className="font-mono text-[10px] font-medium tracking-[0.1em] uppercase text-[#e8432d]">Accredited Investors Only</span>
             </div>
 
-            <h1 className="font-bold tracking-[-0.03em] text-[#0d0c0b] mb-4 leading-[0.92]" style={{ fontSize: "clamp(52px,6vw,76px)" }}>
+            <h1 className="font-bold tracking-[-0.03em] text-[#0d0c0b] mb-4" style={{ fontSize: "clamp(52px,6vw,76px)", lineHeight: "0.88" }}>
               Real estate
               <br />
               <em
