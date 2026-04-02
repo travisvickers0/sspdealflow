@@ -152,7 +152,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="sm:hidden -mx-6 my-4">
+            <div className="sm:hidden -mx-6 mt-2 mb-4">
               <div className="bg-[#0d0c0b] py-3 overflow-hidden flex items-center">
                 <div className="flex-shrink-0 px-4 font-mono text-[9px] font-medium tracking-[0.14em] uppercase text-[rgba(255,255,255,0.25)] border-r border-[rgba(255,255,255,0.07)] mr-4 whitespace-nowrap">
                   Active across
@@ -164,7 +164,7 @@ export default function Home() {
                     WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
                   }}
                 >
-                  <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 40s linear infinite" }}>
+                  <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 52s linear infinite" }}>
                     {[0, 1].map((copy) => (
                       <div key={copy} className="flex items-center flex-shrink-0" aria-hidden={copy === 1}>
                         {tickerStates.map((state, i) => (
@@ -346,7 +346,7 @@ export default function Home() {
             WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
           }}
         >
-          <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 40s linear infinite" }}>
+          <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 52s linear infinite" }}>
             {[0, 1].map((copy) => (
               <div key={copy} className="flex items-center flex-shrink-0" aria-hidden={copy === 1}>
                 {tickerStates.map((state, i) => (
