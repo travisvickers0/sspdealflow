@@ -1,10 +1,11 @@
 import { 
-  users, properties, activityLogs, leads, propertyInterests,
+  users, properties, activityLogs, leads, propertyInterests, closedDeals,
   type User, type UpsertUser,
   type Property, type InsertProperty, type UpdateProperty,
   type ActivityLog, type InsertActivityLog,
   type Lead, type InsertLead,
   type PropertyInterest, type InsertPropertyInterest,
+  type ClosedDeal, type InsertClosedDeal,
   generatePropertySlug
 } from "@shared/schema";
 import { db } from "./db";
@@ -38,6 +39,84 @@ export interface IStorage {
 
   createPropertyInterest(data: InsertPropertyInterest): Promise<PropertyInterest>;
   getPropertyInterests(): Promise<PropertyInterest[]>;
+
+  getClosedDeals(): Promise<ClosedDeal[]>;
+  getClosedDealBySlug(slug: string): Promise<ClosedDeal | undefined>;
+  createClosedDeal(data: InsertClosedDeal): Promise<ClosedDeal>;
+  updateClosedDeal(id: number, data: Partial<InsertClosedDeal>): Promise<ClosedDeal>;
+  deleteClosedDeal(id: number): Promise<boolean>;
+}
+
+const CLOSED_DEAL_INTEGER_FIELDS: Array<keyof InsertClosedDeal> = [
+  "daysHeld",
+];
+
+const CLOSED_DEAL_REAL_FIELDS: Array<keyof InsertClosedDeal> = [
+  "purchasePrice",
+  "salePrice",
+  "dealProfit",
+  "investorRoi",
+  "annualizedRoi",
+  "totalInvestorPayoff",
+  "investorCapital",
+  "investorProfitShare",
+  "netSaleProceeds",
+  "excessDrawReimbursement",
+  "totalSources",
+  "cashToClose",
+  "earnestMoney",
+  "acquisitionCosts",
+  "rehabCosts",
+  "holdingCosts",
+  "salesCosts",
+  "totalUses",
+  "operatorShare",
+  "partnerShare",
+];
+
+function normalizeNumericValue(value: unknown, mode: "int" | "real") {
+  if (value === undefined) return undefined;
+  if (value === null || value === "") return null;
+
+  const parsed =
+    typeof value === "number"
+      ? value
+      : Number(String(value).replace(/[$,%\s,]/g, ""));
+
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return mode === "int" ? Math.round(parsed) : parsed;
+}
+
+function normalizeClosedDealData<T extends InsertClosedDeal | Partial<InsertClosedDeal>>(data: T): T {
+  const normalized = { ...data } as Record<string, unknown>;
+
+  for (const field of CLOSED_DEAL_INTEGER_FIELDS) {
+    if (field in normalized) {
+      normalized[field] = normalizeNumericValue(normalized[field], "int");
+    }
+  }
+
+  for (const field of CLOSED_DEAL_REAL_FIELDS) {
+    if (field in normalized) {
+      normalized[field] = normalizeNumericValue(normalized[field], "real");
+    }
+  }
+
+  if (Array.isArray(normalized.costLineItems)) {
+    normalized.costLineItems = normalized.costLineItems.map((item) => {
+      if (!item || typeof item !== "object") return item;
+      const lineItem = item as Record<string, unknown>;
+      return {
+        ...lineItem,
+        amount: normalizeNumericValue(lineItem.amount, "real"),
+      };
+    });
+  }
+
+  return normalized as T;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -220,6 +299,48 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(propertyInterests)
       .orderBy(desc(propertyInterests.createdAt));
+  }
+
+  async getClosedDeals(): Promise<ClosedDeal[]> {
+    return await db
+      .select()
+      .from(closedDeals)
+      .orderBy(desc(closedDeals.closeDate));
+  }
+
+  async getClosedDealBySlug(slug: string): Promise<ClosedDeal | undefined> {
+    const [deal] = await db
+      .select()
+      .from(closedDeals)
+      .where(eq(closedDeals.slug, slug));
+    return deal;
+  }
+
+  async createClosedDeal(data: InsertClosedDeal): Promise<ClosedDeal> {
+    const normalizedData = normalizeClosedDealData(data);
+    const [deal] = await db
+      .insert(closedDeals)
+      .values(normalizedData)
+      .returning();
+    return deal;
+  }
+
+  async updateClosedDeal(id: number, data: Partial<InsertClosedDeal>): Promise<ClosedDeal> {
+    const normalizedData = normalizeClosedDealData(data);
+    const [deal] = await db
+      .update(closedDeals)
+      .set({ ...normalizedData, updatedAt: new Date() })
+      .where(eq(closedDeals.id, id))
+      .returning();
+    return deal;
+  }
+
+  async deleteClosedDeal(id: number): Promise<boolean> {
+    const result = await db
+      .delete(closedDeals)
+      .where(eq(closedDeals.id, id))
+      .returning();
+    return result.length > 0;
   }
 }
 

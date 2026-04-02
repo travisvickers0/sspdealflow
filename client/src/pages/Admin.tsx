@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical, Users, Heart } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical, Users, Heart, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Property, InsertProperty, UpdateProperty, PropertyStatus, Lead, PropertyInterest } from "@shared/schema";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
@@ -74,11 +74,24 @@ const validateRow = (row: NewPropertyRow): boolean => {
 
 export default function Admin() {
   const { data: properties, isLoading, refetch } = useProperties();
+  const { data: closedDeals = [], refetch: refetchClosedDeals } = useQuery<any[]>({
+    queryKey: ["/api/closed-deals"],
+  });
   const { createProperty, updateProperty, deleteProperty } = useAdminProperties();
   const { uploadPhoto, uploadPhotos, uploadDocument } = useUpload();
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [pdfUploading, setPdfUploading] = useState(false);
+  const [pdfExtracted, setPdfExtracted] = useState<any>(null);
+  const [pdfSaving, setPdfSaving] = useState(false);
+  const [pdfSaveSuccess, setPdfSaveSuccess] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfDragActive, setPdfDragActive] = useState(false);
+  const [pdfPhotoUploading, setPdfPhotoUploading] = useState(false);
+  const [pdfPhotoDragActive, setPdfPhotoDragActive] = useState(false);
+  const [editingPhotoId, setEditingPhotoId] = useState<number | null>(null);
+  const [photoUrl, setPhotoUrl] = useState("");
   const { toast } = useToast();
 
   // Sort properties to match marketplace: status priority, then by newest
@@ -118,6 +131,188 @@ export default function Admin() {
     }).length || 0,
     sold: properties?.filter(p => p.status === 'SOLD').length || 0,
     totalEquity: properties?.reduce((sum, p) => sum + p.estimatedEquity, 0) || 0,
+  };
+
+  const parseApiResponse = async (res: Response) => {
+    const contentType = res.headers.get("content-type") ?? "";
+
+    if (!contentType.includes("application/json")) {
+      const text = await res.text();
+      if (res.status === 401) {
+        throw new Error("You must be logged in as an admin to use this tool.");
+      }
+      if (res.status === 403) {
+        throw new Error("Your account does not have admin access for closed deals.");
+      }
+      if (text.includes("<!DOCTYPE")) {
+        throw new Error("The server returned an HTML page instead of API JSON. Check that the admin endpoint is available and that your admin session is active.");
+      }
+      throw new Error(text || `Request failed with status ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(
+        data?.detail ?? data?.error ?? data?.message ?? `Request failed with status ${res.status}`
+      );
+    }
+
+    return data;
+  };
+
+  const processPdfFile = async (file: File | null | undefined) => {
+    if (!file) return;
+    setPdfUploading(true);
+    setPdfError(null);
+    setPdfExtracted(null);
+    setPdfSaveSuccess(false);
+    const formData = new FormData();
+    formData.append("pdf", file);
+    try {
+      const res = await fetch(
+        "/api/admin/closed-deals/extract-pdf",
+        { method: "POST", body: formData }
+      );
+      const data = await parseApiResponse(res);
+      if (data.success) {
+        setPdfExtracted(data.extracted);
+      } else {
+        setPdfError(
+          data.error ?? "Extraction failed"
+        );
+      }
+    } catch (err: any) {
+      setPdfError(err.message);
+    } finally {
+      setPdfUploading(false);
+    }
+  };
+
+  const handlePdfUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    await processPdfFile(e.target.files?.[0]);
+  };
+
+  const handlePdfDrop = async (
+    e: React.DragEvent<HTMLLabelElement>
+  ) => {
+    e.preventDefault();
+    setPdfDragActive(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      setPdfError("Please drop a PDF file");
+      return;
+    }
+    await processPdfFile(file);
+  };
+
+  const handlePdfSave = async () => {
+    if (!pdfExtracted) return;
+    setPdfSaving(true);
+    try {
+      const res = await fetch(
+        "/api/admin/closed-deals",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(pdfExtracted),
+        }
+      );
+      const data = await parseApiResponse(res);
+      if (data.success) {
+        setPdfSaveSuccess(true);
+        setPdfExtracted(null);
+        refetchClosedDeals();
+      } else {
+        setPdfError(
+          data.error ?? "Save failed"
+        );
+      }
+    } catch (err: any) {
+      setPdfError(err.message);
+    } finally {
+      setPdfSaving(false);
+    }
+  };
+
+  const handlePdfPhotoUpload = async (file: File | null | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setPdfError("Please upload an image file");
+      return;
+    }
+
+    setPdfPhotoUploading(true);
+    setPdfError(null);
+
+    try {
+      const result = await uploadPhoto.mutateAsync(file);
+      setPdfExtracted((prev: any) => prev ? {
+        ...prev,
+        mainPhotoUrl: result.url,
+      } : prev);
+    } catch (err: any) {
+      setPdfError(err.message ?? "Photo upload failed");
+    } finally {
+      setPdfPhotoUploading(false);
+      setPdfPhotoDragActive(false);
+    }
+  };
+
+  const handlePdfPhotoInputChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    await handlePdfPhotoUpload(e.target.files?.[0]);
+  };
+
+  const handlePdfPhotoDrop = async (
+    e: React.DragEvent<HTMLLabelElement>
+  ) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    await handlePdfPhotoUpload(file);
+  };
+
+  const handleSavePhoto = async (id: number) => {
+    await fetch(
+      `/api/admin/closed-deals/${id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          mainPhotoUrl: photoUrl
+        }),
+      }
+    );
+    setEditingPhotoId(null);
+    setPhotoUrl("");
+    refetchClosedDeals();
+  };
+
+  const handleDeleteClosedDeal = async (id: number) => {
+    const confirmed = window.confirm("Delete this closed deal?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/admin/closed-deals/${id}`, {
+        method: "DELETE",
+      });
+      await parseApiResponse(res);
+      if (editingPhotoId === id) {
+        setEditingPhotoId(null);
+        setPhotoUrl("");
+      }
+      refetchClosedDeals();
+    } catch (err: any) {
+      setPdfError(err.message ?? "Delete failed");
+    }
   };
 
   return (
@@ -242,6 +437,7 @@ export default function Admin() {
             </TabsTrigger>
             <TabsTrigger value="bulk-add" data-testid="tab-bulk-add">Bulk Add</TabsTrigger>
             <TabsTrigger value="bulk-edit" data-testid="tab-bulk-edit">Bulk Edit</TabsTrigger>
+            <TabsTrigger value="closed-deals" data-testid="tab-closed-deals">Closed Deals</TabsTrigger>
           </TabsList>
 
           <TabsContent value="properties">
@@ -482,6 +678,324 @@ export default function Admin() {
                 });
               }} 
             />
+          </TabsContent>
+
+          <TabsContent value="closed-deals">
+            <div className="space-y-6">
+              <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[16px] p-6 mb-6">
+                <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-[#e8432d] mb-3">
+                  Upload Closeout PDF
+                </p>
+                <p className="text-[13px] text-[var(--text-secondary)] mb-5">
+                  Upload a completed SSP closeout report PDF. Claude will extract all deal data automatically.
+                  Review the extracted fields before saving.
+                </p>
+
+                <label
+                  className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-[12px] cursor-pointer transition-colors ${
+                    pdfDragActive
+                      ? "border-[#e8432d] bg-[rgba(232,67,45,0.06)]"
+                      : "border-[var(--line)] hover:border-[#e8432d]"
+                  }`}
+                  onDragEnter={(e) => {
+                    e.preventDefault();
+                    setPdfDragActive(true);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setPdfDragActive(true);
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    setPdfDragActive(false);
+                  }}
+                  onDrop={handlePdfDrop}
+                >
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    onChange={handlePdfUpload}
+                    disabled={pdfUploading}
+                  />
+                  {pdfUploading ? (
+                    <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                      <Loader2 className="h-4 w-4 animate-spin text-[#e8432d]" />
+                      Extracting data from PDF...
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <div className="text-[13px] font-medium text-[var(--text-primary)] mb-1">
+                        {pdfDragActive ? "Drop PDF here" : "Click or drag PDF here"}
+                      </div>
+                      <div className="text-[11px] text-[var(--text-secondary)]">
+                        SSP closeout report · max 10MB
+                      </div>
+                    </div>
+                  )}
+                </label>
+
+                {pdfError && (
+                  <div className="mt-3 text-[12px] text-[#e8432d]">
+                    Error: {pdfError}
+                  </div>
+                )}
+
+                {pdfSaveSuccess && (
+                  <div className="mt-3 text-[12px] text-[#16a34a] font-medium">
+                    ✓ Deal saved successfully. Visit /track-record to see it.
+                  </div>
+                )}
+
+                {pdfExtracted && (
+                  <div className="mt-5 border-t border-[var(--line)] pt-5">
+                    <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[var(--text-secondary)] mb-4">
+                      Review Extracted Data
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+                      {[
+                        ["Address", "address"],
+                        ["City", "city"],
+                        ["State", "state"],
+                        ["Zip", "zip"],
+                        ["Source", "source"],
+                        ["Purchase Price", "purchasePrice"],
+                        ["Deal Profit", "dealProfit"],
+                        ["Investor ROI", "investorRoi"],
+                        ["Annualized ROI", "annualizedRoi"],
+                        ["Days Held", "daysHeld"],
+                        ["Acquisition Date", "acquisitionDate"],
+                        ["Close Date", "closeDate"],
+                      ].map(([label, key]) => (
+                        <div key={key}>
+                          <div className="text-[9px] font-semibold tracking-[0.1em] uppercase text-[var(--text-tertiary)] mb-1">
+                            {label}
+                          </div>
+                          <input
+                            className="w-full bg-[var(--bg-hex)] border border-[var(--line)] rounded-[8px] px-3 py-2 text-[13px] text-[var(--text-primary)] outline-none focus:border-[#e8432d] font-['DM_Sans',sans-serif]"
+                            value={pdfExtracted[key] ?? ""}
+                            onChange={e =>
+                              setPdfExtracted({
+                                ...pdfExtracted,
+                                [key]: e.target.value
+                              })
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mb-5">
+                      <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[var(--text-secondary)] mb-3">
+                        Deal Photo
+                      </p>
+                      <label
+                        className={`flex flex-col items-center justify-center w-full min-h-32 border-2 border-dashed rounded-[12px] cursor-pointer transition-colors ${
+                          pdfPhotoDragActive
+                            ? "border-[#e8432d] bg-[rgba(232,67,45,0.06)]"
+                            : "border-[var(--line)] hover:border-[#e8432d]"
+                        }`}
+                        onDragEnter={(e) => {
+                          e.preventDefault();
+                          setPdfPhotoDragActive(true);
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setPdfPhotoDragActive(true);
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault();
+                          setPdfPhotoDragActive(false);
+                        }}
+                        onDrop={handlePdfPhotoDrop}
+                      >
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handlePdfPhotoInputChange}
+                          disabled={pdfPhotoUploading}
+                        />
+                        {pdfPhotoUploading ? (
+                          <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)] py-8">
+                            <Loader2 className="h-4 w-4 animate-spin text-[#e8432d]" />
+                            Uploading photo...
+                          </div>
+                        ) : pdfExtracted.mainPhotoUrl ? (
+                          <div className="w-full p-4">
+                            <img
+                              src={pdfExtracted.mainPhotoUrl}
+                              alt="Deal preview"
+                              className="w-full max-w-sm h-40 mx-auto object-cover rounded-[10px] border border-[var(--line)] mb-3"
+                            />
+                            <div className="text-center">
+                              <div className="text-[13px] font-medium text-[var(--text-primary)] mb-1">
+                                Photo uploaded
+                              </div>
+                              <div className="text-[11px] text-[var(--text-secondary)]">
+                                Click or drag a new image to replace it
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8">
+                            <div className="text-[13px] font-medium text-[var(--text-primary)] mb-1">
+                              {pdfPhotoDragActive ? "Drop image here" : "Click or drag image here"}
+                            </div>
+                            <div className="text-[11px] text-[var(--text-secondary)]">
+                              Optional main photo for the public track record page
+                            </div>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={handlePdfSave}
+                        disabled={pdfSaving}
+                        className="bg-[#e8432d] hover:bg-[#d63520] text-white font-semibold text-[13px] px-6 py-2.5 rounded-[10px] border-none cursor-pointer flex items-center gap-2 disabled:opacity-50 transition-colors"
+                      >
+                        {pdfSaving ? (
+                          <>
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            Saving...
+                          </>
+                        ) : "Save Deal"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPdfExtracted(null);
+                          setPdfError(null);
+                        }}
+                        className="bg-transparent border border-[var(--line)] text-[var(--text-secondary)] font-medium text-[13px] px-6 py-2.5 rounded-[10px] cursor-pointer hover:border-[var(--text-secondary)] transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[16px] overflow-hidden">
+                <div className="px-5 py-4 border-b border-[var(--line)] flex items-center justify-between">
+                  <p className="text-[13px] font-semibold text-[var(--text-primary)]">
+                    Closed Deals ({closedDeals.length})
+                  </p>
+                  <a
+                    href="/track-record"
+                    target="_blank"
+                    className="text-[12px] text-[#e8432d] font-medium hover:underline"
+                  >
+                    View public page →
+                  </a>
+                </div>
+
+                {closedDeals.length === 0 ? (
+                  <div className="px-5 py-10 text-center text-[13px] text-[var(--text-secondary)]">
+                    No closed deals yet. Upload your first closeout PDF above.
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[var(--line)]">
+                    {closedDeals.map((deal: any) => (
+                      <div
+                        key={deal.id}
+                        className="px-5 py-4 flex items-center justify-between gap-4 flex-wrap"
+                      >
+                        <div>
+                          <div className="text-[13px] font-semibold text-[var(--text-primary)]">
+                            {deal.address}
+                          </div>
+                          <div className="text-[11px] text-[var(--text-secondary)]">
+                            {deal.city}, {deal.state} · Closed {deal.closeDate}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-[12px]">
+                          <div className="text-center">
+                            <div className="font-mono font-medium text-[#16a34a]">
+                              ${(deal.dealProfit ?? 0).toLocaleString()}
+                            </div>
+                            <div className="text-[10px] text-[var(--text-tertiary)]">
+                              Profit
+                            </div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-mono font-medium text-[var(--text-primary)]">
+                              {deal.annualizedRoi?.toFixed(1) ?? "—"}%
+                            </div>
+                            <div className="text-[10px] text-[var(--text-tertiary)]">
+                              Ann. ROI
+                            </div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-mono font-medium text-[var(--text-primary)]">
+                              {deal.daysHeld ?? "—"}d
+                            </div>
+                            <div className="text-[10px] text-[var(--text-tertiary)]">
+                              Days
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {editingPhotoId === deal.id ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                className="bg-[var(--bg-hex)] border border-[var(--line)] rounded-[8px] px-3 py-1.5 text-[12px] text-[var(--text-primary)] outline-none focus:border-[#e8432d] w-64 font-['DM_Sans',sans-serif]"
+                                placeholder="https://..."
+                                value={photoUrl}
+                                onChange={e =>
+                                  setPhotoUrl(e.target.value)
+                                }
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleSavePhoto(deal.id)}
+                                className="bg-[#e8432d] text-white text-[11px] font-semibold px-3 py-1.5 rounded-[7px] border-none cursor-pointer"
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEditingPhotoId(null)}
+                                className="text-[11px] text-[var(--text-secondary)] border border-[var(--line)] px-3 py-1.5 rounded-[7px] cursor-pointer bg-transparent"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingPhotoId(deal.id);
+                                setPhotoUrl(
+                                  deal.mainPhotoUrl ?? ""
+                                );
+                              }}
+                              className="text-[11px] font-medium text-[var(--text-secondary)] border border-[var(--line)] px-3 py-1.5 rounded-[7px] cursor-pointer bg-transparent hover:border-[#e8432d] hover:text-[#e8432d] transition-colors"
+                            >
+                              {deal.mainPhotoUrl
+                                ? "Edit Photo"
+                                : "Add Photo"}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteClosedDeal(deal.id)}
+                            className="text-[11px] font-medium text-[#e8432d] border border-[rgba(232,67,45,0.25)] px-3 py-1.5 rounded-[7px] cursor-pointer bg-transparent hover:bg-[rgba(232,67,45,0.08)] transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
 

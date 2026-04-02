@@ -15,6 +15,8 @@ import Admin from "@/pages/Admin";
 import MetaLanding from "@/pages/MetaLanding";
 import Qualify from "@/pages/Qualify";
 import ThankYou from "@/pages/ThankYou";
+import TrackRecord from "@/pages/TrackRecord";
+import ClosedDealDetail from "@/pages/ClosedDealDetail";
 import { useAuth } from "@/hooks/useAuth";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
@@ -69,6 +71,8 @@ function Router() {
       <Route path="/investors" component={MetaLanding} />
       <Route path="/qualify" component={Qualify} />
       <Route path="/thank-you" component={ThankYou} />
+      <Route path="/track-record" component={TrackRecord} />
+      <Route path="/track-record/:slug" component={ClosedDealDetail} />
       <Route path="/property/:slug" component={PropertyDetail} />
       <Route path="/invest/:propertyId" component={Invest} />
       <Route path="/admin" component={AdminRoute} />

@@ -177,6 +177,9 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
               <Link href="/how-it-works" className={navLinkClass(location === "/how-it-works")}>
                 How It Works
               </Link>
+              <Link href="/track-record" className={navLinkClass(location === "/track-record")}>
+                Track Record
+              </Link>
               {isAdmin && (
                 <Link href="/admin" className={navLinkClass(location.startsWith("/admin"))}>
                   Admin
@@ -260,6 +263,13 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                 className={mobileNavLinkClass(location === "/how-it-works")}
               >
                 How It Works
+              </Link>
+              <Link
+                href="/track-record"
+                onClick={() => setMobileMenuOpen(false)}
+                className={mobileNavLinkClass(location === "/track-record")}
+              >
+                Track Record
               </Link>
               {isAdmin && (
                 <Link

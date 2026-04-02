@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, real, timestamp, jsonb, index, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, real, doublePrecision, timestamp, jsonb, index, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -79,6 +79,66 @@ export const properties = pgTable("properties", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const closedDeals = pgTable("closed_deals", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+
+  // Property info
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  zip: text("zip"),
+  source: text("source"),
+
+  // Photos
+  mainPhotoUrl: text("main_photo_url"),
+  galleryPhotoUrls: text("gallery_photo_urls").array(),
+
+  // Key financials
+  purchasePrice: doublePrecision("purchase_price"),
+  salePrice: doublePrecision("sale_price"),
+  dealProfit: doublePrecision("deal_profit"),
+  investorRoi: real("investor_roi"),
+  annualizedRoi: real("annualized_roi"),
+  totalInvestorPayoff: doublePrecision("total_investor_payoff"),
+  investorCapital: doublePrecision("investor_capital"),
+  investorProfitShare: doublePrecision("investor_profit_share"),
+
+  // Timeline
+  acquisitionDate: text("acquisition_date"),
+  closeDate: text("close_date"),
+  daysHeld: integer("days_held"),
+
+  // Sources of funds
+  netSaleProceeds: doublePrecision("net_sale_proceeds"),
+  excessDrawReimbursement: doublePrecision("excess_draw_reimbursement"),
+  totalSources: doublePrecision("total_sources"),
+
+  // Uses of funds
+  cashToClose: doublePrecision("cash_to_close"),
+  earnestMoney: doublePrecision("earnest_money"),
+  acquisitionCosts: doublePrecision("acquisition_costs"),
+  rehabCosts: doublePrecision("rehab_costs"),
+  holdingCosts: doublePrecision("holding_costs"),
+  salesCosts: doublePrecision("sales_costs"),
+  totalUses: doublePrecision("total_uses"),
+
+  // Cost line items
+  costLineItems: jsonb("cost_line_items"),
+
+  // JV split
+  operatorShare: doublePrecision("operator_share"),
+  partnerShare: doublePrecision("partner_share"),
+
+  // Meta
+  reportGeneratedAt: text("report_generated_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type ClosedDeal = typeof closedDeals.$inferSelect;
+export type InsertClosedDeal = typeof closedDeals.$inferInsert;
 
 export const insertPropertySchema = createInsertSchema(properties, {
   status: propertyStatusSchema,

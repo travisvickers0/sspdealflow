@@ -8,6 +8,8 @@ import { z } from "zod";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import OpenAI from "openai";
+import { createRequire } from "module";
 import { extractBPOData } from "./services/openai";
 import { geocodeComps, geocodeAddress } from "./services/geocoding";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
@@ -16,6 +18,15 @@ import { sendFacebookPixelEvent, type FacebookPixelEvent, createLeadEvent } from
 import nodemailer from "nodemailer";
 import { sendQualificationConfirmation } from "./services/resend";
 import { appendLeadToSheet } from "./lib/googleSheets";
+
+const requireFunc = typeof require !== "undefined" ? require : createRequire(import.meta.url);
+const { parsePDF } = requireFunc(path.join(process.cwd(), "server", "utils", "pdfParser.cjs")) as {
+  parsePDF: (dataBuffer: Buffer) => Promise<{ text?: string }>;
+};
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 async function sendDealAlertEmails(property: any) {
   try {
@@ -314,6 +325,18 @@ const documentUpload = multer({
       cb(null, true);
     } else {
       cb(new Error("Invalid file type. Only PDF is allowed."));
+    }
+  },
+});
+
+const closedDealPdfUpload = multer({
+  storage: memoryStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PDF files are accepted"));
     }
   },
 });
@@ -910,6 +933,31 @@ export async function registerRoutes(
     }
   });
 
+  // GET /api/closed-deals - Get all closed deals
+  app.get("/api/closed-deals", async (req: Request, res: Response) => {
+    try {
+      const deals = await storage.getClosedDeals();
+      res.json(deals);
+    } catch (error) {
+      console.error("Error fetching closed deals:", error);
+      res.status(500).json({ error: "Failed to fetch deals" });
+    }
+  });
+
+  // GET /api/closed-deals/:slug - Get a single closed deal
+  app.get("/api/closed-deals/:slug", async (req: Request, res: Response) => {
+    try {
+      const deal = await storage.getClosedDealBySlug(req.params.slug);
+      if (!deal) {
+        return res.status(404).json({ error: "Deal not found" });
+      }
+      res.json(deal);
+    } catch (error) {
+      console.error("Error fetching closed deal:", error);
+      res.status(500).json({ error: "Failed to fetch deal" });
+    }
+  });
+
   // GET /api/properties/:id - Get single property (by ID or slug)
   app.get("/api/properties/:id", async (req: Request, res: Response) => {
     try {
@@ -981,6 +1029,173 @@ export async function registerRoutes(
   // ============================================
   // ADMIN ENDPOINTS (Protected by isAdmin middleware)
   // ============================================
+
+  // POST /api/admin/closed-deals/extract-pdf - Extract structured deal data from a closeout PDF
+  app.post("/api/admin/closed-deals/extract-pdf", isAdmin, (req: Request, res: Response, next: NextFunction) => {
+    closedDealPdfUpload.single("pdf")(req, res, (err) => {
+      if (err) {
+        console.error("Closed deal PDF upload error:", err);
+        if (err instanceof multer.MulterError) {
+          return res.status(400).json({ error: err.message, code: err.code });
+        }
+        return res.status(400).json({ error: err.message || "Upload failed" });
+      }
+      next();
+    });
+  }, async (req: Request, res: Response) => {
+    const file = req.file as Express.Multer.File | undefined;
+
+    if (!file) {
+      return res.status(400).json({ error: "No PDF file provided" });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: "OPENAI_API_KEY is not configured" });
+    }
+
+    try {
+      const pdfData = await parsePDF(file.buffer);
+      const pdfText = (pdfData.text ?? "").trim();
+
+      if (!pdfText) {
+        throw new Error("Could not extract text from PDF");
+      }
+
+      const textLength = pdfText.length;
+      const beginningText = pdfText.slice(0, Math.min(25000, textLength));
+      const endingText = textLength > 25000 ? pdfText.slice(-12000) : "";
+      const pdfTextForExtraction = endingText
+        ? `${beginningText}\n\n[...middle section omitted for brevity...]\n\n${endingText}`
+        : beginningText;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        response_format: { type: "json_object" },
+        temperature: 0.1,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You extract structured real-estate closeout data from SSP closeout report PDFs. Return only valid JSON matching the requested schema. Use null when a field is missing. Parse dollar values as numbers without dollar signs or commas. Parse percentages as numbers without percent signs.",
+          },
+          {
+            role: "user",
+            content: `Extract all financial and deal data from this SSP closeout report PDF text.
+Return ONLY a valid JSON object with NO markdown formatting, NO backticks, NO preamble.
+
+Required JSON structure:
+{
+  "address": "street address only",
+  "city": "city name",
+  "state": "2-letter state code",
+  "zip": "zip code or null",
+  "source": "HUD or Off-Market",
+  "purchasePrice": number,
+  "salePrice": number or null,
+  "dealProfit": number,
+  "investorRoi": number (as percentage, e.g. 5.99),
+  "annualizedRoi": number (as percentage, e.g. 15.52),
+  "totalInvestorPayoff": number,
+  "investorCapital": number,
+  "investorProfitShare": number,
+  "operatorShare": number,
+  "partnerShare": number,
+  "acquisitionDate": "Month DD, YYYY",
+  "closeDate": "Month DD, YYYY",
+  "daysHeld": number,
+  "netSaleProceeds": number,
+  "excessDrawReimbursement": number,
+  "totalSources": number,
+  "cashToClose": number,
+  "earnestMoney": number,
+  "acquisitionCosts": number,
+  "rehabCosts": number,
+  "holdingCosts": number,
+  "salesCosts": number,
+  "totalUses": number,
+  "reportGeneratedAt": "date string from PDF footer",
+  "costLineItems": [
+    {
+      "category": "Renovation|Holding|Acquisition|Sales",
+      "amount": number
+    }
+  ]
+}
+
+If any value is not present in the PDF, use null.
+
+PDF text:
+${pdfTextForExtraction}`,
+          },
+        ],
+      });
+
+      const rawText = completion.choices[0]?.message?.content ?? "";
+      const cleaned = rawText
+        .replace(/```json\n?/g, "")
+        .replace(/```\n?/g, "")
+        .trim();
+
+      const extracted = JSON.parse(cleaned);
+      const slug = `${extracted.address}-${extracted.city}-${extracted.state}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+
+      res.json({
+        success: true,
+        extracted: { ...extracted, slug },
+      });
+    } catch (error: any) {
+      console.error("[pdf-extract] Error:", error?.message || error);
+      res.status(500).json({
+        error: "Failed to extract PDF data",
+        detail: error?.message || "Unknown error",
+      });
+    }
+  });
+
+  // POST /api/admin/closed-deals - Save a closed deal
+  app.post("/api/admin/closed-deals", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const deal = await storage.createClosedDeal(req.body);
+      res.status(201).json({ success: true, deal });
+    } catch (error: any) {
+      console.error("[closed-deals] Save error:", error);
+      res.status(500).json({
+        error: "Failed to save deal",
+        detail: error?.message || "Unknown error",
+      });
+    }
+  });
+
+  // PATCH /api/admin/closed-deals/:id - Update a closed deal
+  app.patch("/api/admin/closed-deals/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const deal = await storage.updateClosedDeal(
+        parseInt(req.params.id, 10),
+        req.body,
+      );
+      res.json({ success: true, deal });
+    } catch (error) {
+      console.error("[closed-deals] Update error:", error);
+      res.status(500).json({ error: "Failed to update deal" });
+    }
+  });
+
+  // DELETE /api/admin/closed-deals/:id - Delete a closed deal
+  app.delete("/api/admin/closed-deals/:id", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const deleted = await storage.deleteClosedDeal(parseInt(req.params.id, 10));
+      if (!deleted) {
+        return res.status(404).json({ error: "Closed deal not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[closed-deals] Delete error:", error);
+      res.status(500).json({ error: "Failed to delete deal" });
+    }
+  });
 
   // POST /api/admin/properties - Create property
   app.post("/api/admin/properties", isAdmin, async (req: Request, res: Response) => {
