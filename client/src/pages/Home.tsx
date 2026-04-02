@@ -119,7 +119,7 @@ export default function Home() {
             </h1>
 
             <p className="text-[15px] text-[rgba(13,12,11,0.48)] leading-[1.75] max-w-[380px] mb-8">
-              Vetted off-market acquisitions across the Southeast. 50/50 profit split at sale. No fees, no pooled capital.
+              Vetted off-market acquisitions across the country. 50/50 profit split at sale. No fees, no pooled capital.
             </p>
 
             <div className="flex gap-3 items-center mb-6">
