@@ -150,7 +150,9 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
       <header
         className={`sticky top-0 z-50 w-full pt-[env(safe-area-inset-top)] ${
           (transparentNav || transparentNavDark) && !navScrolled
-            ? "border-b border-transparent bg-transparent"
+            ? transparentNavDark
+              ? "border-b border-transparent bg-[#f7f4ef]"
+              : "border-b border-transparent bg-transparent"
             : "border-b border-[var(--line)] bg-[rgba(15,14,13,0.92)] backdrop-blur-[16px]"
         }`}
         style={{ transition: "background 0.5s, border-color 0.5s, backdrop-filter 0.5s" }}

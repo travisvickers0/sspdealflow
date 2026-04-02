@@ -91,8 +91,8 @@ export default function Home() {
 
   return (
     <Layout transparentNavDark>
-      <section className="bg-[#f7f4ef] -mt-[56px] sm:-mt-[64px]">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-[calc(56px+2rem)] sm:pt-[calc(64px+2.5rem)] lg:pt-[calc(64px+3rem)] pb-16 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <section className="bg-[#f7f4ef]">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-12 sm:pt-16 lg:pt-20 pb-16 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           <div className="flex flex-col gap-0">
 
