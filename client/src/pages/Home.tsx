@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <Layout transparentNavDark>
       <section className="bg-[var(--cream-base)]">
-        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-12 pb-8 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-12 pb-6 sm:pt-20 sm:pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="flex flex-col gap-0">
             <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.16)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
               <span className="w-1.5 h-1.5 bg-[#e8432d] rounded-full animate-pulse flex-shrink-0" />
@@ -122,7 +122,7 @@ export default function Home() {
               Vetted off-market acquisitions across the Southeast. 50/50 profit split at sale. No fees, no pooled capital.
             </p>
 
-            <div className="flex gap-3 items-center mb-9">
+            <div className="flex gap-3 items-center mb-6">
               <button
                 type="button"
                 onClick={() => setLocation("/properties")}
@@ -152,8 +152,8 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="sm:hidden -mx-6 mb-6">
-              <div className="bg-[#0d0c0b] py-3 overflow-hidden flex items-center rounded-none">
+            <div className="sm:hidden -mx-6 mb-0">
+              <div className="bg-[#0d0c0b] py-3 overflow-hidden flex items-center">
                 <div className="flex-shrink-0 px-4 font-mono text-[9px] font-medium tracking-[0.14em] uppercase text-[rgba(255,255,255,0.25)] border-r border-[rgba(255,255,255,0.07)] mr-4 whitespace-nowrap">
                   Active across
                 </div>
@@ -184,7 +184,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 h-[460px] lg:h-[500px]">
+          <div className="grid grid-cols-2 gap-3 h-[460px] lg:h-[500px] mt-5 lg:mt-0">
             {(() => {
               const heroProperty = sortedProperties.find((p) => p.mainPhotoUrl) ?? sortedProperties[0];
               const heroPhoto = heroProperty ? getPropertyImage(heroProperty) : null;
