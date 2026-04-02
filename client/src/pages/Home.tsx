@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowRight, TrendingUp, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { posthog } from "@/lib/posthog";
 
@@ -11,6 +11,69 @@ function CheckIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
+function useCountUp(end: number, duration = 1800, prefix = "", suffix = "") {
+  const [display, setDisplay] = useState(prefix + "0" + suffix);
+  const ref = useRef<HTMLDivElement>(null);
+  const triggered = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !triggered.current) {
+          triggered.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const t = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);
+            const val = Math.round(eased * end);
+            if (end >= 1000000) {
+              setDisplay(prefix + (val / 1000000).toFixed(1) + "M" + suffix);
+            } else {
+              setDisplay(prefix + val.toLocaleString() + suffix);
+            }
+            if (t < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [end, duration, prefix, suffix]);
+
+  return { ref, display };
+}
+
+function Sparkline() {
+  const points = [12, 18, 15, 22, 20, 28, 25, 32, 30, 38, 35, 42];
+  const w = 120, h = 32, px = 4, py = 4;
+  const max = Math.max(...points);
+  const min = Math.min(...points);
+  const coords = points.map((v, i) => {
+    const x = px + (i / (points.length - 1)) * (w - 2 * px);
+    const y = py + ((max - v) / (max - min)) * (h - 2 * py);
+    return `${x},${y}`;
+  });
+  const line = coords.join(" ");
+  const areaPath = `M${coords[0]} ${coords.join(" L")} L${w - px},${h} L${px},${h} Z`;
+
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 w-full" preserveAspectRatio="none" style={{ height: `${h}px` }}>
+      <defs>
+        <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#22c55e" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill="url(#sparkFill)" />
+      <polyline points={line} fill="none" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -53,6 +116,9 @@ export default function Home() {
     if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}k`;
     return `$${amount}`;
   };
+
+  const dealsCountUp = useCountUp(119);
+  const equityCountUp = useCountUp(6100000, 2000, "$");
 
   const handleLeadSubmit = async () => {
     if (!formData.firstName || !formData.email) return;
@@ -210,29 +276,41 @@ export default function Home() {
               );
             })()}
 
-            <div className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
+            <div ref={dealsCountUp.ref} className="bg-white border border-[rgba(13,12,11,0.06)] rounded-[20px] p-5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.05)] transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] cursor-default" data-testid="card-deals-closed">
               <div>
-                <div className="font-mono text-[48px] font-medium text-[#0d0c0b] leading-none tracking-[-0.02em] mb-1.5">119</div>
+                <div className="font-mono text-[48px] font-medium text-[#0d0c0b] leading-none tracking-[-0.02em] mb-1.5" data-testid="text-deals-count">{dealsCountUp.display}</div>
                 <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(13,12,11,0.35)]">Deals Closed</div>
+                <div className="text-[11px] font-semibold text-[#16a34a] mt-1" data-testid="text-deals-secondary">+12 this quarter</div>
+                <Sparkline />
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 mt-2">
                 <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse flex-shrink-0" />
                 <span className="text-[11px] font-semibold text-[#16a34a] tracking-[0.06em] uppercase">Live Platform</span>
               </div>
             </div>
 
-            <div className="bg-[#e8432d] rounded-[20px] p-5 flex flex-col justify-between relative overflow-hidden">
-              <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-[rgba(255,255,255,0.08)] rounded-full pointer-events-none" />
-              <div>
-                <div className="font-mono text-[44px] font-medium text-white leading-none tracking-[-0.02em] mb-1.5">
-                  {formatMoney(totalEquity) === "$0" ? "$6.1M" : formatMoney(totalEquity)}
+            <div ref={equityCountUp.ref} className="bg-[#e8432d] rounded-[20px] p-5 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_30px_rgba(232,67,45,0.35)] cursor-default" data-testid="card-total-equity">
+              <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="topoGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#topoGrid)" />
+              </svg>
+              <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[rgba(255,255,255,0.04)] rounded-full pointer-events-none" />
+              <div className="absolute -top-8 -left-8 w-20 h-20 bg-[rgba(255,255,255,0.04)] rounded-full pointer-events-none" />
+              <div className="relative z-10">
+                <div className="font-mono text-[44px] font-medium text-white leading-none tracking-[-0.02em] mb-1.5" data-testid="text-equity-amount">
+                  {equityCountUp.display}
                 </div>
-                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.55)] mb-2">Total Equity</div>
-                <div className="text-[11px] text-[rgba(255,255,255,0.45)] leading-[1.5]">
+                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.55)] mb-1">Total Equity</div>
+                <div className="text-[11px] font-semibold text-[rgba(255,255,255,0.7)]" data-testid="text-equity-secondary">Avg $51K per deal</div>
+                <div className="text-[11px] text-[rgba(255,255,255,0.45)] leading-[1.5] mt-1">
                   Generated for investors across all closed deals
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 relative z-10">
                 <div className="flex items-center">
                   {["B", "G", "J", "M"].map((l, i) => (
                     <div key={l} className="w-6 h-6 rounded-full bg-[rgba(255,255,255,0.2)] border-2 border-[#e8432d] flex items-center justify-center text-[8px] font-bold text-white flex-shrink-0" style={{ marginLeft: i === 0 ? 0 : -6 }}>
