@@ -125,8 +125,8 @@ export default function Admin() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-sm sm:text-base text-gray-500 mt-1">Manage properties and investments</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">Admin Dashboard</h1>
+            <p className="text-sm sm:text-base text-[var(--text-tertiary)] mt-1">Manage properties and investments</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
             <Button variant="outline" onClick={() => refetch()} data-testid="button-refresh" className="w-full sm:w-auto">
@@ -178,12 +178,12 @@ export default function Admin() {
           <Card>
             <CardContent className="p-3 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <div className="p-2 sm:p-3 bg-blue-100 rounded-lg w-fit">
-                  <Building2 className="h-4 sm:h-6 w-4 sm:w-6 text-blue-600" />
+                <div className="p-2 sm:p-3 bg-[rgba(59,130,246,0.12)] rounded-lg w-fit">
+                  <Building2 className="h-4 sm:h-6 w-4 sm:w-6 text-blue-400" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-500">Total Properties</p>
-                  <p className="text-xl sm:text-2xl font-bold">{stats.total}</p>
+                  <p className="text-xs sm:text-sm text-[var(--text-tertiary)]">Total Properties</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{stats.total}</p>
                 </div>
               </div>
             </CardContent>
@@ -191,12 +191,12 @@ export default function Admin() {
           <Card>
             <CardContent className="p-3 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <div className="p-2 sm:p-3 bg-amber-100 rounded-lg w-fit">
-                  <DollarSign className="h-4 sm:h-6 w-4 sm:w-6 text-amber-600" />
+                <div className="p-2 sm:p-3 bg-[rgba(245,158,11,0.12)] rounded-lg w-fit">
+                  <DollarSign className="h-4 sm:h-6 w-4 sm:w-6 text-amber-400" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-500">Needs Funding</p>
-                  <p className="text-xl sm:text-2xl font-bold">{stats.needsFunding}</p>
+                  <p className="text-xs sm:text-sm text-[var(--text-tertiary)]">Needs Funding</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{stats.needsFunding}</p>
                 </div>
               </div>
             </CardContent>
@@ -204,12 +204,12 @@ export default function Admin() {
           <Card>
             <CardContent className="p-3 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <div className="p-2 sm:p-3 bg-green-100 rounded-lg w-fit">
-                  <TrendingUp className="h-4 sm:h-6 w-4 sm:w-6 text-green-600" />
+                <div className="p-2 sm:p-3 bg-[rgba(34,197,94,0.12)] rounded-lg w-fit">
+                  <TrendingUp className="h-4 sm:h-6 w-4 sm:w-6 text-green-400" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-500">Funded</p>
-                  <p className="text-xl sm:text-2xl font-bold">{stats.funded}</p>
+                  <p className="text-xs sm:text-sm text-[var(--text-tertiary)]">Funded</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">{stats.funded}</p>
                 </div>
               </div>
             </CardContent>
@@ -217,12 +217,12 @@ export default function Admin() {
           <Card>
             <CardContent className="p-3 sm:p-6">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <div className="p-2 sm:p-3 bg-purple-100 rounded-lg w-fit">
-                  <DollarSign className="h-4 sm:h-6 w-4 sm:w-6 text-purple-600" />
+                <div className="p-2 sm:p-3 bg-[rgba(168,85,247,0.12)] rounded-lg w-fit">
+                  <DollarSign className="h-4 sm:h-6 w-4 sm:w-6 text-purple-400" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs sm:text-sm text-gray-500">Total Equity</p>
-                  <p className="text-xl sm:text-2xl font-bold">${(stats.totalEquity / 1000).toFixed(0)}K</p>
+                  <p className="text-xs sm:text-sm text-[var(--text-tertiary)]">Total Equity</p>
+                  <p className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">${(stats.totalEquity / 1000).toFixed(0)}K</p>
                 </div>
               </div>
             </CardContent>
@@ -252,21 +252,21 @@ export default function Admin() {
             ) : (
               <>
                 {/* Desktop Table View */}
-                <div className="hidden md:block bg-white rounded-xl border shadow-sm overflow-hidden">
+                <div className="hidden md:block bg-[var(--surface-hex)] rounded-xl border border-[var(--line)] overflow-hidden">
                   <table className="w-full">
-                    <thead className="bg-gray-50 border-b">
+                    <thead className="bg-[var(--surface-2-hex)] border-b border-[var(--line)]">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Property</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Price</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Equity</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Closing</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-secondary)] uppercase">Property</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-secondary)] uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-secondary)] uppercase">Price</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-secondary)] uppercase">Equity</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--text-secondary)] uppercase">Closing</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-[var(--text-secondary)] uppercase">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-[var(--line)]">
                       {sortedProperties.map((property) => (
-                        <tr key={property.id} className="hover:bg-gray-50" data-testid={`row-property-${property.id}`}>
+                        <tr key={property.id} className="hover:bg-[var(--surface-2-hex)]" data-testid={`row-property-${property.id}`}>
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-3">
                               <Link href={`/property/${property.slug}`}>
@@ -277,14 +277,14 @@ export default function Admin() {
                                     className="w-12 h-12 rounded-lg object-cover hover:ring-2 hover:ring-primary cursor-pointer transition-all"
                                   />
                                 ) : (
-                                  <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center hover:ring-2 hover:ring-primary cursor-pointer transition-all">
-                                    <Building2 className="h-6 w-6 text-gray-400" />
+                                  <div className="w-12 h-12 rounded-lg bg-[var(--surface-3-hex)] flex items-center justify-center hover:ring-2 hover:ring-primary cursor-pointer transition-all">
+                                    <Building2 className="h-6 w-6 text-[var(--text-tertiary)]" />
                                   </div>
                                 )}
                               </Link>
                               <div>
-                                <div className="font-medium text-gray-900" data-testid={`text-address-${property.id}`}>{property.address}</div>
-                                <div className="text-sm text-gray-500">{property.city}, {property.state}</div>
+                                <div className="font-medium text-[var(--text-primary)]" data-testid={`text-address-${property.id}`}>{property.address}</div>
+                                <div className="text-sm text-[var(--text-tertiary)]">{property.city}, {property.state}</div>
                               </div>
                             </div>
                           </td>
@@ -298,9 +298,9 @@ export default function Admin() {
                               const s = normalizeStatus(property.status);
                               return (
                                 <Badge className={
-                                  s === 'AVAILABLE' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
-                                  s === 'FUNDED' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
-                                  'bg-amber-200 text-amber-900 hover:bg-amber-200'
+                                  s === 'AVAILABLE' ? 'bg-[rgba(245,158,11,0.15)] text-amber-400 hover:bg-[rgba(245,158,11,0.15)]' :
+                                  s === 'FUNDED' ? 'bg-[rgba(59,130,246,0.15)] text-blue-400 hover:bg-[rgba(59,130,246,0.15)]' :
+                                  'bg-[rgba(245,158,11,0.25)] text-amber-300 hover:bg-[rgba(245,158,11,0.25)]'
                                 } data-testid={`badge-status-${property.id}`}>
                                   {s === 'AVAILABLE' ? 'Needs Funding' :
                                    s === 'FUNDED' ? 'Funded' : 'SOLD'}
@@ -308,9 +308,9 @@ export default function Admin() {
                               );
                             })()}
                           </td>
-                          <td className="px-4 py-4 font-medium" data-testid={`text-price-${property.id}`}>${property.purchasePrice.toLocaleString()}</td>
-                          <td className="px-4 py-4 text-green-600 font-medium" data-testid={`text-equity-${property.id}`}>${property.estimatedEquity.toLocaleString()}</td>
-                          <td className="px-4 py-4 text-sm text-gray-500">{property.closingDate}</td>
+                          <td className="px-4 py-4 font-medium text-[var(--text-primary)]" data-testid={`text-price-${property.id}`}>${property.purchasePrice.toLocaleString()}</td>
+                          <td className="px-4 py-4 text-[var(--green-hex)] font-medium" data-testid={`text-equity-${property.id}`}>${property.estimatedEquity.toLocaleString()}</td>
+                          <td className="px-4 py-4 text-sm text-[var(--text-tertiary)]">{property.closingDate}</td>
                           <td className="px-4 py-4 text-right">
                             <div className="flex justify-end gap-2">
                               <Button 
@@ -327,7 +327,7 @@ export default function Admin() {
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="text-red-500 hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)]"
                                 onClick={() => {
                                   if (confirm("Are you sure you want to delete this property?")) {
                                     deleteProperty.mutate(property.id);
@@ -363,14 +363,14 @@ export default function Admin() {
                                 className="w-16 h-16 rounded-lg object-cover flex-shrink-0 hover:ring-2 hover:ring-primary cursor-pointer transition-all"
                               />
                             ) : (
-                              <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-primary cursor-pointer transition-all">
-                                <Building2 className="h-8 w-8 text-gray-400" />
+                              <div className="w-16 h-16 rounded-lg bg-[var(--surface-3-hex)] flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-primary cursor-pointer transition-all">
+                                <Building2 className="h-8 w-8 text-[var(--text-tertiary)]" />
                               </div>
                             )}
                           </Link>
                           <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-gray-900 text-sm truncate" data-testid={`text-address-${property.id}`}>{property.address}</div>
-                            <div className="text-xs text-gray-500 truncate">{property.city}, {property.state}</div>
+                            <div className="font-semibold text-[var(--text-primary)] text-sm truncate" data-testid={`text-address-${property.id}`}>{property.address}</div>
+                            <div className="text-xs text-[var(--text-tertiary)] truncate">{property.city}, {property.state}</div>
                             {(() => {
                               const normalizeStatus = (status: string) => {
                                 if (status === "needs_funding" || status === "committed") return "AVAILABLE";
@@ -380,9 +380,9 @@ export default function Admin() {
                               const s = normalizeStatus(property.status);
                               return (
                                 <Badge className={`mt-1 ${
-                                  s === 'AVAILABLE' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
-                                  s === 'FUNDED' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
-                                  'bg-amber-200 text-amber-900 hover:bg-amber-200'
+                                  s === 'AVAILABLE' ? 'bg-[rgba(245,158,11,0.15)] text-amber-400 hover:bg-[rgba(245,158,11,0.15)]' :
+                                  s === 'FUNDED' ? 'bg-[rgba(59,130,246,0.15)] text-blue-400 hover:bg-[rgba(59,130,246,0.15)]' :
+                                  'bg-[rgba(245,158,11,0.25)] text-amber-300 hover:bg-[rgba(245,158,11,0.25)]'
                                 }`} data-testid={`badge-status-${property.id}`}>
                                   {s === 'AVAILABLE' ? 'Needs Funding' :
                                    s === 'FUNDED' ? 'Funded' : 'SOLD'}
@@ -394,17 +394,17 @@ export default function Admin() {
                         
                         <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
                           <div>
-                            <p className="text-gray-500">Purchase Price</p>
-                            <p className="font-semibold text-gray-900" data-testid={`text-price-${property.id}`}>${(property.purchasePrice / 1000).toFixed(0)}K</p>
+                            <p className="text-[var(--text-tertiary)]">Purchase Price</p>
+                            <p className="font-semibold text-[var(--text-primary)]" data-testid={`text-price-${property.id}`}>${(property.purchasePrice / 1000).toFixed(0)}K</p>
                           </div>
                           <div>
-                            <p className="text-gray-500">Equity</p>
-                            <p className="font-semibold text-green-600" data-testid={`text-equity-${property.id}`}>${(property.estimatedEquity / 1000).toFixed(0)}K</p>
+                            <p className="text-[var(--text-tertiary)]">Equity</p>
+                            <p className="font-semibold text-[var(--green-hex)]" data-testid={`text-equity-${property.id}`}>${(property.estimatedEquity / 1000).toFixed(0)}K</p>
                           </div>
                         </div>
                         
-                        <div className="mb-3 pb-3 border-t">
-                          <p className="text-xs text-gray-500 mt-2 mb-1">Closing: <span className="text-gray-900 font-medium">{property.closingDate}</span></p>
+                        <div className="mb-3 pb-3 border-t border-[var(--line)]">
+                          <p className="text-xs text-[var(--text-tertiary)] mt-2 mb-1">Closing: <span className="text-[var(--text-primary)] font-medium">{property.closingDate}</span></p>
                         </div>
                         
                         <div className="flex gap-2">
@@ -424,7 +424,7 @@ export default function Admin() {
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-red-500 hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)]"
                             onClick={() => {
                               if (confirm("Are you sure you want to delete this property?")) {
                                 deleteProperty.mutate(property.id);
@@ -445,7 +445,7 @@ export default function Admin() {
                 </div>
 
                 {(!properties || properties.length === 0) && (
-                  <div className="text-center py-12 text-gray-500">
+                  <div className="text-center py-12 text-[var(--text-tertiary)]">
                     No properties yet. Click "Add Property" to create one.
                   </div>
                 )}
@@ -801,7 +801,7 @@ function SortablePhoto({ id, url, onSetHero, onRemove }: SortablePhotoProps) {
       <img 
         src={url} 
         alt="Gallery photo" 
-        className="w-full aspect-square object-cover rounded-lg border border-gray-200 hover:border-amber-400 transition-all cursor-pointer"
+        className="w-full aspect-square object-cover rounded-lg border border-[var(--line)] hover:border-amber-400 transition-all cursor-pointer"
         onClick={() => setShowActions(!showActions)}
       />
       <div 
@@ -810,7 +810,7 @@ function SortablePhoto({ id, url, onSetHero, onRemove }: SortablePhotoProps) {
         className="absolute top-1 left-1 p-1.5 bg-white/90 rounded cursor-grab active:cursor-grabbing touch-none"
         title="Drag to reorder"
       >
-        <GripVertical className="h-4 w-4 text-gray-500" />
+        <GripVertical className="h-4 w-4 text-[var(--text-tertiary)]" />
       </div>
       <div className={`absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center gap-2 transition-opacity ${showActions || !isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
         <button
@@ -896,8 +896,8 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload, isUp
 
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-gray-900">Photos</h3>
-      <p className="text-sm text-gray-500">Drag photos to reorder. Click the star to set as hero image.</p>
+      <h3 className="font-semibold text-[var(--text-primary)]">Photos</h3>
+      <p className="text-sm text-[var(--text-tertiary)]">Drag photos to reorder. Click the star to set as hero image.</p>
       
       <div className="space-y-4">
         <DndContext 
@@ -930,8 +930,8 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload, isUp
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <Label className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm sm:text-base ${
             isUploading 
-              ? 'bg-blue-100 text-blue-700 cursor-wait' 
-              : 'bg-gray-100 hover:bg-gray-200 cursor-pointer active:bg-gray-300'
+              ? 'bg-[rgba(59,130,246,0.15)] text-blue-400 cursor-wait' 
+              : 'bg-[var(--surface-3-hex)] hover:bg-[var(--surface-3-hex)] cursor-pointer active:bg-[var(--line)]'
           }`}>
             {isUploading ? (
               <>
@@ -965,7 +965,7 @@ function PhotoManager({ mainPhotoUrl, galleryPhotoUrls, onUpdate, onUpload, isUp
               <span className="font-medium">Delete All Photos</span>
             </button>
           )}
-          <span className="text-xs sm:text-sm text-gray-500">
+          <span className="text-xs sm:text-sm text-[var(--text-tertiary)]">
             {totalPhotos} photo(s)
           </span>
         </div>
@@ -1205,7 +1205,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
     <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Location</h3>
+          <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base">Location</h3>
           <div>
             <Label className="text-xs sm:text-sm">Address *</Label>
             <Input 
@@ -1251,7 +1251,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Pricing</h3>
+          <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base">Pricing</h3>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <Label className="text-xs sm:text-sm">Purchase Price *</Label>
@@ -1275,7 +1275,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                 readOnly
                 tabIndex={-1}
                 data-testid="input-equity"
-                className="text-sm bg-gray-50"
+                className="text-sm bg-[var(--surface-2-hex)]"
               />
             </div>
           </div>
@@ -1310,7 +1310,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Property Specs</h3>
+          <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base">Property Specs</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <div>
               <Label className="text-xs sm:text-sm">Beds *</Label>
@@ -1350,7 +1350,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Status & Dates</h3>
+          <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base">Status & Dates</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <Label className="text-xs sm:text-sm">Status</Label>
@@ -1388,8 +1388,8 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       {formData.status === "SOLD" && (
         <div className="space-y-4 sm:space-y-6 border-t pt-6">
           <div>
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-4">Sold Deal Information</h3>
-            <p className="text-xs sm:text-sm text-gray-500 mb-4">Fill in the final numbers from the completed deal.</p>
+            <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base mb-4">Sold Deal Information</h3>
+            <p className="text-xs sm:text-sm text-[var(--text-tertiary)] mb-4">Fill in the final numbers from the completed deal.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -1473,7 +1473,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                   data-testid="input-realized-roi"
                   className="text-sm"
                 />
-                <p className="text-xs text-gray-500 mt-1">Enter as percentage (e.g., 25.5 for 25.5%)</p>
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">Enter as percentage (e.g., 25.5 for 25.5%)</p>
               </div>
             </div>
           </div>
@@ -1481,7 +1481,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       )}
 
       <div className="space-y-4">
-        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Description</h3>
+        <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base">Description</h3>
         <Textarea 
           value={formData.description || ""} 
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -1501,11 +1501,11 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       />
 
       <div className="space-y-4">
-        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Documents</h3>
+        <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base">Documents</h3>
         <div className="space-y-2">
           {(formData.documents as any[]).map((doc, idx) => (
-            <div key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
-              <FileText className="h-4 w-4 text-gray-500 flex-shrink-0" />
+            <div key={idx} className="flex items-center gap-2 p-2 bg-[var(--surface-2-hex)] rounded text-sm">
+              <FileText className="h-4 w-4 text-[var(--text-tertiary)] flex-shrink-0" />
               <span className="flex-1 text-xs sm:text-sm truncate">{doc.name}</span>
               <button 
                 type="button"
@@ -1528,12 +1528,12 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
               className="text-sm"
             />
             <div className="flex items-center gap-2">
-              <div className="flex-1 border-t border-gray-200"></div>
-              <span className="text-xs text-gray-500">OR</span>
-              <div className="flex-1 border-t border-gray-200"></div>
+              <div className="flex-1 border-t border-[var(--line)]"></div>
+              <span className="text-xs text-[var(--text-tertiary)]">OR</span>
+              <div className="flex-1 border-t border-[var(--line)]"></div>
             </div>
             <div>
-              <Label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
+              <Label className="text-xs sm:text-sm font-medium text-[var(--text-secondary)] mb-2 block">
                 Upload BPO Document (Auto-extract Comps)
               </Label>
               <Input 
@@ -1550,7 +1550,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                   Extracting comps from BPO... This may take up to a minute.
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">
                   Upload a BPO PDF to automatically extract comparable sales data
                 </p>
               )}
@@ -1562,7 +1562,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       {/* Comparable Sales */}
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Comparable Sales</h3>
+          <h3 className="font-semibold text-[var(--text-primary)] text-sm sm:text-base">Comparable Sales</h3>
           <Button type="button" variant="outline" size="sm" onClick={addComp} className="text-xs sm:text-sm">
             <Plus className="h-4 w-4 mr-1" />
             <span className="hidden sm:inline">Add Comp</span>
@@ -1571,9 +1571,9 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
         </div>
         <div className="space-y-3">
           {(formData.comps as any[]).map((comp, idx) => (
-            <div key={comp.id || idx} className="p-3 border rounded-lg bg-gray-50 space-y-2">
+            <div key={comp.id || idx} className="p-3 border rounded-lg bg-[var(--surface-2-hex)] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs sm:text-sm font-medium text-gray-700">Comp #{idx + 1}</span>
+                <span className="text-xs sm:text-sm font-medium text-[var(--text-secondary)]">Comp #{idx + 1}</span>
                 <button 
                   type="button"
                   className="text-red-500 hover:text-red-700 flex-shrink-0"
@@ -1651,14 +1651,14 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
             </div>
           ))}
           {(formData.comps as any[]).length === 0 && (
-            <p className="text-xs sm:text-sm text-gray-500 text-center py-4">No comparable sales added yet.</p>
+            <p className="text-xs sm:text-sm text-[var(--text-tertiary)] text-center py-4">No comparable sales added yet.</p>
           )}
         </div>
       </div>
 
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-4 border-t">
         {isProcessingBPO && (
-          <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-3 py-2 rounded-lg mr-auto">
+          <div className="flex items-center gap-2 text-sm text-amber-400 bg-[rgba(245,158,11,0.1)] px-3 py-2 rounded-lg mr-auto">
             <RefreshCw className="h-4 w-4 animate-spin" />
             Processing BPO... Please wait before saving.
           </div>
@@ -1868,34 +1868,34 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
 
       {importMode === "table" ? (
         <>
-          <div className="bg-white rounded-xl border shadow-sm overflow-x-auto">
+          <div className="bg-[var(--surface-hex)] rounded-xl border border-[var(--line)] overflow-x-auto">
             <table className="w-full min-w-[1200px]">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-[var(--surface-2-hex)] border-b border-[var(--line)]">
                 <tr>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600 w-8"></th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Address *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">City *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">State *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">ZIP *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Status</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Price *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Equity *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Beds *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Baths *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">SqFt *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">BPO *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600">Closing *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-gray-600 w-8"></th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] w-8"></th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Address *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">City *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">State *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">ZIP *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Status</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Price *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Equity *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Beds *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Baths *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">SqFt *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">BPO *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Closing *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] w-8"></th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {rows.map((row, idx) => (
-                  <tr key={row.id} className={row.isValid ? "bg-green-50/50" : "hover:bg-gray-50"}>
+                  <tr key={row.id} className={row.isValid ? "bg-[rgba(34,197,94,0.08)]" : "hover:bg-[var(--surface-2-hex)]"}>
                     <td className="px-2 py-1.5 text-center">
                       {row.isValid ? (
                         <Check className="h-4 w-4 text-green-500 mx-auto" />
                       ) : (
-                        <span className="text-gray-400 text-xs">{idx + 1}</span>
+                        <span className="text-[var(--text-tertiary)] text-xs">{idx + 1}</span>
                       )}
                     </td>
                     <td className="px-2 py-1.5">
@@ -2010,7 +2010,7 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="h-7 w-7 p-0 text-red-500 hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)]"
                         onClick={() => removeRow(row.id)}
                       >
                         <X className="h-4 w-4" />
@@ -2028,7 +2028,7 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
               Add Row
             </Button>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-[var(--text-tertiary)]">
                 {validRows.length} of {rows.length} rows valid
               </span>
               <Button 
@@ -2205,26 +2205,26 @@ function BulkEditor({ properties, onSuccess }: { properties: Property[], onSucce
       </div>
 
       {editedRows.size > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 text-amber-600" />
-          <span className="text-sm text-amber-800">
+        <div className="bg-[rgba(245,158,11,0.1)] border border-[rgba(245,158,11,0.2)] rounded-lg p-3 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-amber-400" />
+          <span className="text-sm text-amber-300">
             You have {editedRows.size} unsaved {editedRows.size === 1 ? 'change' : 'changes'}. Click "Save Changes" to apply them.
           </span>
         </div>
       )}
 
-      <div className="bg-white rounded-xl border shadow-sm overflow-x-auto">
+      <div className="bg-[var(--surface-hex)] rounded-xl border border-[var(--line)] overflow-x-auto">
         <table className="w-full min-w-[1000px]">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-[var(--surface-2-hex)] border-b">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Address</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">City</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">State</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Status</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Price</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Equity</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">BPO</th>
-              <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600">Closing</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Address</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">City</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">State</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Status</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Price</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Equity</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">BPO</th>
+              <th className="px-3 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Closing</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -2232,7 +2232,7 @@ function BulkEditor({ properties, onSuccess }: { properties: Property[], onSucce
               const edited = editedRows.get(property.id) || {};
               const hasEdits = editedRows.has(property.id);
               return (
-                <tr key={property.id} className={hasEdits ? "bg-amber-50" : "hover:bg-gray-50"}>
+                <tr key={property.id} className={hasEdits ? "bg-[rgba(245,158,11,0.08)]" : "hover:bg-[var(--surface-2-hex)]"}>
                   <td className="px-3 py-2">
                     <Input 
                       value={(edited.address ?? property.address) as string}
@@ -2307,7 +2307,7 @@ function BulkEditor({ properties, onSuccess }: { properties: Property[], onSucce
           </tbody>
         </table>
         {filteredProperties.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-[var(--text-tertiary)]">
             {properties.length === 0 
               ? "No properties yet. Use 'Bulk Add' to add properties."
               : "No properties found matching the filters."}
