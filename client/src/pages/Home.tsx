@@ -26,6 +26,8 @@ export default function Home() {
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
   const [formError, setFormError] = useState("");
+  const activeStates = ["Georgia", "Tennessee", "Florida", "Texas", "Kentucky", "Virginia", "Alabama", "Mississippi", "North Carolina", "Arizona"];
+  const tickerStates = Array.from({ length: 4 }, () => activeStates).flat();
 
   const sortedProperties = (properties || [])
     .slice()
@@ -91,7 +93,7 @@ export default function Home() {
 
   return (
     <Layout transparentNavDark>
-      <section className="bg-[#f7f4ef]">
+      <section className="bg-[var(--cream-base)]">
         <div className="max-w-[1360px] mx-auto px-6 sm:px-10 lg:px-14 pt-20 pb-16 lg:pt-24 lg:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="flex flex-col gap-0">
             <div className="inline-flex items-center gap-2 bg-[rgba(232,67,45,0.06)] border border-[rgba(232,67,45,0.16)] rounded-full px-3.5 py-1.5 mb-6 w-fit">
@@ -231,20 +233,34 @@ export default function Home() {
             >
               <div>
                 <div
-                  className="font-mono text-[clamp(36px,3.5vw,48px)] font-medium text-[#0d0c0b] leading-none tracking-[-0.02em] mb-1.5"
+                  className="font-mono text-[clamp(36px,3.5vw,48px)] font-medium text-[#0d0c0b] leading-none tracking-[-0.02em] mb-1"
                   data-testid="text-deals-count"
                 >
-                  {properties?.length
-                    ? properties.filter((p) => p.status === "needs_funding" || p.status === "committed").length +
-                      (properties.length -
-                        properties.filter((p) => p.status === "needs_funding" || p.status === "committed").length)
-                    : 119}
+                  119
                 </div>
-                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(13,12,11,0.3)]">Deals Closed</div>
+                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(13,12,11,0.3)] mb-4">Deals Closed</div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse flex-shrink-0" />
-                <span className="text-[10px] font-semibold text-[#16a34a] tracking-[0.06em] uppercase">Live Platform</span>
+              <div className="flex items-end gap-1 mb-4 h-10">
+                {[40, 55, 45, 65, 58, 72, 68, 85, 78, 95, 88, 100].map((h, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 rounded-sm transition-all"
+                    style={{
+                      height: `${h}%`,
+                      background: i === 11 ? "#e8432d" : i >= 8 ? "rgba(13,12,11,0.15)" : "rgba(13,12,11,0.07)",
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="border-t border-[rgba(13,12,11,0.06)] pt-3 flex items-center justify-between">
+                <div>
+                  <div className="text-[11px] font-semibold text-[#0d0c0b]">+12 this quarter</div>
+                  <div className="text-[10px] text-[rgba(13,12,11,0.35)]">94d avg hold</div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 bg-[#22c55e] rounded-full animate-pulse flex-shrink-0" />
+                  <span className="text-[10px] font-semibold text-[#16a34a] tracking-[0.06em] uppercase">Live Platform</span>
+                </div>
               </div>
             </div>
 
@@ -252,15 +268,24 @@ export default function Home() {
               <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-[rgba(255,255,255,0.07)] rounded-full pointer-events-none" />
               <div>
                 <div
-                  className="font-mono text-[clamp(32px,3.2vw,44px)] font-medium text-white leading-none tracking-[-0.02em] mb-1.5"
+                  className="font-mono text-[clamp(32px,3.2vw,44px)] font-medium text-white leading-none tracking-[-0.02em] mb-1"
                   data-testid="text-equity-amount"
                 >
                   {formatMoney(totalEquity) === "$0" ? "$6.1M" : formatMoney(totalEquity)}
                 </div>
-                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.55)] mb-2">Total Equity</div>
-                <div className="text-[11px] text-[rgba(255,255,255,0.4)] leading-[1.5]">Generated for investors across all closed deals</div>
+                <div className="text-[10px] font-semibold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.55)] mb-4">Total Equity</div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="bg-[rgba(0,0,0,0.15)] rounded-[10px] px-3 py-2.5">
+                  <div className="font-mono text-[18px] font-medium text-white leading-none mb-1">50/50</div>
+                  <div className="text-[9px] font-semibold tracking-[0.09em] uppercase text-[rgba(255,255,255,0.5)]">Profit Split</div>
+                </div>
+                <div className="bg-[rgba(0,0,0,0.15)] rounded-[10px] px-3 py-2.5">
+                  <div className="font-mono text-[18px] font-medium text-white leading-none mb-1">20%+</div>
+                  <div className="text-[9px] font-semibold tracking-[0.09em] uppercase text-[rgba(255,255,255,0.5)]">Avg ROI</div>
+                </div>
+              </div>
+              <div className="border-t border-[rgba(255,255,255,0.15)] pt-3 flex items-center gap-2">
                 <div className="flex items-center">
                   {["B", "G", "J", "M"].map((l, i) => (
                     <div
@@ -272,7 +297,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <span className="text-[10px] font-semibold text-[rgba(255,255,255,0.55)]">250+ investors</span>
+                <span className="text-[10px] font-semibold text-[rgba(255,255,255,0.6)]">250+ investors</span>
               </div>
             </div>
           </div>
@@ -290,42 +315,25 @@ export default function Home() {
             WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)",
           }}
         >
-          <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 28s linear infinite" }}>
-            {[
-              "Georgia",
-              "Tennessee",
-              "Florida",
-              "Texas",
-              "Kentucky",
-              "Virginia",
-              "Alabama",
-              "Mississippi",
-              "North Carolina",
-              "Arizona",
-              "Georgia",
-              "Tennessee",
-              "Florida",
-              "Texas",
-              "Kentucky",
-              "Virginia",
-              "Alabama",
-              "Mississippi",
-              "North Carolina",
-              "Arizona",
-            ].map((state, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 px-5 text-[11px] font-semibold text-[rgba(255,255,255,0.42)] tracking-[0.05em] uppercase whitespace-nowrap border-r border-[rgba(255,255,255,0.06)]"
-              >
-                <span className="w-1 h-1 bg-[#e8432d] rounded-full flex-shrink-0" />
-                {state}
+          <div className="flex items-center w-max" style={{ animation: "tape-scroll-h 24s linear infinite" }}>
+            {[0, 1].map((copy) => (
+              <div key={copy} className="flex items-center flex-shrink-0" aria-hidden={copy === 1}>
+                {tickerStates.map((state, i) => (
+                  <div
+                    key={`${copy}-${state}-${i}`}
+                    className="flex items-center gap-2 px-4 text-[11px] font-semibold text-[rgba(255,255,255,0.42)] tracking-[0.05em] uppercase whitespace-nowrap border-r border-[rgba(255,255,255,0.06)]"
+                  >
+                    <span className="w-1 h-1 bg-[#e8432d] rounded-full flex-shrink-0" />
+                    {state}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <section className="bg-[#ede9e1] py-20 px-6 sm:px-10 lg:px-14" data-featured-pool-size={featuredProperties.length}>
+      <section className="bg-[var(--cream-alt)] py-20 px-6 sm:px-10 lg:px-14" data-featured-pool-size={featuredProperties.length}>
         <div className="max-w-[1360px] mx-auto">
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -451,7 +459,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#f7f4ef] border-t border-[rgba(13,12,11,0.07)] py-20 px-6 sm:px-10 lg:px-14">
+      <section className="bg-[var(--cream-base)] border-t border-[rgba(13,12,11,0.07)] py-20 px-6 sm:px-10 lg:px-14">
         <div className="max-w-[1360px] mx-auto">
           <div className="mb-14">
             <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#e8432d] mb-3">How It Works</p>
@@ -509,7 +517,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#ede9e1] border-t border-[rgba(13,12,11,0.07)] py-20 px-6 sm:px-10 lg:px-14">
+      <section className="bg-[var(--cream-alt)] border-t border-[rgba(13,12,11,0.07)] py-20 px-6 sm:px-10 lg:px-14">
         <div className="max-w-[1360px] mx-auto">
           <div className="mb-10">
             <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#e8432d] mb-3">Track Record</p>

@@ -56,6 +56,15 @@
   --surface-hex: #181614;
   --surface-2-hex: #201e1b;
   --surface-3-hex: #252220;
+  --cream-base: #f7f4ef;
+  --cream-alt: #ede9e1;
+  --cream-surface: #fffcf7;
+  --cream-border: rgba(13, 12, 11, 0.1);
+  --cream-border-strong: rgba(13, 12, 11, 0.16);
+  --cream-ink: #0d0c0b;
+  --cream-ink-muted: rgba(13, 12, 11, 0.62);
+  --cream-ink-soft: rgba(13, 12, 11, 0.42);
+  --cream-accent-muted: rgba(232, 67, 45, 0.08);
   --line: #2a2724;
   --line-light: #353129;
   --text-primary: #f0ebe3;

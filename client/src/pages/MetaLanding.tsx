@@ -18,7 +18,7 @@ declare global {
 
 function HeaderSection() {
   return (
-    <section className="bg-[#faf9f7] py-14 lg:py-16">
+    <section className="bg-[var(--cream-base)] py-14 lg:py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">
         <div className="text-center">
           <div className="mb-4">
@@ -67,7 +67,7 @@ function HowFirstPositionWorksSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-[var(--cream-base)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -103,7 +103,7 @@ function CapitalFlowSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-slate-50">
+    <section className="py-16 lg:py-24 bg-[var(--cream-alt)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -137,7 +137,7 @@ function CapitalFlowSection() {
 
 function CTASection() {
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-[var(--cream-base)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
         <div className="text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
@@ -179,7 +179,7 @@ export default function MetaLanding() {
   }, []);
 
   return (
-    <Layout>
+    <Layout creamShell>
       <main>
         <HeaderSection />
         <HowFirstPositionWorksSection />

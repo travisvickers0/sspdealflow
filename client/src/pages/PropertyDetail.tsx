@@ -1,11 +1,10 @@
 import { Layout } from "@/components/Layout";
+import { PropertyPhotoGallery } from "@/components/property/PropertyPhotoGallery";
 import { useProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import { useRoute, Link, Redirect } from "wouter";
 import {
   MapPin,
-  ChevronLeft,
-  ChevronRight,
   FileText,
   Share2,
   Loader2,
@@ -19,7 +18,6 @@ import {
   Hammer,
   Target,
   ArrowRight,
-  Images,
   Check,
   Download,
   Shield,
@@ -32,20 +30,11 @@ import { CompsMap } from "@/components/CompsMap";
 import { generatePropertyDescription } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
-import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
-import "yet-another-react-lightbox/plugins/thumbnails.css";
-import Counter from "yet-another-react-lightbox/plugins/counter";
-import "yet-another-react-lightbox/plugins/counter.css";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
 
 export default function PropertyDetail() {
   const [, params] = useRoute("/property/:slug");
   const { data: property, isLoading } = useProperty(params?.slug);
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [interestOpen, setInterestOpen] = useState(false);
   const [interestForm, setInterestForm] = useState({
     fullName: "",
@@ -105,21 +94,6 @@ export default function PropertyDetail() {
       });
     }
   }, [property?.id]);
-
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        setSelectedImage((prev) => (prev > 0 ? prev - 1 : allImages.length > 0 ? allImages.length - 1 : 0));
-      } else if (e.key === "ArrowRight") {
-        setSelectedImage((prev) =>
-          prev < (allImages.length > 0 ? allImages.length - 1 : 0) ? prev + 1 : 0,
-        );
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [allImages.length]);
 
   useEffect(() => {
     document.body.removeAttribute("data-nav-scrolled");
@@ -225,14 +199,6 @@ export default function PropertyDetail() {
 
   const investorTotalReturn = purchasePrice + investorProfitShare;
 
-  const handlePreviousImage = () => {
-    setSelectedImage((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
-  };
-
-  const handleNextImage = () => {
-    setSelectedImage((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
-  };
-
   const handleInterestSubmit = async () => {
     if (!property) return;
     if (!interestForm.fullName || !interestForm.email) return;
@@ -270,7 +236,40 @@ export default function PropertyDetail() {
     }
   };
 
-  const zillowHref = `https://www.zillow.com/homes/${encodeURIComponent(`${property.address} ${property.city} ${property.state} ${property.zip}`.replace(/,/g, "").replace(/\s+/g, "-").trim())}_rb/`;
+  const zillowHref =
+    property.zillowUrl ??
+    `https://www.zillow.com/homes/${encodeURIComponent(
+      `${property.address} ${property.city} ${property.state} ${property.zip}`
+        .replace(/,/g, "")
+        .replace(/\s+/g, "-")
+        .trim(),
+    )}_rb/`;
+
+  const handleShareProperty = async () => {
+    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: property.address,
+          text: `${property.address}, ${property.city}, ${property.state}`,
+          url: shareUrl,
+        });
+        return;
+      }
+
+      if (navigator.clipboard && shareUrl) {
+        await navigator.clipboard.writeText(shareUrl);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const mobileStreetAddress = property.address
+    .replace(new RegExp(`,?\\s*${property.city},\\s*${property.state}\\s+${property.zip}$`), "")
+    .split(",")[0]
+    .trim();
 
   const bpoValue = property.bpoValue ?? 0;
   const rehabBudget = property.rehabBudget ?? 0;
@@ -302,26 +301,47 @@ export default function PropertyDetail() {
     ? new Date(property.closingDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     : "TBD";
 
-  const specDateLabel = isSold ? "Exit Date" : "Closing";
-  const specDateValue =
-    isSold && property.exitDate
-      ? new Date(property.exitDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      : property.closingDate
-        ? new Date(property.closingDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-        : "N/A";
+  const specDateLabel = "Closing";
+  const specDateValue = property.closingDate
+    ? new Date(property.closingDate).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "—";
 
-  const sectionLabel = (label: string) => (
-    <div className="flex items-center gap-3 mb-6">
+  const sectionLabel = (label: string, className = "mb-6") => (
+    <div className={`hidden lg:flex items-center gap-3 ${className}`}>
       <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-tertiary)] whitespace-nowrap">
         {label}
       </span>
       <div className="flex-1 border-t border-[var(--line)]" />
     </div>
   );
+  const mobileSectionLabel = (label: string) => (
+    <p className="lg:hidden text-[10px] font-semibold tracking-[0.12em] uppercase text-[var(--text-tertiary)] mb-3">
+      {label}
+    </p>
+  );
+  const mobileSectionDividerClassName = "border-t border-[var(--line)] my-6 lg:hidden";
+  const fundingStatusPillClassName =
+    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wide";
+  const fundingStatusLabel = isAvailable
+    ? "Open"
+    : isCommitted
+      ? "Committed"
+      : isFunded
+        ? "Funded"
+        : "Sold";
+  const fundingStatusClassName = isAvailable
+    ? "bg-green-500/15 border border-green-500/20 text-green-400"
+    : isCommitted || isFunded
+      ? "bg-blue-500/15 border border-blue-500/20 text-blue-400"
+      : "bg-amber-500/15 border border-amber-500/20 text-amber-400";
 
   const profitCalculatorCard = (
-    <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6 space-y-5">
-      <div className="flex items-center gap-2 mb-1">
+    <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-5 sm:p-6 space-y-5">
+      <div className="flex flex-wrap items-center gap-2 mb-1">
         <span className="text-[13px] font-semibold text-[var(--text-primary)]">Profit Calculator</span>
         <span className="text-[10px] bg-[var(--surface-2-hex)] border border-[var(--line)] text-[var(--text-tertiary)] px-2 py-0.5 rounded-full">
           50/50 Split
@@ -329,21 +349,21 @@ export default function PropertyDetail() {
       </div>
 
       <div className="p-4 bg-[var(--surface-2-hex)] rounded-xl border border-[var(--line)]">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Your Investment</span>
             <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">Full purchase price</p>
           </div>
-          <span className="text-2xl font-mono font-bold text-[var(--text-primary)]">${purchasePrice.toLocaleString()}</span>
+          <span className="text-xl sm:text-2xl font-mono font-bold text-[var(--text-primary)] break-words">${purchasePrice.toLocaleString()}</span>
         </div>
       </div>
 
       <div className="p-4 bg-[var(--blue-muted)] rounded-xl border border-[var(--blue-border)]">
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
           <span className="text-sm font-semibold text-[var(--text-secondary)]">
             {isSold ? "Final Project Profit" : "Total Projected Equity"}
           </span>
-          <span className="text-xl font-mono font-bold text-blue-400">${totalEquity.toLocaleString()}</span>
+          <span className="text-lg sm:text-xl font-mono font-bold text-blue-400 break-words">${totalEquity.toLocaleString()}</span>
         </div>
         <p className="text-[11px] text-blue-400/70">
           {isSold ? "Total profit realized at exit" : "ARV minus purchase price and rehab costs"}
@@ -351,7 +371,7 @@ export default function PropertyDetail() {
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Profit Distribution</p>
           {usesGuaranteedMinimum && (
             <span className="text-[10px] font-semibold px-2 py-0.5 bg-amber-500/15 text-amber-400 rounded-full border border-amber-500/20">
@@ -389,7 +409,7 @@ export default function PropertyDetail() {
           <div className="h-4 rounded-full bg-[var(--surface-2-hex)]" />
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="p-3 bg-[var(--green-muted)] rounded-lg border border-[var(--green-border)] text-center">
             <p className="text-[11px] text-[var(--text-tertiary)] mb-1">{isSold ? "Investor Share" : "Your Share"}</p>
             <p className="text-lg font-mono font-bold text-green-400">${investorProfitShare.toLocaleString()}</p>
@@ -403,14 +423,14 @@ export default function PropertyDetail() {
       </div>
 
       <div className="p-4 bg-[var(--green-muted)] rounded-xl border-2 border-[var(--green-border)]">
-        <div className="flex justify-between items-start mb-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start mb-3">
           <div>
             <span className="text-sm font-semibold text-[var(--text-secondary)]">Your Total Return</span>
             <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">Investment + profit share</p>
           </div>
-          <span className="text-2xl font-mono font-bold text-green-400">${investorTotalReturn.toLocaleString()}</span>
+          <span className="text-xl sm:text-2xl font-mono font-bold text-green-400 break-words">${investorTotalReturn.toLocaleString()}</span>
         </div>
-        <div className="flex justify-between items-center pt-3 border-t border-[var(--green-border)]">
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center pt-3 border-t border-[var(--green-border)]">
           <span className="text-[11px] font-medium text-[var(--text-tertiary)]">
             {isSold ? "Realized ROI" : "Estimated ROI"}
           </span>
@@ -737,320 +757,166 @@ export default function PropertyDetail() {
 
   return (
     <Layout transparentNav>
-      <div className="relative w-full overflow-hidden">
-        <div className="relative w-full h-[55vw] min-h-[340px] max-h-[620px] lg:h-[620px] group">
-          <Link
-            href="/properties"
-            className="absolute top-6 left-6 lg:left-12 z-20 flex items-center gap-1.5 text-white/70 hover:text-white text-[13px] font-medium transition-colors pointer-events-auto group"
-          >
-            <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back
-          </Link>
+      <div className="bg-[var(--bg-hex)] relative z-10 min-h-screen">
+        <div className="pt-4 sm:pt-6 lg:pt-8">
+          <PropertyPhotoGallery
+            images={allImages}
+            address={property.address}
+          />
+        </div>
 
-          <div className="absolute inset-0 w-full h-full">
-            {allImages[selectedImage] ? (
-              <img
-                src={allImages[selectedImage]}
-                alt={property.address}
-                className="absolute inset-0 w-full h-full object-cover object-center cursor-pointer"
-                style={{ objectPosition: "50% 40%" }}
-                onClick={() => setLightboxOpen(true)}
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-hex)] via-[var(--surface-2-hex)] to-[var(--bg-hex)]">
-                <div
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)",
-                    backgroundSize: "48px 48px",
-                  }}
-                />
-              </div>
-            )}
-
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/50 via-black/5 to-black/15" />
-          </div>
-
-          {allImages.length > 1 && (
-            <button
-              type="button"
-              className="absolute top-5 right-5 lg:top-6 lg:right-12 flex items-center gap-2 px-3.5 py-2 bg-black/40 backdrop-blur-md border border-white/15 text-white text-[12px] font-medium rounded-full hover:bg-black/60 transition-all cursor-pointer z-20"
-              onClick={() => setLightboxOpen(true)}
-              data-testid="button-open-gallery"
-            >
-              <Images className="h-3.5 w-3.5" />
-              View all photos ({allImages.length})
-            </button>
-          )}
-
-          {allImages.length > 1 && (
-            <>
-              <button
-                type="button"
-                onClick={handlePreviousImage}
-                className="absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/15 grid place-items-center text-white/80 hover:bg-black/50 hover:text-white transition-all"
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="h-4 w-4 lg:h-5 lg:w-5" />
-              </button>
-              <button
-                type="button"
-                onClick={handleNextImage}
-                className="absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/15 grid place-items-center text-white/80 hover:bg-black/50 hover:text-white transition-all"
-                aria-label="Next image"
-              >
-                <ChevronRight className="h-4 w-4 lg:h-5 lg:w-5" />
-              </button>
-            </>
-          )}
-
-          <div className="absolute bottom-0 left-0 right-0 z-10 px-5 lg:px-12 pb-5 lg:pb-6">
-            <div className="flex items-end justify-between gap-6">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {isAvailable && (
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/20 backdrop-blur-sm border border-green-500/25 text-green-300">
-                      <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                      Open for Funding
-                    </span>
-                  )}
-                  {isCommitted && (
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/20 backdrop-blur-sm border border-blue-500/25 text-blue-300">
-                      Funding Committed
-                    </span>
-                  )}
-                  {isFunded && (
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/20 backdrop-blur-sm border border-blue-500/25 text-blue-300">
-                      Funded
-                    </span>
-                  )}
-                  {isSold && (
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/20 backdrop-blur-sm border border-amber-500/25 text-amber-300">
-                      <Check className="h-3 w-3" />
-                      Sold
-                    </span>
-                  )}
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-6 mt-6 pb-0 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 sm:gap-10 items-start">
+          <div className="flex flex-col pb-28 sm:pb-0">
+            <section className="lg:hidden mb-6">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  <span className={`${fundingStatusPillClassName} ${fundingStatusClassName}`}>
+                    {isAvailable && <span className="w-1.5 h-1.5 rounded-full bg-current" />}
+                    {fundingStatusLabel}
+                  </span>
                   <a
                     href={zillowHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2.5 py-1 bg-[#006AFF]/90 hover:bg-[#006AFF] text-white text-[11px] font-bold rounded-full transition-colors shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#006aff] text-white text-[11px] font-semibold transition-colors hover:bg-[#0058d4]"
                     data-testid="link-zillow"
                   >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                      <path d="M12 2L2 9.5V22h7v-7h6v7h7V9.5L12 2z" />
+                    </svg>
                     Zillow
                   </a>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleShareProperty}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                  title="Share"
+                  aria-label="Share property"
+                >
+                  <Share2 className="h-4 w-4" />
+                </button>
+              </div>
+              <h1
+                className="text-[26px] font-bold tracking-[-0.025em] text-[var(--text-primary)] leading-[1.1] mb-2"
+                data-testid="text-property-address"
+              >
+                {mobileStreetAddress}
+              </h1>
+              <div className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--text-secondary)]">
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 1C4.07 1 2.5 2.57 2.5 4.5c0 2.72 3.5 6.5 3.5 6.5s3.5-3.78 3.5-6.5C9.5 2.57 7.93 1 6 1z"
+                    stroke="currentColor"
+                    strokeWidth="1.2"
+                  />
+                  <circle cx="6" cy="4.5" r="1.2" fill="currentColor" />
+                </svg>
+                {property.city}, {property.state} {property.zip}
+              </div>
+            </section>
 
+            <section className="hidden lg:block lg:pb-10 lg:border-b border-[var(--line)]">
+              <div className="mb-6 lg:mb-0">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className={`${fundingStatusPillClassName} ${fundingStatusClassName}`}>
+                    {isAvailable && <span className="w-1.5 h-1.5 rounded-full bg-current" />}
+                    {fundingStatusLabel}
+                  </span>
+                  <a
+                    href={zillowHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#006aff] text-white text-[11px] font-semibold transition-colors hover:bg-[#0058d4]"
+                    data-testid="link-zillow"
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                      <path d="M12 2L2 9.5V22h7v-7h6v7h7V9.5L12 2z" />
+                    </svg>
+                    Zillow
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleShareProperty}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                    title="Share"
+                    aria-label="Share property"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </button>
+                </div>
                 <h1
-                  className="font-serif text-3xl sm:text-4xl lg:text-[52px] leading-[1.05] tracking-tight text-white mb-2 break-words"
+                  className="font-serif text-3xl lg:text-[44px] leading-[1.05] tracking-tight text-[var(--text-primary)] mb-3 break-words"
                   data-testid="text-property-address"
                 >
                   {property.address}
                 </h1>
-
-                <div className="flex flex-wrap items-center gap-2 text-white/70 text-[14px]">
-                  <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                <div className="flex flex-wrap items-center gap-2 text-[14px] text-[var(--text-secondary)]">
+                  <MapPin className="h-4 w-4 flex-shrink-0 text-[var(--text-tertiary)]" />
                   <span>
                     {property.city}, {property.state} {property.zip}
-                    {isSold && <span className="text-white/40"> · Exited</span>}
                   </span>
                 </div>
               </div>
+            </section>
+            <div className="hidden lg:block border-t border-[var(--line)] my-0" />
 
-              <div className="hidden lg:flex items-center gap-3 shrink-0">
-                <div className="bg-black/35 backdrop-blur-md border border-white/10 rounded-[10px] px-4 py-3 text-right">
-                  <p className="text-[9px] uppercase tracking-[0.1em] font-semibold text-white/45 mb-0.5">Purchase</p>
-                  <p className="font-mono text-[18px] font-medium text-white leading-none">${purchasePrice.toLocaleString()}</p>
-                </div>
-                <div className="bg-black/35 backdrop-blur-md border border-white/10 rounded-[10px] px-4 py-3 text-right">
-                  <p className="text-[9px] uppercase tracking-[0.1em] font-semibold text-white/45 mb-0.5">Equity</p>
-                  <p className="font-mono text-[18px] font-medium text-green-400 leading-none">${estimatedEquityVal.toLocaleString()}</p>
-                </div>
-                <div className="bg-black/35 backdrop-blur-md border border-white/10 rounded-[10px] px-4 py-3 text-right">
-                  <p className="text-[9px] uppercase tracking-[0.1em] font-semibold text-white/45 mb-0.5">ARV</p>
-                  <p className="font-mono text-[18px] font-medium text-white leading-none">${bpoValue.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {allImages.length > 1 && (
-            <div className="hidden lg:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-20 gap-1.5 bg-black/30 backdrop-blur-md rounded-lg p-1.5 border border-white/10">
-              {allImages.slice(0, 6).map((img, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setSelectedImage(idx)}
-                  className={`relative w-16 h-11 rounded-md overflow-hidden transition-all cursor-pointer ${
-                    selectedImage === idx
-                      ? "ring-2 ring-white ring-offset-1 ring-offset-black/50 opacity-100"
-                      : "opacity-60 hover:opacity-90"
-                  }`}
-                >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-              {allImages.length > 6 && (
-                <button
-                  type="button"
-                  onClick={() => setLightboxOpen(true)}
-                  className="w-16 h-11 rounded-md bg-black/50 backdrop-blur-sm text-white/80 text-[11px] font-semibold grid place-items-center hover:bg-black/70 transition-all cursor-pointer"
-                >
-                  +{allImages.length - 6}
-                </button>
-              )}
-            </div>
-          )}
-
-          {allImages.length > 1 && (
-            <div className="flex lg:hidden absolute bottom-20 left-1/2 -translate-x-1/2 z-20">
-              <span className="bg-black/40 backdrop-blur-sm text-white/80 text-[11px] font-medium px-3 py-1 rounded-full border border-white/10">
-                {selectedImage + 1} / {allImages.length}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="lg:hidden bg-[var(--bg-hex)]">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--line)]">
-            <div className="flex flex-wrap items-center gap-2 min-w-0">
-              {isAvailable && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-green-500/15 border border-green-500/20 text-green-400">
-                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                  Open
-                </span>
-              )}
-              {isCommitted && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
-                  Committed
-                </span>
-              )}
-              {isFunded && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-blue-500/15 border border-blue-500/20 text-blue-400">
-                  Funded
-                </span>
-              )}
-              {isSold && (
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wide bg-amber-500/15 border border-amber-500/20 text-amber-400">
-                  Sold
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2 shrink-0 ml-2">
-              <a
-                href={zillowHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-[8px] bg-[#006AFF] text-white hover:bg-[#0055CC] transition-colors"
-                data-testid="link-zillow"
-              >
-                <span className="text-[11px] font-bold">Z</span>
-              </a>
-              <button
-                type="button"
-                className="p-2.5 rounded-[8px] border border-[var(--line)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
-                title="Share"
-              >
-                <Share2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          <div className="px-5 pt-4 pb-5">
-            <h1
-              className="font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight text-[var(--text-primary)] mb-2"
-              data-testid="text-property-address"
-            >
-              {property.address}
-            </h1>
-            <div className="flex items-center gap-2 text-[var(--text-secondary)] text-[14px]">
-              <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-              <span>{property.city}, {property.state} {property.zip}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Lightbox
-        open={lightboxOpen}
-        close={() => setLightboxOpen(false)}
-        index={selectedImage}
-        slides={allImages.map((src) => ({ src }))}
-        plugins={[Thumbnails, Counter, Zoom]}
-        thumbnails={{
-          position: "bottom",
-          width: 100,
-          height: 70,
-          gap: 8,
-          padding: 8,
-        }}
-        counter={{ container: { style: { top: "unset", bottom: 0, left: "50%", transform: "translateX(-50%)" } } }}
-        carousel={{
-          finite: false,
-          preload: 3,
-        }}
-        zoom={{
-          maxZoomPixelRatio: 3,
-          scrollToZoom: true,
-        }}
-        styles={{
-          container: { backgroundColor: "rgba(0, 0, 0, 0.95)" },
-        }}
-        on={{
-          view: ({ index }) => setSelectedImage(index),
-        }}
-      />
-
-      <div className="bg-[var(--bg-hex)] relative z-10 min-h-screen">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24 lg:pb-12 grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-10 items-start">
-          <div className="flex flex-col">
-            <section className="py-10 border-b border-[var(--line)]">
-              {sectionLabel("Property")}
-              <div className="grid grid-cols-2 sm:grid-cols-4 border border-[var(--line)] rounded-[16px] overflow-hidden bg-[var(--surface-hex)] divide-x divide-y divide-[var(--line)]">
+            <section className="lg:py-10 lg:border-b border-[var(--line)]">
+              <div className="mb-6 lg:mb-0">
+                {mobileSectionLabel("PROPERTY")}
+                {sectionLabel("Property", "mt-0 mb-3")}
+                <div className="grid grid-cols-2 sm:grid-cols-4 border border-[var(--line)] rounded-[16px] overflow-hidden bg-[var(--surface-hex)] divide-x divide-y divide-[var(--line)]">
                 {[
                   { Icon: Bed, value: property.beds, label: "Bedrooms" },
                   { Icon: Bath, value: property.baths, label: "Bathrooms" },
-                  { Icon: Ruler, value: (property.squareFeet ?? 0).toLocaleString(), label: "Sq. Ft." },
+                  {
+                    Icon: Ruler,
+                    value: property.squareFeet ? property.squareFeet.toLocaleString() : "—",
+                    label: "Sq Ft",
+                  },
                   { Icon: Calendar, value: specDateValue, label: specDateLabel },
                 ].map(({ Icon, value, label }, i) => (
-                  <div key={i} className="px-5 py-6 hover:bg-[var(--surface-2-hex)] transition-colors">
-                    <div className="w-9 h-9 bg-[var(--surface-2-hex)] rounded-[8px] grid place-items-center mb-4 text-[var(--text-tertiary)]">
-                      <Icon className="h-4 w-4" strokeWidth={1.5} />
+                  <div key={i} className="p-3.5 lg:p-5 hover:bg-[var(--surface-2-hex)] transition-colors">
+                    <div className="w-7 h-7 lg:w-9 lg:h-9 bg-[var(--surface-2-hex)] rounded-[8px] grid place-items-center mb-2.5 lg:mb-4 text-[var(--text-tertiary)]">
+                      <Icon className="h-4 w-4 lg:h-6 lg:w-6" strokeWidth={1.5} />
                     </div>
-                    <p className="font-serif text-[32px] leading-none text-[var(--text-primary)] mb-1.5">{value}</p>
+                    <p className="font-serif text-[22px] lg:text-[28px] leading-none text-[var(--text-primary)] mb-1.5 break-words">{value}</p>
                     <p className="text-[11px] text-[var(--text-tertiary)]">{label}</p>
                   </div>
                 ))}
+                </div>
               </div>
             </section>
+            <div className={mobileSectionDividerClassName} />
 
-            <section className="py-10 border-b border-[var(--line)]">
-              {sectionLabel("Deal Financials")}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[14px] p-6">
+            <section className="lg:py-10 lg:border-b border-[var(--line)]">
+              <div className="mb-6 lg:mb-0">
+                {mobileSectionLabel("DEAL FINANCIALS")}
+                {sectionLabel("Deal Financials", "mt-0 mb-2")}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 sm:gap-3 mb-6 lg:mb-8">
+                <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[10px] sm:rounded-[14px] p-4 sm:p-6 mb-3 sm:mb-0">
                   <p className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-3">PURCHASE PRICE</p>
-                  <p className="font-mono text-[28px] font-medium text-[var(--text-primary)]">${purchasePrice.toLocaleString()}</p>
+                  <p className="font-mono text-[24px] sm:text-[28px] font-medium text-[var(--text-primary)] break-words">${purchasePrice.toLocaleString()}</p>
                   <p className="text-[11px] text-[var(--text-tertiary)] mt-2">Your total investment</p>
                 </div>
-                <div className="bg-[var(--blue-muted)] border border-[var(--blue-border)] rounded-[14px] p-6">
+                <div className="bg-[var(--blue-muted)] border border-[var(--blue-border)] rounded-[10px] sm:rounded-[14px] p-4 sm:p-6 mb-3 sm:mb-0">
                   <p className="text-[10px] uppercase tracking-wide text-blue-400/60 mb-3">AFTER REPAIR VALUE</p>
-                  <p className="font-mono text-[28px] font-medium text-blue-400">${bpoValue.toLocaleString()}</p>
+                  <p className="font-mono text-[24px] sm:text-[28px] font-medium text-blue-400 break-words">${bpoValue.toLocaleString()}</p>
                   <p className="text-[11px] text-blue-400/50 mt-2">BPO-verified market value</p>
                 </div>
                 {!isSold && (
-                  <div className="bg-[var(--green-muted)] border border-[var(--green-border)] rounded-[14px] p-6">
+                  <div className="bg-[var(--green-muted)] border border-[var(--green-border)] rounded-[10px] sm:rounded-[14px] p-4 sm:p-6">
                     <p className="text-[10px] uppercase tracking-wide text-green-400/60 mb-3">EST. PROFIT</p>
-                    <p className="font-mono text-[28px] font-medium text-green-400">${estimatedEquityVal.toLocaleString()}</p>
+                    <p className="font-mono text-[24px] sm:text-[28px] font-medium text-green-400 break-words">${estimatedEquityVal.toLocaleString()}</p>
                     <p className="text-[11px] text-green-400/50 mt-2">50/50 split at sale</p>
                   </div>
                 )}
               </div>
 
-              <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[16px] p-7">
-                <div className="flex justify-between items-center mb-6">
+              <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[16px] p-5 sm:p-7">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6">
                   <span className="text-[13px] font-semibold text-[var(--text-secondary)]">Deal Waterfall</span>
-                  <span className="text-[11px] text-[var(--text-tertiary)]">
+                  <span className="text-[11px] text-[var(--text-tertiary)] sm:text-right">
                     {rehabBudget === 0 ? "$0 rehab budget" : `$${rehabBudget.toLocaleString()} rehab budget`}
                   </span>
                 </div>
@@ -1082,8 +948,11 @@ export default function PropertyDetail() {
                     value: `$${estimatedEquityVal.toLocaleString()}`,
                   },
                 ].map((row, idx) => (
-                  <div key={idx} className="flex items-center gap-4 mb-3 last:mb-0">
-                    <span className="text-[12px] text-[var(--text-tertiary)] w-[140px] flex-shrink-0">{row.label}</span>
+                  <div key={idx} className="grid grid-cols-1 sm:grid-cols-[140px_minmax(0,1fr)_80px] gap-2 sm:gap-4 items-center mb-3 last:mb-0">
+                    <div className="flex items-center justify-between gap-3 sm:block">
+                      <span className="text-[12px] text-[var(--text-tertiary)]">{row.label}</span>
+                      <span className="font-mono text-[12px] text-[var(--text-tertiary)] sm:hidden">{row.value}</span>
+                    </div>
                     <div className="flex-1 h-8 bg-[var(--surface-2-hex)] rounded-[6px] overflow-hidden">
                       <div
                         className={`h-full rounded-[6px] flex items-center px-3 font-mono text-[12px] font-medium min-w-0 ${row.fillClass}`}
@@ -1095,19 +964,24 @@ export default function PropertyDetail() {
                         {(row.empty || row.widthPct > 12) && <span className="truncate">{row.value}</span>}
                       </div>
                     </div>
-                    <span className="font-mono text-[12px] text-[var(--text-tertiary)] w-20 text-right flex-shrink-0">{row.value}</span>
+                    <span className="hidden sm:block font-mono text-[12px] text-[var(--text-tertiary)] w-20 text-right flex-shrink-0">{row.value}</span>
                   </div>
                 ))}
               </div>
+              </div>
             </section>
+            <div className={mobileSectionDividerClassName} />
 
             {!isSold && (
-              <section className="py-10 border-b border-[var(--line)]">
-                {sectionLabel("50 / 50 Profit Split")}
-                <div className="grid grid-cols-2 gap-0.5 rounded-[16px] overflow-hidden mb-5">
-                  <div className="bg-[var(--green-muted)] border border-[var(--green-border)] rounded-l-[16px] p-7">
+              <>
+                <section className="lg:py-10 lg:border-b border-[var(--line)]">
+                  <div className="mb-6 lg:mb-0">
+                    {mobileSectionLabel("50/50 PROFIT SPLIT")}
+                    {sectionLabel("50 / 50 Profit Split")}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-0.5 rounded-[16px] overflow-hidden mb-5">
+                  <div className="bg-[var(--green-muted)] border border-[var(--green-border)] rounded-[16px] sm:rounded-l-[16px] sm:rounded-r-none p-5 sm:p-7">
                     <p className="text-[10px] uppercase tracking-wide text-green-400/60 mb-2">YOUR SHARE</p>
-                    <p className="font-mono text-[38px] font-medium text-green-400 leading-none mb-2">
+                    <p className="font-mono text-[32px] sm:text-[38px] font-medium text-green-400 leading-none mb-2 break-words">
                       ${investorProfitShare.toLocaleString()}
                     </p>
                     <p className="text-[12px] text-[var(--text-tertiary)]">
@@ -1115,9 +989,9 @@ export default function PropertyDetail() {
                       {usesGuaranteedMinimum && <span className="text-amber-400"> (Guaranteed Minimum)</span>}
                     </p>
                   </div>
-                  <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-r-[16px] p-7">
+                  <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[16px] sm:rounded-r-[16px] sm:rounded-l-none p-5 sm:p-7">
                     <p className="text-[10px] uppercase tracking-wide text-[var(--text-tertiary)] mb-2">SSP SHARE</p>
-                    <p className="font-mono text-[38px] font-medium text-[var(--text-secondary)] leading-none mb-2">
+                    <p className="font-mono text-[32px] sm:text-[38px] font-medium text-[var(--text-secondary)] leading-none mb-2 break-words">
                       ${sspProfitShare.toLocaleString()}
                     </p>
                     <p className="text-[12px] text-[var(--text-tertiary)]">SSP manages all operations</p>
@@ -1127,7 +1001,7 @@ export default function PropertyDetail() {
                   <div className="w-1/2 bg-green-500 rounded-full" />
                   <div className="w-1/2 bg-[var(--surface-3-hex)] rounded-full" />
                 </div>
-                <div className="flex items-center justify-between bg-[var(--surface-hex)] border border-[var(--line)] rounded-[12px] px-6 py-5">
+                <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between bg-[var(--surface-hex)] border border-[var(--line)] rounded-[12px] px-5 sm:px-6 py-5">
                   <div>
                     <p className="text-[13px] text-[var(--text-secondary)]">Your Total Return at Sale</p>
                     <p className="text-[11px] text-[var(--text-tertiary)] mt-1">${investorTotalReturn.toLocaleString()} total</p>
@@ -1137,41 +1011,50 @@ export default function PropertyDetail() {
                     <p className="text-[11px] text-[var(--text-tertiary)] mt-1">Est. ROI</p>
                   </div>
                 </div>
-              </section>
+                  </div>
+                </section>
+                <div className={mobileSectionDividerClassName} />
+              </>
             )}
 
-            <section className="py-10 border-b border-[var(--line)]">
-              {sectionLabel("Deal Thesis")}
-              {isSold ? (
-                <div className="text-[15px] text-[var(--text-secondary)] leading-[1.85] space-y-4">
+            <section className="lg:py-10 lg:border-b border-[var(--line)]">
+              <div className="mb-6 lg:mb-0">
+                {mobileSectionLabel("DEAL THESIS")}
+                {sectionLabel("Deal Thesis")}
+                {isSold ? (
+                  <div className="text-[15px] text-[var(--text-secondary)] leading-[1.85] space-y-4">
                   <p>
                     This property was successfully acquired, renovated, and sold as part of our value-add strategy. The project was secured off-market at a competitive entry price and executed through a standardized, low-risk cosmetic update. The renovation focused on high-impact basics—new flooring, fresh paint, and general improvements—to bring the property to market standards and maximize resale value.
                   </p>
                   {property.description && <p>{property.description}</p>}
                 </div>
-              ) : (
-                <>
-                  <div
-                    className="text-[15px] text-[var(--text-secondary)] leading-[1.85] space-y-4 [&_p]:mb-4"
-                    dangerouslySetInnerHTML={{
-                      __html: generatePropertyDescription(property)
-                        .split("\n\n")
-                        .map((para) => `<p>${para.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`)
-                        .join(""),
-                    }}
-                    data-testid="text-property-description"
-                  />
-                  <div className="mt-7 pl-5 border-l-4 border-primary bg-[var(--surface-hex)] rounded-r-[12px] p-5 text-[13px] text-[var(--text-secondary)] leading-[1.7]">
+                ) : (
+                  <>
+                    <div
+                      className="text-[15px] text-[var(--text-secondary)] leading-[1.85] space-y-4 [&_p]:mb-4"
+                      dangerouslySetInnerHTML={{
+                        __html: generatePropertyDescription(property)
+                          .split("\n\n")
+                          .map((para) => `<p>${para.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`)
+                          .join(""),
+                      }}
+                      data-testid="text-property-description"
+                    />
+                    <div className="mt-6 lg:mt-7 pl-5 border-l-4 border-primary bg-[var(--surface-hex)] rounded-r-[12px] p-5 text-[13px] text-[var(--text-secondary)] leading-[1.7]">
                     This opportunity represents a clear value-add scenario secured off-market at a competitive entry price. You fund the purchase. SSP handles rehab & management. When the property sells, you get your capital back plus your 50% profit share.
-                  </div>
-                </>
-              )}
+                    </div>
+                  </>
+                )}
+              </div>
             </section>
+            <div className={mobileSectionDividerClassName} />
 
             {isSold && (
-              <section className="lg:hidden py-10 border-b border-[var(--line)]">
-                {sectionLabel("Deal Outcome")}
-                <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6 space-y-4">
+              <>
+                <section className="lg:hidden">
+                  <div className="mb-6">
+                    {mobileSectionLabel("DEAL OUTCOME")}
+                    <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[20px] p-6 space-y-4">
                   {property.exitDate && (
                     <div className="flex justify-between text-[13px]">
                       <span className="text-[var(--text-secondary)]">Exit Date</span>
@@ -1197,18 +1080,25 @@ export default function PropertyDetail() {
                     Download Case Study PDF
                   </Button>
                 </div>
-              </section>
+                  </div>
+                </section>
+                <div className={mobileSectionDividerClassName} />
+              </>
             )}
 
-            <div className="lg:hidden py-10 border-b border-[var(--line)]">
-              {sectionLabel("Profit Calculator")}
+            <div className="lg:hidden mb-6">
+              {mobileSectionLabel("PROFIT CALCULATOR")}
               {profitCalculatorCard}
             </div>
+            <div className={mobileSectionDividerClassName} />
 
             {hasComps && (
-              <section className="py-10 border-b border-[var(--line)]">
-                {sectionLabel("Location & Comps")}
-                <div className="rounded-[16px] overflow-hidden h-[280px] border border-[var(--line)] mb-6">
+              <>
+                <section className="lg:py-10 lg:border-b border-[var(--line)]">
+                  <div className="mb-6 lg:mb-0">
+                    {mobileSectionLabel("LOCATION & COMPS")}
+                    {sectionLabel("Location & Comps")}
+                    <div className="rounded-[16px] overflow-hidden h-[280px] border border-[var(--line)] mb-6">
                   <CompsMap
                     subjectAddress={property.address}
                     subjectCity={property.city}
@@ -1217,8 +1107,8 @@ export default function PropertyDetail() {
                     comps={compsForMap}
                   />
                 </div>
-                <div className="w-full border border-[var(--line)] rounded-[14px] overflow-hidden">
-                  <table className="w-full text-left">
+                <div className="w-full border border-[var(--line)] rounded-[14px] overflow-hidden overflow-x-auto">
+                  <table className="w-full min-w-[680px] text-left">
                     <thead className="bg-[var(--surface-2-hex)]">
                       <tr>
                         {["Address", "Beds·Baths", "Sq.Ft.", "Sale Price", "Sold"].map((h) => (
@@ -1272,13 +1162,19 @@ export default function PropertyDetail() {
                     </tbody>
                   </table>
                 </div>
-              </section>
+                  </div>
+                </section>
+                <div className={mobileSectionDividerClassName} />
+              </>
             )}
 
             {(isAvailable || isCommitted) && (
-              <section className="py-10 border-b border-[var(--line)]">
-                {sectionLabel("Deal Timeline")}
-                <div className="relative pl-2">
+              <>
+                <section className="lg:py-10 lg:border-b border-[var(--line)]">
+                  <div className="mb-6 lg:mb-0">
+                    {mobileSectionLabel("DEAL TIMELINE")}
+                    {sectionLabel("Deal Timeline")}
+                    <div className="relative pl-2">
                   <div className="absolute left-[11px] top-3 bottom-3 w-px bg-[var(--line)]" />
                   {[
                     {
@@ -1344,13 +1240,18 @@ export default function PropertyDetail() {
                     </div>
                   ))}
                 </div>
-              </section>
+                  </div>
+                </section>
+                <div className={mobileSectionDividerClassName} />
+              </>
             )}
 
-            <section className="py-10">
-              {sectionLabel("Documents")}
-              {documents.length > 0 ? (
-                <div>
+            <section className="lg:py-10">
+              <div className="mb-6 lg:mb-0">
+                {mobileSectionLabel("DOCUMENTS")}
+                {sectionLabel("Documents")}
+                {documents.length > 0 ? (
+                  <div>
                   {documents.map((doc, idx) => (
                     <a
                       key={idx}
@@ -1374,13 +1275,14 @@ export default function PropertyDetail() {
                     </a>
                   ))}
                 </div>
-              ) : (
-                <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[14px] p-10 text-center">
+                ) : (
+                  <div className="bg-[var(--surface-hex)] border border-[var(--line)] rounded-[14px] p-10 text-center">
                   <FileText className="h-9 w-9 text-[var(--line-light)] mx-auto mb-3" />
                   <p className="text-[13px] text-[var(--text-tertiary)]">No documents uploaded yet</p>
                   <p className="text-[11px] mt-1 opacity-60 text-[var(--text-tertiary)]">Documents appear here once uploaded</p>
                 </div>
-              )}
+                )}
+              </div>
             </section>
           </div>
 

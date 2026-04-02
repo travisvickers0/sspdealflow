@@ -81,9 +81,10 @@ interface LayoutProps {
   children: React.ReactNode;
   transparentNav?: boolean;
   transparentNavDark?: boolean;
+  creamShell?: boolean;
 }
 
-export function Layout({ children, transparentNav = false, transparentNavDark = false }: LayoutProps) {
+export function Layout({ children, transparentNav = false, transparentNavDark = false, creamShell = false }: LayoutProps) {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
@@ -134,10 +135,11 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
   }, [transparentNav, transparentNavDark]);
 
   const isDarkText = transparentNavDark && !navScrolled;
+  const usesCreamChrome = isDarkText || (creamShell && (!transparentNav || navScrolled));
 
   const navLinkClass = (active: boolean) =>
     `text-sm font-medium transition-colors ${
-      isDarkText
+      usesCreamChrome
         ? (active ? "text-[#0d0c0b]" : "text-[rgba(13,12,11,0.5)] hover:text-[#0d0c0b]")
         : (active ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]")
     }`;
@@ -146,13 +148,19 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
     `text-sm font-medium py-3 px-4 rounded-lg transition-colors ${navLinkClass(active)}`;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background font-sans text-foreground overflow-x-hidden">
+    <div
+      className={`min-h-screen flex flex-col font-sans overflow-x-hidden ${
+        creamShell ? "bg-[var(--cream-base)] text-[var(--cream-ink)]" : "bg-background text-foreground"
+      }`}
+    >
       <header
         className={`sticky top-0 z-50 w-full pt-[env(safe-area-inset-top)] ${
           (transparentNav || transparentNavDark) && !navScrolled
             ? transparentNavDark
-              ? "border-b border-transparent bg-[#f7f4ef]"
+              ? "border-b border-transparent bg-[var(--cream-base)]"
               : "border-b border-transparent bg-transparent"
+            : creamShell
+              ? "border-b border-[var(--cream-border)] bg-[rgba(247,244,239,0.92)] backdrop-blur-[16px]"
             : "border-b border-[var(--line)] bg-[rgba(15,14,13,0.92)] backdrop-blur-[16px]"
         }`}
         style={{ transition: "background 0.5s, border-color 0.5s, backdrop-filter 0.5s" }}
@@ -191,7 +199,7 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                     <Button
                       variant="ghost"
                       size="sm"
-                      className={`hidden sm:flex cursor-pointer gap-2 transition-colors ${isDarkText ? "text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
+                      className={`hidden sm:flex cursor-pointer gap-2 transition-colors ${usesCreamChrome ? "text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
                     >
                       <LogOut className="h-4 w-4" />
                       Log out
@@ -203,7 +211,7 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                   <a href="/signin">
                     <Button
                       size="sm"
-                      className={`h-9 rounded-full px-5 bg-transparent text-[13px] font-medium transition-all cursor-pointer ${isDarkText ? "border border-[rgba(13,12,11,0.15)] text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b] hover:border-[rgba(13,12,11,0.3)]" : "border border-[var(--line-light)] text-[var(--text-secondary)] hover:border-[var(--text-tertiary)] hover:text-[var(--text-primary)]"}`}
+                      className={`h-9 rounded-full px-5 bg-transparent text-[13px] font-medium transition-all cursor-pointer ${usesCreamChrome ? "border border-[rgba(13,12,11,0.15)] text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b] hover:border-[rgba(13,12,11,0.3)]" : "border border-[var(--line-light)] text-[var(--text-secondary)] hover:border-[var(--text-tertiary)] hover:text-[var(--text-primary)]"}`}
                     >
                       Sign in
                     </Button>
@@ -211,7 +219,7 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                   <a href="/signup">
                     <Button
                       size="sm"
-                      className={`h-9 rounded-full px-5 text-[13px] font-semibold transition-all cursor-pointer active:scale-95 ${isDarkText ? "bg-[#0d0c0b] text-[#f7f4ef] hover:bg-[#e8432d]" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+                      className={`h-9 rounded-full px-5 text-[13px] font-semibold transition-all cursor-pointer active:scale-95 ${usesCreamChrome ? "bg-[#0d0c0b] text-[var(--cream-base)] hover:bg-[#e8432d]" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
                     >
                       Sign up
                     </Button>
@@ -222,7 +230,7 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
             <Button
               variant="ghost"
               size="icon"
-              className={`md:hidden h-9 w-9 cursor-pointer active:scale-95 ${isDarkText ? "text-[#0d0c0b]" : "text-[var(--text-secondary)]"}`}
+              className={`md:hidden h-9 w-9 cursor-pointer active:scale-95 ${usesCreamChrome ? "text-[#0d0c0b]" : "text-[var(--text-secondary)]"}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               <Menu className="h-5 w-5" />
@@ -231,7 +239,13 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[var(--line)] bg-[rgba(15,14,13,0.96)] backdrop-blur-lg animate-in slide-in-from-top-2 duration-200">
+          <div
+            className={`md:hidden backdrop-blur-lg animate-in slide-in-from-top-2 duration-200 ${
+              usesCreamChrome
+                ? "border-t border-[var(--cream-border)] bg-[rgba(247,244,239,0.98)]"
+                : "border-t border-[var(--line)] bg-[rgba(15,14,13,0.96)]"
+            }`}
+          >
             <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
               <Link
                 href="/properties"
@@ -256,12 +270,16 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
                   Admin
                 </Link>
               )}
-              <div className="border-t border-[var(--line)] my-2" />
+              <div className={`my-2 ${usesCreamChrome ? "border-t border-[var(--cream-border)]" : "border-t border-[var(--line)]"}`} />
               {isAuthenticated ? (
                 <a href="/api/logout" className="w-full">
                   <Button
                     variant="ghost"
-                    className="w-full justify-center cursor-pointer active:scale-95 gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    className={`w-full justify-center cursor-pointer active:scale-95 gap-2 ${
+                      usesCreamChrome
+                        ? "text-[rgba(13,12,11,0.6)] hover:text-[#0d0c0b]"
+                        : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    }`}
                   >
                     <LogOut className="h-4 w-4" />
                     Log out
@@ -270,12 +288,22 @@ export function Layout({ children, transparentNav = false, transparentNavDark = 
               ) : (
                 <div className="flex flex-col gap-2 w-full">
                   <a href="/signin" className="w-full">
-                    <Button className="w-full justify-center cursor-pointer active:scale-95 h-9 rounded-full px-5 border border-[var(--line-light)] bg-transparent text-[var(--text-secondary)] text-[13px] font-medium hover:border-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-all">
+                    <Button
+                      className={`w-full justify-center cursor-pointer active:scale-95 h-9 rounded-full px-5 bg-transparent text-[13px] font-medium transition-all ${
+                        usesCreamChrome
+                          ? "border border-[rgba(13,12,11,0.15)] text-[rgba(13,12,11,0.6)] hover:border-[rgba(13,12,11,0.3)] hover:text-[#0d0c0b]"
+                          : "border border-[var(--line-light)] text-[var(--text-secondary)] hover:border-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+                      }`}
+                    >
                       Sign in
                     </Button>
                   </a>
                   <a href="/signup" className="w-full">
-                    <Button className="w-full justify-center cursor-pointer active:scale-95 h-9 rounded-full px-5 bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 transition-all">
+                    <Button
+                      className={`w-full justify-center cursor-pointer active:scale-95 h-9 rounded-full px-5 text-[13px] font-semibold transition-all ${
+                        usesCreamChrome ? "bg-[#0d0c0b] text-[var(--cream-base)] hover:bg-[#e8432d]" : "bg-primary text-primary-foreground hover:bg-primary/90"
+                      }`}
+                    >
                       Sign up
                     </Button>
                   </a>

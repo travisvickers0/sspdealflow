@@ -23,7 +23,7 @@ import airbnbHero from "@assets/generated_images/clean_airbnb-style_minimal_warm
 
 function HeroSection() {
   return (
-    <section className="relative bg-[#faf9f7] py-20 lg:py-28 overflow-hidden">
+    <section className="relative bg-[var(--cream-base)] py-20 lg:py-28 overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
         <img 
           src={airbnbHero} 
@@ -86,7 +86,7 @@ function StepsSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-[var(--cream-base)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12">
           <span className="text-sm font-semibold text-primary uppercase tracking-wide">Simple Process</span>
@@ -155,7 +155,7 @@ function ComparisonSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-slate-50">
+    <section className="py-16 lg:py-24 bg-[var(--cream-alt)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -202,7 +202,7 @@ function ComparisonSection() {
 
 function InvestmentModelSection() {
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-[var(--cream-base)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -287,7 +287,7 @@ function CapitalProtectionSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-slate-50">
+    <section className="py-16 lg:py-24 bg-[var(--cream-alt)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -343,7 +343,7 @@ function TimelineSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-[var(--cream-base)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -428,7 +428,7 @@ function RecentlyFundedSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-[var(--cream-base)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
@@ -514,7 +514,7 @@ function FAQSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-slate-50">
+    <section className="py-16 lg:py-24 bg-[var(--cream-alt)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -546,7 +546,7 @@ function FAQSection() {
 
 function FinalCTASection() {
   return (
-    <section className="relative py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-rose-50 via-amber-50 to-white">
+    <section className="relative py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-[var(--cream-alt)] via-[var(--cream-base)] to-[var(--cream-surface)]">
       <div className="hidden sm:block absolute top-20 left-20 w-64 h-64 bg-primary/5 rounded-full filter blur-3xl animate-pulse" />
       <div className="hidden sm:block absolute bottom-10 right-32 w-72 h-72 bg-orange-200/10 rounded-full filter blur-3xl animate-pulse delay-1000" />
       
@@ -586,7 +586,7 @@ function FinalCTASection() {
 
 export default function HowItWorks() {
   return (
-    <Layout>
+    <Layout creamShell>
       <main>
         <HeroSection />
         <StepsSection />
