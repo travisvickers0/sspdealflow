@@ -210,7 +210,11 @@ export default function TrackRecord() {
     } else if (sortBy === "hold") {
       nextDeals = [...nextDeals].sort((a, b) => (a.daysHeld ?? 0) - (b.daysHeld ?? 0));
     } else {
-      nextDeals = [...nextDeals].sort((a, b) => (b.closeDate ?? "").localeCompare(a.closeDate ?? ""));
+      nextDeals = [...nextDeals].sort((a, b) => {
+        const da = a.closeDate ? new Date(a.closeDate).getTime() : 0;
+        const db = b.closeDate ? new Date(b.closeDate).getTime() : 0;
+        return db - da;
+      });
     }
 
     return nextDeals;
