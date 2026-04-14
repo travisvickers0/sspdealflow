@@ -65,11 +65,20 @@ function DealCard({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[rgba(0,0,0,0.3)] to-transparent" />
 
-        <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-[rgba(10,9,8,0.7)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-full px-2.5 py-1">
-          <span className="w-1.5 h-1.5 bg-[#4ade80] rounded-full flex-shrink-0" />
-          <span className="text-[9px] font-bold tracking-[0.07em] uppercase text-[rgba(255,255,255,0.8)]">
-            Completed
-          </span>
+        <div className="absolute top-3 left-3 flex items-center gap-2">
+          <div className="flex items-center gap-1.5 bg-[rgba(10,9,8,0.7)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-full px-2.5 py-1">
+            <span className="w-1.5 h-1.5 bg-[#4ade80] rounded-full flex-shrink-0" />
+            <span className="text-[9px] font-bold tracking-[0.07em] uppercase text-[rgba(255,255,255,0.8)]">
+              Completed
+            </span>
+          </div>
+          {(deal.investorRoi == null || deal.investorRoi === 0) && (
+            <div className="flex items-center gap-1.5 bg-[rgba(10,9,8,0.7)] backdrop-blur-sm border border-[rgba(255,255,255,0.12)] rounded-full px-2.5 py-1">
+              <span className="text-[9px] font-bold tracking-[0.07em] uppercase text-amber-400">
+                Cash Deal
+              </span>
+            </div>
+          )}
         </div>
 
         {deal.annualizedRoi != null ? (
@@ -104,12 +113,25 @@ function DealCard({
             </div>
           </div>
           <div className="bg-[#f7f4ef] px-3 py-2.5">
-            <div className="font-mono text-[14px] font-medium text-[#2563eb] leading-none mb-1">
-              {deal.investorRoi != null ? `${deal.investorRoi.toFixed(2)}%` : "—"}
-            </div>
-            <div className="text-[8px] font-semibold tracking-[0.09em] uppercase text-[rgba(13,12,11,0.35)]">
-              Inv. ROI
-            </div>
+            {deal.investorRoi != null && deal.investorRoi > 0 ? (
+              <>
+                <div className="font-mono text-[14px] font-medium text-[#2563eb] leading-none mb-1">
+                  {deal.investorRoi.toFixed(2)}%
+                </div>
+                <div className="text-[8px] font-semibold tracking-[0.09em] uppercase text-[rgba(13,12,11,0.35)]">
+                  Inv. ROI
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="font-mono text-[11px] font-semibold text-amber-600 leading-none mb-1">
+                  Cash Deal
+                </div>
+                <div className="text-[8px] font-semibold tracking-[0.09em] uppercase text-[rgba(13,12,11,0.35)]">
+                  No JV
+                </div>
+              </>
+            )}
           </div>
           <div className="bg-[#f7f4ef] px-3 py-2.5">
             <div className="font-mono text-[14px] font-medium text-[#0d0c0b] leading-none mb-1">
