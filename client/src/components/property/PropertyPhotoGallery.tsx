@@ -27,7 +27,7 @@ export function PropertyPhotoGallery({
     <>
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-6">
         <div className="overflow-hidden rounded-2xl bg-[var(--surface-hex)] shadow-xl ring-1 ring-black/5">
-          <div className="relative h-[240px] sm:h-[340px] lg:h-[460px]">
+          <div className="relative h-[240px] sm:h-[340px] lg:h-[340px]">
             {activeImage ? (
               <img
                 key={activeImage}
