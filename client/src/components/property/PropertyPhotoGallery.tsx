@@ -72,20 +72,21 @@ export function PropertyPhotoGallery({
     </Link>
   );
 
-  const viewAllPill = showViewAllPill ? (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        openLightboxAt(0);
-      }}
-      className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-2 rounded-[8px] bg-black/75 px-3.5 py-2 text-[13px] font-medium text-white backdrop-blur-md transition-colors hover:bg-black/85"
-      data-testid="button-open-gallery"
-    >
-      <GridIcon className="text-white" />
-      View all {totalPhotos} photos
-    </button>
-  ) : null;
+  const renderViewAllPill = (testId: string) =>
+    showViewAllPill ? (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          openLightboxAt(0);
+        }}
+        className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-2 rounded-[8px] bg-black/75 px-3.5 py-2 text-[13px] font-medium text-white backdrop-blur-md transition-colors hover:bg-black/85"
+        data-testid={testId}
+      >
+        <GridIcon className="text-white" />
+        View all {totalPhotos} photos
+      </button>
+    ) : null;
 
   return (
     <>
@@ -118,7 +119,7 @@ export function PropertyPhotoGallery({
             )}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/30 via-black/10 to-transparent" />
             {backPill}
-            {viewAllPill}
+            {renderViewAllPill("button-open-gallery-mobile")}
           </div>
         </div>
 
@@ -206,7 +207,7 @@ export function PropertyPhotoGallery({
                         style={{ background: "var(--surface-2-hex)" }}
                       />
                     )}
-                    {isLastTile && viewAllPill}
+                    {isLastTile && renderViewAllPill("button-open-gallery")}
                   </div>
                 );
               })}
