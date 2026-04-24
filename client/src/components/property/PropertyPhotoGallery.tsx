@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ChevronLeft, Images } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -14,101 +14,211 @@ interface PropertyPhotoGalleryProps {
   address: string;
 }
 
+function GridIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="0.5" y="0.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="8" y="0.5" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="0.5" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+      <rect x="8" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
 export function PropertyPhotoGallery({
   images,
   address,
 }: PropertyPhotoGalleryProps) {
-  const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const activeImage = images[selectedImage];
+  const totalPhotos = images.length;
+  const heroImage = images[0];
+  const previewImages: (string | null)[] = [
+    images[1] ?? null,
+    images[2] ?? null,
+    images[3] ?? null,
+    images[4] ?? null,
+  ];
+  const showViewAllPill = totalPhotos > 5;
+
+  const openLightboxAt = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const tileBaseClass =
+    "group relative overflow-hidden cursor-pointer transition-[filter,opacity] duration-150 hover:brightness-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60";
+
+  const placeholderClass =
+    "w-full h-full bg-gradient-to-br from-[var(--surface-2-hex)] via-[var(--surface-hex)] to-[var(--bg-hex)]";
+
+  const backPill = (
+    <Link
+      href="/properties"
+      className="absolute left-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-black/45 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-black/60"
+      data-testid="link-back-properties"
+    >
+      <ChevronLeft className="h-4 w-4" />
+      Back
+    </Link>
+  );
+
+  const viewAllPill = showViewAllPill ? (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        openLightboxAt(0);
+      }}
+      className="absolute bottom-3 right-3 z-20 inline-flex items-center gap-2 rounded-[8px] bg-black/75 px-3.5 py-2 text-[13px] font-medium text-white backdrop-blur-md transition-colors hover:bg-black/85"
+      data-testid="button-open-gallery"
+    >
+      <GridIcon className="text-white" />
+      View all {totalPhotos} photos
+    </button>
+  ) : null;
 
   return (
     <>
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-6">
-        <div className="overflow-hidden rounded-2xl bg-[var(--surface-hex)] shadow-xl ring-1 ring-black/5">
-          <div className="relative h-[240px] sm:h-[340px] lg:h-[340px]">
-            {activeImage ? (
+        {/* Mobile: single hero with View All overlay */}
+        <div className="md:hidden">
+          <div
+            role={heroImage ? "button" : undefined}
+            tabIndex={heroImage ? 0 : undefined}
+            onClick={() => heroImage && openLightboxAt(0)}
+            onKeyDown={(e) => {
+              if (heroImage && (e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                openLightboxAt(0);
+              }
+            }}
+            className="relative w-full overflow-hidden rounded-[12px] bg-[var(--surface-hex)] shadow-xl ring-1 ring-black/5"
+            style={{ aspectRatio: "4 / 3" }}
+            data-testid="gallery-mobile-hero"
+          >
+            {heroImage ? (
               <img
-                key={activeImage}
-                src={activeImage}
+                src={heroImage}
                 alt={address}
                 className="h-full w-full object-cover"
                 style={{ objectPosition: "50% 42%" }}
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[var(--surface-hex)] via-[var(--surface-2-hex)] to-[var(--bg-hex)]" />
+              <div className={placeholderClass} />
             )}
-
             <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/30 via-black/10 to-transparent" />
-
-            <Link
-              href="/properties"
-              className="absolute left-4 top-4 z-20 inline-flex items-center gap-1.5 rounded-full bg-black/35 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-black/45"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Back
-            </Link>
-
-            {images.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setLightboxOpen(true)}
-                className="absolute right-4 top-4 z-20 inline-flex items-center gap-2 rounded-full bg-black/35 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-black/45"
-                data-testid="button-open-gallery"
-              >
-                <Images className="h-4 w-4" />
-                <span className="hidden sm:inline">View All Photos</span>
-                <span className="sm:hidden">Photos</span>
-              </button>
-            )}
-
-            {images.length > 1 && (
-              <div className="absolute bottom-4 right-4 z-20 rounded-full bg-black/35 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-                {selectedImage + 1} / {images.length}
-              </div>
-            )}
+            {backPill}
+            {viewAllPill}
           </div>
+        </div>
 
-          {images.length > 1 && (
-            <div className="border-t border-[var(--line)] bg-[var(--surface-hex)] px-3 py-3 sm:px-4">
-              <div className="flex gap-2 overflow-x-auto sm:gap-3">
-                {images.map((image, index) => (
-                  <button
-                    key={image + index}
-                    type="button"
-                    onClick={() => setSelectedImage(index)}
-                    className={`group relative h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-lg transition-all sm:h-20 sm:w-20 lg:h-[88px] lg:w-[88px] ${
-                      selectedImage === index
-                        ? "ring-2 ring-white shadow-[0_0_0_1px_rgba(255,255,255,0.18)]"
-                        : "opacity-80 hover:opacity-100"
-                    }`}
-                    aria-label={`Select photo ${index + 1}`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${address} thumbnail ${index + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    />
-                    <div
-                      className={`absolute inset-0 transition-colors ${
-                        selectedImage === index
-                          ? "bg-transparent"
-                          : "bg-black/10 group-hover:bg-black/0"
-                      }`}
-                    />
-                  </button>
-                ))}
+        {/* Desktop: asymmetric 5-tile grid */}
+        <div className="hidden md:block">
+          <div
+            className="relative overflow-hidden rounded-[12px] bg-[var(--surface-hex)] p-3 shadow-xl ring-1 ring-black/5"
+            data-testid="gallery-desktop-grid"
+          >
+            <div
+              className="grid h-[500px] w-full gap-1.5"
+              style={{
+                gridTemplateColumns: "2fr 1fr 1fr",
+                gridTemplateRows: "1fr 1fr",
+              }}
+            >
+              {/* Hero — photo 0, spans both rows */}
+              <div
+                role={heroImage ? "button" : undefined}
+                tabIndex={heroImage ? 0 : undefined}
+                onClick={() => heroImage && openLightboxAt(0)}
+                onKeyDown={(e) => {
+                  if (heroImage && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault();
+                    openLightboxAt(0);
+                  }
+                }}
+                className={`${tileBaseClass} rounded-l-[8px]`}
+                style={{ gridColumn: "1 / 2", gridRow: "1 / 3" }}
+                data-testid="gallery-tile-hero"
+                aria-label={heroImage ? `Open photo 1 of ${totalPhotos}` : undefined}
+              >
+                {heroImage ? (
+                  <img
+                    src={heroImage}
+                    alt={address}
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition: "50% 42%" }}
+                  />
+                ) : (
+                  <div className={placeholderClass} />
+                )}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/30 via-black/10 to-transparent" />
+                {backPill}
               </div>
+
+              {/* Preview tiles — photos 1-4 */}
+              {previewImages.map((image, i) => {
+                const photoIndex = i + 1;
+                const isLastTile = i === 3;
+                const cornerClass =
+                  i === 0
+                    ? "rounded-tr-[8px]"
+                    : i === 1
+                      ? ""
+                      : i === 2
+                        ? ""
+                        : "rounded-br-[8px]";
+
+                return (
+                  <div
+                    key={i}
+                    role={image ? "button" : undefined}
+                    tabIndex={image ? 0 : undefined}
+                    onClick={() => image && openLightboxAt(photoIndex)}
+                    onKeyDown={(e) => {
+                      if (image && (e.key === "Enter" || e.key === " ")) {
+                        e.preventDefault();
+                        openLightboxAt(photoIndex);
+                      }
+                    }}
+                    className={`${image ? tileBaseClass : "relative overflow-hidden"} ${cornerClass}`}
+                    data-testid={`gallery-tile-${photoIndex}`}
+                    aria-label={image ? `Open photo ${photoIndex + 1} of ${totalPhotos}` : undefined}
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={`${address} photo ${photoIndex + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="h-full w-full"
+                        style={{ background: "var(--surface-2-hex)" }}
+                      />
+                    )}
+                    {isLastTile && viewAllPill}
+                  </div>
+                );
+              })}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
       <Lightbox
         open={lightboxOpen}
         close={() => setLightboxOpen(false)}
-        index={selectedImage}
+        index={lightboxIndex}
         slides={images.map((src) => ({ src }))}
         plugins={[Thumbnails, Counter, Zoom]}
         thumbnails={{
@@ -140,7 +250,7 @@ export function PropertyPhotoGallery({
           container: { backgroundColor: "rgba(0, 0, 0, 0.95)" },
         }}
         on={{
-          view: ({ index }) => setSelectedImage(index),
+          view: ({ index }) => setLightboxIndex(index),
         }}
       />
     </>
