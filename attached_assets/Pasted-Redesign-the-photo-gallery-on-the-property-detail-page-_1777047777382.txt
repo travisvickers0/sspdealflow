@@ -1,0 +1,58 @@
+Redesign the photo gallery on the property detail page to use an asymmetric hero + 4-up grid layout (Airbnb-style).
+File: The property detail page component (likely PropertyDetail.tsx or similar — the page that renders /property/:slug including 1519 Venetian Dr SW). Replace the current hero image + horizontal thumbnail strip gallery.
+Layout requirements:
+Build a responsive CSS grid with this structure on desktop (≥768px):
+
+Grid: grid-template-columns: 2fr 1fr 1fr and grid-template-rows: 1fr 1fr
+Gap: 6px between tiles
+Container: border-radius: 12px; overflow: hidden; with a subtle dark padding wrapper (padding: 12px; background: rgba(15,15,15,0.4) or match existing card surface)
+Total height: approximately 500px on desktop
+
+Tile placement:
+
+Hero tile — photo index 0 — spans grid-row: span 2 on the left column (2fr width, full height)
+Top-right tile — photo index 1
+Top-far-right tile — photo index 2
+Bottom-right tile — photo index 3
+Bottom-far-right tile — photo index 4 — this one contains the "View all photos" CTA overlay
+
+All tiles: object-fit: cover; width: 100%; height: 100%; cursor: pointer; with a subtle hover effect (filter: brightness(1.05) or opacity: 0.92 on hover, 150ms transition).
+"View all photos" button (bottom-right tile only):
+
+Position: absolute; bottom: 12px; right: 12px;
+Style: background: rgba(0,0,0,0.75); color: white; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px;
+Include a 2x2 grid SVG icon (14x14px) on the left of the text
+Label: View all {totalPhotos} photos
+On click: opens the existing full-screen photo viewer / lightbox
+
+Click behavior:
+
+Clicking any individual tile opens the full-screen photo viewer starting at that photo's index
+Clicking "View all photos" opens the viewer at index 0
+
+Mobile (<768px):
+
+Collapse to a single hero image (photo 0) at full width, aspect-ratio: 4/3
+Keep the "View all 8 photos" button overlay in the bottom-right of the hero
+Hide the 4 preview tiles on mobile — users tap through the full viewer instead
+
+Edge cases:
+
+If fewer than 5 photos exist, fill empty grid slots with a neutral placeholder (background: var(--color-border-tertiary)) and hide the "View all" CTA if total ≤ 5
+Preserve the existing "Back" button, "OPEN" status badge, "Zillow" link, and share button — these sit above the gallery, unchanged
+Preserve the existing full-screen photo viewer / lightbox component — this redesign only changes the gallery trigger, not the viewer itself
+
+Do NOT change:
+
+The property info below the gallery (title, address, Property card, Deal Financials)
+The right-side "Open for Funding" sidebar
+Navigation, header, or routing
+Photo data source / API
+
+Keep all existing TypeScript types and props. Match the current cream/light theme tokens if they exist, otherwise use the dark surface treatment shown in the current design.
+
+Paste that as-is into Cursor. A couple of callouts before you run it:
+
+Photo count — your current gallery shows 8 thumbnails. The prompt assumes at least 5 photos; if some properties have fewer, the edge case handling covers it.
+Existing lightbox — the prompt assumes you already have a full-screen photo viewer (the "View All Photos" button in your current UI implies one). If you don't, add a sentence asking Cursor to build a simple one, or I can write that prompt separately.
+If Cursor asks about photo metadata — it might want to know the shape of your photo objects. The answer is probably just { url: string, alt?: string }[] but check your existing code first.
