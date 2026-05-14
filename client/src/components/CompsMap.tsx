@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, useRef } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import { Loader2 } from "lucide-react";
 
@@ -26,6 +26,22 @@ interface MapWrapperProps extends CompsMapProps {
   apiKey: string;
 }
 
+/** Street-only comp lines (common in BPO tables) geocode better with subject city/state. */
+function formatCompGeocodeAddress(
+  comp: Comp,
+  subjectCity: string,
+  subjectState: string,
+  subjectZip: string,
+): string {
+  const a = (comp.address || "").trim();
+  if (!a) return a;
+  if (a.includes(",") && (/\b[A-Z]{2}\b/.test(a) || /\d{5}(-\d{4})?\b/.test(a))) {
+    return a;
+  }
+  const tail = [subjectCity, subjectState, subjectZip].filter(Boolean).join(" ").trim();
+  return tail ? `${a}, ${tail}` : a;
+}
+
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -45,6 +61,7 @@ const MapContent = memo(function MapContent({
   const [map, setMap] = useState<google.maps.Map | null>(null);
   // Track client-side geocoded coordinates for comps missing lat/lng
   const [geocodedComps, setGeocodedComps] = useState<Map<string, { lat: number; lng: number }>>(new Map());
+  const geocodeAttemptedRef = useRef<Set<string>>(new Set());
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -67,31 +84,39 @@ const MapContent = memo(function MapContent({
     }
   }, [isLoaded, subjectAddress, subjectCity, subjectState, subjectZip]);
 
+  useEffect(() => {
+    geocodeAttemptedRef.current = new Set();
+    setGeocodedComps(new Map());
+  }, [subjectAddress, subjectCity, subjectState, subjectZip]);
+
   // Client-side geocoding fallback for comps missing lat/lng
   useEffect(() => {
     if (!isLoaded) return;
 
-    const compsNeedingGeocoding = comps.filter(
-      (comp) => (!comp.lat || !comp.lng) && comp.address && !geocodedComps.has(comp.id)
-    );
-
-    if (compsNeedingGeocoding.length === 0) return;
-
     const geocoder = new google.maps.Geocoder();
 
-    compsNeedingGeocoding.forEach((comp) => {
-      geocoder.geocode({ address: comp.address }, (results, status) => {
+    comps.forEach((comp) => {
+      if (comp.lat && comp.lng) return;
+      if (!comp.address || !comp.id) return;
+      if (geocodeAttemptedRef.current.has(comp.id)) return;
+      geocodeAttemptedRef.current.add(comp.id);
+
+      const address = formatCompGeocodeAddress(comp, subjectCity, subjectState, subjectZip);
+      geocoder.geocode({ address }, (results, status) => {
         if (status === "OK" && results && results[0]) {
           const location = results[0].geometry.location;
           setGeocodedComps((prev) => {
+            if (prev.has(comp.id)) return prev;
             const next = new Map(prev);
             next.set(comp.id, { lat: location.lat(), lng: location.lng() });
             return next;
           });
+        } else {
+          geocodeAttemptedRef.current.delete(comp.id);
         }
       });
     });
-  }, [isLoaded, comps, geocodedComps]);
+  }, [isLoaded, comps, subjectCity, subjectState, subjectZip]);
 
   // Helper to get comp coordinates (server-side or client-side fallback)
   const getCompCoords = useCallback(
@@ -232,7 +257,7 @@ const MapContent = memo(function MapContent({
         })()}
       </GoogleMap>
 
-      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg z-10">
+      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg z-10 max-h-[min(200px,45vh)] overflow-y-auto">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold border-2 border-white shadow">
@@ -240,9 +265,9 @@ const MapContent = memo(function MapContent({
             </div>
             <span className="text-xs font-medium text-gray-700">Subject Property</span>
           </div>
-          {comps.slice(0, 3).map((comp, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <div className="w-5 h-5 bg-slate-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white shadow">
+          {comps.map((comp, idx) => (
+            <div key={comp.id || idx} className="flex items-center gap-2">
+              <div className="w-5 h-5 bg-slate-600 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white shadow flex-shrink-0">
                 {idx + 1}
               </div>
               <span className="text-xs text-gray-600">{comp.address?.split(",")[0] || `Comp ${idx + 1}`}</span>

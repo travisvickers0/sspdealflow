@@ -17,7 +17,7 @@ function loadPDFParser() {
 const parsePDF = loadPDFParser();
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "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",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export interface CompData {
@@ -53,7 +53,38 @@ export interface BPOExtractionResult {
   }>;
 }
 
+/** More text + a mid-document slice so comp grids in the middle of long PDFs are not lost. */
+function buildPdfTextForExtraction(pdfText: string): string {
+  const textLength = pdfText.length;
+  const headChars = 28_000;
+  const tailChars = 18_000;
+  const midChars = 12_000;
+
+  const beginningText = pdfText.slice(0, Math.min(headChars, textLength));
+  let middleText = "";
+  if (textLength > headChars + tailChars + 5_000) {
+    const midStart = Math.max(headChars, Math.floor(textLength * 0.28));
+    const midEnd = Math.min(textLength - tailChars, midStart + midChars);
+    if (midEnd > midStart) {
+      middleText = pdfText.slice(midStart, midEnd);
+    }
+  }
+  const endingText = textLength > headChars ? pdfText.slice(-Math.min(tailChars, textLength)) : "";
+
+  const parts: string[] = [beginningText];
+  if (middleText) {
+    parts.push("\n\n[...earlier section omitted...]\n\n", middleText);
+  }
+  if (endingText && textLength > headChars) {
+    parts.push("\n\n[...middle section may be omitted...]\n\n", endingText);
+  }
+  return parts.join("");
+}
+
 export async function extractBPOData(filePath: string): Promise<BPOExtractionResult> {
+  if (!process.env.OPENAI_API_KEY?.trim()) {
+    throw new Error("OPENAI_API_KEY is not configured");
+  }
   try {
     console.log("Reading PDF file:", filePath);
     // Read and parse PDF
@@ -69,24 +100,18 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
       throw new Error("Could not read PDF text");
     }
 
-    // Extract text from both beginning (for subject/comps) and end (for repairs)
-    const textLength = pdfText.length;
-    const beginningText = pdfText.slice(0, Math.min(15000, textLength));
-    const endingText = textLength > 15000 ? pdfText.slice(-10000) : "";
-    
-    // Combine both sections
-    const pdfTextForExtraction = endingText 
-      ? `${beginningText}\n\n[...middle section omitted for brevity...]\n\n${endingText}`
-      : beginningText;
-
-    console.log(`Using ${pdfTextForExtraction.length} chars for extraction (first ${beginningText.length} + last ${endingText.length})`);
+    const pdfTextForExtraction = buildPdfTextForExtraction(pdfText);
+    console.log(
+      `Using ${pdfTextForExtraction.length} chars for extraction (full PDF text length: ${pdfText.length})`,
+    );
 
     // Define extraction tool
     const extractionTool = {
       type: "function" as const,
       function: {
         name: "extract_bpo",
-        description: "Extract subject property, comparable sales, and estimated repairs from a BPO PDF document.",
+        description:
+          "Extract subject property, comparable closed/sold sales, and repair estimates from a broker price opinion (BPO), broker valuation, or appraisal-style PDF. Layouts vary: adapt to the document at hand.",
         parameters: {
           type: "object",
           properties: {
@@ -101,14 +126,23 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
                 baths: { type: "number" },
                 sqft: { type: "number" },
                 yearBuilt: { type: "number" },
-                asIsValue: { type: "number", description: "As-Is Price/Value - prominently displayed in top right of first page, labeled 'As-Is Price' or 'As Is Value'" },
-                arv: { type: "number", description: "After Repair Value (ARV) - typically shown near the As-Is Price in top right of first page" },
+                asIsValue: {
+                  type: "number",
+                  description:
+                    "Current/as-is value: e.g. 'ESTIMATED AS-IS VALUE', 'As-Is', 'As Is Value', 'As Is Market Value', 'Retrospective Value - as is', 'Market Value - subject property', 'Opinion of Value' for the subject in as-is condition.",
+                },
+                arv: {
+                  type: "number",
+                  description:
+                    "Value after repairs if present: e.g. 'AFTER REPAIR VALUE (ARV)', 'ARV', 'After Repair Value', 'As Repaired', 'Upon Completion', 'Hypothetical Condition', or value 'subject to' completion of repairs.",
+                },
               },
               required: ["address"],
             },
             comps: {
               type: "array",
-              description: "Extract ONLY from the 'Recent Sales' table (NOT 'Active Listings'). The table has columns: Subject, Comp 1, Comp 2, Comp 3. Extract Comp 1, Comp 2, and Comp 3 data only - ignore the Subject column and ignore any Active Listings page.",
+              description:
+                "Comparable closed/sold properties only (actual sales). Include every sold comp in: 'Recent Sales', 'Sold Comps · Last 6 Months', 'Sold Comps · 6–12 Months Ago', 'Sales Comparison', 'Comparable Sales', 'Closed Sales', or Subject|Comp1|Comp2 column layouts. For row tables with ADDRESS, SOLD, PRICE, BD/BA (e.g. 2/1 or 2/1.5), SQFT, DIST: extract each data row; map BD/BA to beds/baths (2/1.5 => beds 2, baths 1.5); map DIST '1.5 mi' to distance. EXCLUDE 'Active Listings' / pending sections when sold comps exist. Prefer sold/closed price over list price.",
               items: {
                 type: "object",
                 properties: {
@@ -132,7 +166,8 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
             },
             repairs: {
               type: "array",
-              description: "Extract the 'Estimated Repairs' table from the back of the BPO. Each repair item typically has a category/description and estimated cost.",
+              description:
+                "Repair line items if present: tables titled 'Estimated Repairs', 'Cost to Cure', etc. If only a total rehab budget appears in narrative (e.g. '~$30K rehab'), return one item: category 'Rehab (estimated)', estimatedCost as the dollar amount, description briefly quoting the source. Use [] if no amount can be inferred.",
               items: {
                 type: "object",
                 properties: {
@@ -164,22 +199,24 @@ export async function extractBPOData(filePath: string): Promise<BPOExtractionRes
       messages: [
         {
           role: "system",
-          content: "You are an expert BPO parser. Extract subject property details, ONLY the 'Recent Sales' table, and the 'Estimated Repairs' table from the BPO report.\n\n" +
-            "IMPORTANT:\n" +
-            "1. For As-Is Price: Extract the 'As-Is Price' or 'As Is Value' from the TOP RIGHT of the FIRST PAGE. This is ALWAYS prominently displayed and labeled clearly. This is the current value of the property without repairs.\n" +
-            "2. For ARV: Extract the estimated ARV (After Repair Value) also from the TOP RIGHT of the FIRST PAGE, displayed near the As-Is Price.\n" +
-            "3. For comps: The BPO contains an 'Active Listings' page and a 'Recent Sales' page. ONLY extract from the 'Recent Sales' table. This table has columns: Subject (the house being valued), Comp 1, Comp 2, Comp 3. Extract ONLY Comp 1, Comp 2, and Comp 3 - do NOT extract the Subject column or anything from Active Listings.\n" +
-            "4. For repairs: Look for a table section titled 'Estimated Repairs', 'Repair Estimate', 'Scope of Repairs', or similar at the back of the document.\n\n" +
-            "Key instructions:\n" +
-            "- Extract numeric values WITHOUT $ symbols or commas (e.g., '250000' not '$250,000')\n" +
-            "- The As-Is Price and ARV are typically in the top right corner of page 1\n" +
-            "- For distances, extract numeric miles (e.g., 0.5 for '0.5 mi')\n" +
-            "- Parse dates in ISO format (YYYY-MM-DD)\n" +
-            "- Use the SOLD price from Recent Sales comps (not list price)",
+          content: `You extract structured data from real-estate valuation PDFs: broker BPOs, broker valuations (including "SSP · Valuation Report" style), and similar reports. Layouts differ—read what is in the text.
+
+SUBJECT: Street, city, state, ZIP when available (header may show "City, ST ZIP"; subject line may be street only—infer and merge). Beds/baths/sqft from header lines like "2 bd 1 ba 760 sqft".
+- asIsValue: labels such as "ESTIMATED AS-IS VALUE", "As-Is Price", or as-is market value for the subject.
+- arv: labels such as "AFTER REPAIR VALUE (ARV)", "ARV", after-repair opinion.
+
+COMPS (CLOSED SALES ONLY):
+- Include all rows under "Sold Comps" / "Recent Sales" / closed sales grids. Skip "Active Listings" tables when both exist.
+- Row format ADDRESS, SOLD date, PRICE, BD/BA, SQFT, DIST: extract all sold rows; never use list price from active listings as a comp sold price.
+- Parse BD/BA: "2/1" => beds 2 baths 1; "2/1.5" => beds 2 baths 1.5; "3/1" => beds 3 baths 1.
+
+REPAIRS: Table line items if present; else one aggregate from narrative rehab budget (e.g. "~$30K rehab") if a clear dollar amount is given; else [].
+
+RULES: Numeric fields without $ or commas. Dates ISO where possible. repairs can be [].`,
         },
         {
           role: "user",
-          content: `Extract all data from this BPO report:\n\n${pdfTextForExtraction}`,
+          content: `Extract all data from this valuation/BPO report:\n\n${pdfTextForExtraction}`,
         },
       ],
       tools: [extractionTool],

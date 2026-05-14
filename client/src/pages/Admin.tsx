@@ -1654,24 +1654,38 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
           ...prev,
           documents: [...(prev.documents as any[]), { 
             name: result.originalName || file.name, 
-            url: result.url 
+            url: result.url,
+            type: "BPO / Valuation PDF",
           }],
           // Add extracted comps to the comps array
           comps: [...(prev.comps as any[]), ...(result.comps || [])]
         };
         
-        // Auto-populate BPO Value from As-Is Price if extracted
-        if (result.subject?.asIsValue && result.subject.asIsValue > 0) {
-          updates.bpoValue = result.subject.asIsValue;
+        // BPO Value on the deal page is labeled ARV — prefer ARV when present, else as-is
+        const arv = result.subject?.arv;
+        const asIs = result.subject?.asIsValue;
+        let newBpo: number | undefined;
+        if (typeof arv === "number" && arv > 0) {
+          newBpo = arv;
+        } else if (typeof asIs === "number" && asIs > 0) {
+          newBpo = asIs;
+        }
+        if (newBpo !== undefined) {
+          updates.bpoValue = newBpo;
+          updates.estimatedEquity = Math.max(0, newBpo - prev.purchasePrice);
         }
         
         return updates;
       });
 
-      // Build success message
+      const s = result.subject;
       let successMessage = `Extracted ${result.comps?.length || 0} comparable sales.`;
-      if (result.subject?.asIsValue) {
-        successMessage += ` As-Is Price: $${result.subject.asIsValue.toLocaleString()} (auto-filled in BPO Value).`;
+      if (typeof s?.arv === "number" && s.arv > 0 && typeof s?.asIsValue === "number" && s.asIsValue > 0) {
+        successMessage += ` As-Is $${s.asIsValue.toLocaleString()}, ARV $${s.arv.toLocaleString()} (BPO Value set to ARV).`;
+      } else if (typeof s?.arv === "number" && s.arv > 0) {
+        successMessage += ` ARV $${s.arv.toLocaleString()} (auto-filled in BPO Value).`;
+      } else if (typeof s?.asIsValue === "number" && s.asIsValue > 0) {
+        successMessage += ` As-Is $${s.asIsValue.toLocaleString()} (auto-filled in BPO Value).`;
       }
       successMessage += ` Click Save to persist changes.`;
 

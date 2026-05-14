@@ -276,8 +276,26 @@ export default function PropertyDetail() {
     ? Math.max(0, Math.ceil((new Date(property.closingDate).getTime() - Date.now()) / 86400000))
     : 14;
 
+  const documents = Array.isArray(property.documents) ? (property.documents as { url: string; name: string; type?: string; size?: number }[]) : [];
+
+  /** Prefer linking the processed BPO/valuation PDF near the comps map */
+  const valuationPdf = documents.find((d) => {
+    const blob = `${d.name} ${d.type ?? ""}`.toLowerCase();
+    return /\.pdf$/i.test(d.name) && /bpo|valuation|broker|comp|appraisal|mao|ssp\s*·?\s*valuation/i.test(blob);
+  }) ?? documents.find((d) => /\.pdf$/i.test(d.name));
+
   const rawComps =
-    (property.comps as { id?: string; address?: string; beds?: number; baths?: number; sqft?: number; price?: number; soldDate?: string }[]) || [];
+    (property.comps as {
+      id?: string;
+      address?: string;
+      beds?: number;
+      baths?: number;
+      sqft?: number;
+      price?: number;
+      soldDate?: string;
+      lat?: number;
+      lng?: number;
+    }[]) || [];
   const comps = rawComps;
   const compsForMap = comps.map((c, i) => ({
     id: String(c.id ?? i),
@@ -287,9 +305,10 @@ export default function PropertyDetail() {
     sqft: c.sqft,
     price: c.price,
     soldDate: c.soldDate,
+    lat: typeof c.lat === "number" ? c.lat : undefined,
+    lng: typeof c.lng === "number" ? c.lng : undefined,
   }));
   const hasComps = Array.isArray(comps) && comps.length > 0;
-  const documents = Array.isArray(property.documents) ? (property.documents as { url: string; name: string; type?: string; size?: number }[]) : [];
 
   const closingDateDisplay = property.closingDate
     ? new Date(property.closingDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
@@ -1092,6 +1111,18 @@ export default function PropertyDetail() {
                   <div className="mb-6 lg:mb-0">
                     {mobileSectionLabel("LOCATION & COMPS")}
                     {sectionLabel("Location & Comps")}
+                    {valuationPdf && (
+                      <a
+                        href={valuationPdf.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 mb-4 text-[13px] font-medium text-primary hover:underline"
+                        data-testid="link-valuation-pdf"
+                      >
+                        <FileText className="h-4 w-4 flex-shrink-0" />
+                        Open valuation / BPO PDF ({valuationPdf.name})
+                      </a>
+                    )}
                     <div className="rounded-[16px] overflow-hidden h-[280px] border border-[var(--line)] mb-6">
                   <CompsMap
                     subjectAddress={property.address}
