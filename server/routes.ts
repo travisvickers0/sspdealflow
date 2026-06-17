@@ -1,9 +1,10 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, updatePropertySchema, users } from "@shared/schema";
+import { insertPropertySchema, updatePropertySchema, users, properties, type Property } from "@shared/schema";
 import { db } from "./db";
-import { isNotNull } from "drizzle-orm";
+import { isNotNull, isNull, and, eq } from "drizzle-orm";
+import crypto from "crypto";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
@@ -28,8 +29,39 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function sendDealAlertEmails(property: any) {
+const DEFAULT_SITE_URL = "https://sspdealflow.com";
+
+// Signed token so unsubscribe links can't be forged. Format: <userId>.<hmac>
+function makeUnsubscribeToken(userId: string): string {
+  const secret = process.env.SESSION_SECRET ?? "";
+  const sig = crypto.createHmac("sha256", secret).update(userId).digest("hex");
+  return `${userId}.${sig}`;
+}
+
+export function verifyUnsubscribeToken(token: string): string | null {
+  const [userId, sig] = token.split(".");
+  if (!userId || !sig) return null;
+  const secret = process.env.SESSION_SECRET ?? "";
+  const expected = crypto.createHmac("sha256", secret).update(userId).digest("hex");
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  return userId;
+}
+
+async function sendDealAlertEmails(property: Property): Promise<{ sent: number; failed: number; recipients: number }> {
   try {
+    // Only announce deals that are actually live/available.
+    if (property.status !== "AVAILABLE") {
+      console.log(`[deal-alert] Skipped — property ${property.id} status is "${property.status}" (not AVAILABLE)`);
+      return { sent: 0, failed: 0, recipients: 0 };
+    }
+
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error("[deal-alert] SMTP_USER/SMTP_PASS not configured — cannot send");
+      return { sent: 0, failed: 0, recipients: 0 };
+    }
+
     const allUsers = await db
       .select({
         id: users.id,
@@ -38,15 +70,14 @@ async function sendDealAlertEmails(property: any) {
         lastName: users.lastName,
       })
       .from(users)
-      .where(isNotNull(users.email));
+      .where(and(isNotNull(users.email), isNull(users.unsubscribedFromDeals)));
 
     if (!allUsers.length) {
       console.log("[deal-alert] No users to notify");
-      return;
+      return { sent: 0, failed: 0, recipients: 0 };
     }
 
-    const nodemailer = await import("nodemailer");
-    const transporter = nodemailer.default.createTransport({
+    const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
@@ -54,14 +85,21 @@ async function sendDealAlertEmails(property: any) {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      // Pool + cap throughput so a burst of recipients doesn't trip Gmail limits.
+      pool: true,
+      maxConnections: 3,
+      maxMessages: 50,
+      rateDelta: 1000,
+      rateLimit: 10,
     });
 
-    const propertyUrl = `${process.env.SITE_URL ?? "https://sspdealflow.com"}/property/${property.slug}`;
+    const siteUrl = process.env.SITE_URL ?? DEFAULT_SITE_URL;
+    const propertyUrl = `${siteUrl}/property/${property.slug}`;
 
     const photoUrl = property.mainPhotoUrl
       ? property.mainPhotoUrl.startsWith("http")
         ? property.mainPhotoUrl
-        : `${process.env.SITE_URL ?? "https://sspdealflow.com"}${property.mainPhotoUrl}`
+        : `${siteUrl}${property.mainPhotoUrl}`
       : null;
 
     const equityFormatted = property.estimatedEquity
@@ -76,6 +114,10 @@ async function sendDealAlertEmails(property: any) {
       ? `$${property.bpoValue.toLocaleString()}`
       : "TBD";
 
+    const rehabFormatted = property.rehabBudget
+      ? `$${property.rehabBudget.toLocaleString()}`
+      : "$0 — cosmetic only";
+
     const closingFormatted = property.closingDate
       ? new Date(property.closingDate).toLocaleDateString("en-US", {
           month: "long", day: "numeric", year: "numeric"
@@ -84,10 +126,22 @@ async function sendDealAlertEmails(property: any) {
 
     const testEmail = (process.env.TEST_LOGIN_EMAIL || "test@ssp.com").toLowerCase();
 
-    const emailPromises = allUsers
-      .filter(u => u.email && u.email.toLowerCase() !== testEmail)
-      .map(user => {
+    let recipients = allUsers.filter(
+      u => u.email && u.email.toLowerCase() !== testEmail
+    );
+
+    // Safe testing: when DEAL_ALERT_TEST_RECIPIENT is set, redirect the whole
+    // send to that single address so real investors are never emailed. Remove
+    // the env var in production to send for real.
+    const testRecipientOverride = process.env.DEAL_ALERT_TEST_RECIPIENT?.trim();
+    if (testRecipientOverride) {
+      console.log(`[deal-alert] TEST MODE — redirecting all mail to ${testRecipientOverride}`);
+      recipients = [{ id: "test-recipient", email: testRecipientOverride, firstName: "Test", lastName: null }];
+    }
+
+    const buildEmail = (user: typeof recipients[number]) => {
         const firstName = user.firstName ?? "Investor";
+        const unsubscribeUrl = `${siteUrl}/api/unsubscribe?token=${encodeURIComponent(makeUnsubscribeToken(user.id))}`;
 
         return transporter.sendMail({
           from: `"SSP Deal Flow" <${process.env.SMTP_USER}>`,
@@ -214,7 +268,7 @@ ${photoUrl ? `
           <tr style="border-bottom:1px solid #2a2724">
             <td style="padding:9px 0;font-size:12px;color:#a89e91">Rehab budget</td>
             <td style="padding:9px 0;font-size:13px;font-weight:600;color:#f0ebe3;text-align:right;font-family:monospace">
-              ${property.rehabBudget === 0 ? "$0 — cosmetic only" : priceFormatted}
+              ${rehabFormatted}
             </td>
           </tr>
           <tr style="border-bottom:1px solid #2a2724">
@@ -257,6 +311,14 @@ ${photoUrl ? `
         Deal-by-deal joint venture partnerships. Not a Fund. No pooled capital.<br/>
         You're receiving this because you have an SSP Deal Flow account.
       </p>
+      <p style="margin:0 0 8px;font-size:10px;color:#6b6158;line-height:1.6">
+        Southern Specialty Properties · 3611 Braselton Hwy, Dacula, GA 30019
+      </p>
+      <p style="margin:0 0 8px;font-size:10px;color:#6b6158">
+        <a href="${unsubscribeUrl}" style="color:#6b6158;text-decoration:underline">
+          Unsubscribe from deal alerts
+        </a>
+      </p>
       <p style="margin:0;font-size:10px;color:#6b6158">
         © 2026 Southern Specialty Properties
       </p>
@@ -265,15 +327,36 @@ ${photoUrl ? `
   </div>
 `,
         });
-      });
+    };
 
-    const results = await Promise.allSettled(emailPromises);
-    const sent = results.filter(r => r.status === "fulfilled").length;
-    const failed = results.filter(r => r.status === "rejected").length;
+    // Send in small batches so the pooled transport paces delivery instead of
+    // firing every message at once (Gmail throttles big concurrent bursts).
+    const BATCH_SIZE = 20;
+    let sent = 0;
+    let failed = 0;
+    for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
+      const batch = recipients.slice(i, i + BATCH_SIZE);
+      const results = await Promise.allSettled(batch.map(buildEmail));
+      sent += results.filter(r => r.status === "fulfilled").length;
+      failed += results.filter(r => r.status === "rejected").length;
+    }
 
-    console.log(`[deal-alert] Sent ${sent}/${allUsers.length} emails. Failed: ${failed}`);
+    transporter.close();
+
+    // Record that the alert went out so we don't double-send and can show
+    // status. Skipped in test mode so a test send never marks a real deal sent.
+    if (!testRecipientOverride) {
+      await db
+        .update(properties)
+        .set({ dealAlertSentAt: new Date() })
+        .where(eq(properties.id, property.id));
+    }
+
+    console.log(`[deal-alert] Sent ${sent}/${recipients.length} emails. Failed: ${failed}`);
+    return { sent, failed, recipients: recipients.length };
   } catch (err: any) {
     console.error("[deal-alert] Failed:", err.message);
+    return { sent: 0, failed: 0, recipients: 0 };
   }
 }
 
@@ -329,6 +412,9 @@ const documentUpload = multer({
   },
 });
 
+/** BPO / valuation PDFs are often scanned multi-page files — allow larger than generic uploads */
+const BPO_PROCESS_MAX_FILE_BYTES = 50 * 1024 * 1024;
+
 const closedDealPdfUpload = multer({
   storage: memoryStorage,
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -337,6 +423,18 @@ const closedDealPdfUpload = multer({
       cb(null, true);
     } else {
       cb(new Error("Only PDF files are accepted"));
+    }
+  },
+});
+
+const bpoProcessUpload = multer({
+  storage: diskStorage,
+  limits: { fileSize: BPO_PROCESS_MAX_FILE_BYTES },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only PDF is allowed."));
     }
   },
 });
@@ -1393,9 +1491,15 @@ ${pdfTextForExtraction}`,
         details: { address: property.address },
       });
 
-      sendDealAlertEmails(property).catch((err) =>
-        console.error("[deal-alert] Background send failed:", err)
-      );
+      // Only email investors when the admin opted in on the form. This lets
+      // deals be backfilled silently and alerted later (one at a time) via the
+      // manual "Send email alert" button. The send fn also no-ops for
+      // non-AVAILABLE deals and won't re-send if dealAlertSentAt is already set.
+      if (req.body?.sendAlert === true) {
+        sendDealAlertEmails(property).catch((err) =>
+          console.error("[deal-alert] Background send failed:", err)
+        );
+      }
       
       res.status(201).json(property);
     } catch (error) {
@@ -1404,6 +1508,84 @@ ${pdfTextForExtraction}`,
       }
       console.error("Error creating property:", error);
       res.status(500).json({ error: "Failed to create property" });
+    }
+  });
+
+  // POST /api/admin/properties/:id/send-alert - Manually send the deal alert email.
+  // Lets admins stagger backfilled deals: create silently, then trigger each
+  // alert on demand. Won't re-send unless { force: true } is passed.
+  app.post("/api/admin/properties/:id/send-alert", isAdmin, async (req: Request, res: Response) => {
+    try {
+      const property = await storage.getProperty(req.params.id);
+      if (!property) {
+        return res.status(404).json({ error: "Property not found" });
+      }
+
+      if (property.status !== "AVAILABLE") {
+        return res.status(400).json({
+          error: `Deal alerts can only be sent for AVAILABLE deals (this one is "${property.status}").`,
+        });
+      }
+
+      if (property.dealAlertSentAt && req.body?.force !== true) {
+        return res.status(409).json({
+          error: "An alert was already sent for this deal.",
+          alreadySent: true,
+          dealAlertSentAt: property.dealAlertSentAt,
+        });
+      }
+
+      const result = await sendDealAlertEmails(property);
+
+      await storage.createActivityLog({
+        action: "send_deal_alert",
+        resourceType: "property",
+        resourceId: property.id,
+        details: { address: property.address, ...result },
+      });
+
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("[deal-alert] Manual send error:", error);
+      res.status(500).json({ error: "Failed to send deal alert" });
+    }
+  });
+
+  // GET /api/unsubscribe?token=... - Public, one-click opt-out from deal alerts.
+  app.get("/api/unsubscribe", async (req: Request, res: Response) => {
+    const page = (title: string, message: string) => `<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title></head>
+<body style="font-family:Arial,sans-serif;background:#0a0908;color:#f0ebe3;margin:0;padding:48px 20px;text-align:center">
+  <div style="max-width:460px;margin:0 auto;background:#181614;border:1px solid #2a2724;border-radius:12px;padding:32px">
+    <h1 style="font-size:22px;margin:0 0 12px">${title}</h1>
+    <p style="font-size:14px;color:#a89e91;line-height:1.6;margin:0">${message}</p>
+  </div>
+</body></html>`;
+
+    try {
+      const token = typeof req.query.token === "string" ? req.query.token : "";
+      const userId = verifyUnsubscribeToken(token);
+      if (!userId) {
+        return res
+          .status(400)
+          .send(page("Invalid link", "This unsubscribe link is invalid or has expired."));
+      }
+
+      await db
+        .update(users)
+        .set({ unsubscribedFromDeals: new Date() })
+        .where(eq(users.id, userId));
+
+      res.send(
+        page(
+          "You're unsubscribed",
+          "You'll no longer receive new deal alert emails. You can still browse deals anytime in your account."
+        )
+      );
+    } catch (error) {
+      console.error("[unsubscribe] Error:", error);
+      res.status(500).send(page("Something went wrong", "Please try again later."));
     }
   });
 
@@ -1738,10 +1920,18 @@ ${pdfTextForExtraction}`,
 
   // POST /api/admin/process-bpo - Process BPO document and extract comps
   app.post("/api/admin/process-bpo", isAdmin, (req: Request, res: Response, next: NextFunction) => {
-    upload.single("file")(req, res, (err) => {
+    bpoProcessUpload.single("file")(req, res, (err) => {
       if (err) {
         console.error("Multer error in BPO upload:", err);
         if (err instanceof multer.MulterError) {
+          if (err.code === "LIMIT_FILE_SIZE") {
+            const maxMb = Math.round(BPO_PROCESS_MAX_FILE_BYTES / (1024 * 1024));
+            return res.status(400).json({
+              error: "File too large",
+              message: `BPO/valuation PDF must be ${maxMb}MB or smaller. Try compressing the PDF or reducing scan resolution.`,
+              code: err.code,
+            });
+          }
           return res.status(400).json({ error: err.message, code: err.code });
         }
         return res.status(500).json({ error: err.message || "Upload failed" });

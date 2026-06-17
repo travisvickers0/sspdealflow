@@ -25,6 +25,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  unsubscribedFromDeals: timestamp("unsubscribed_from_deals"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -75,7 +76,10 @@ export const properties = pgTable("properties", {
   comps: jsonb("comps").default(sql`'[]'::jsonb`),
   
   description: text("description"),
-  
+
+  // Timestamp of when the "new deal" alert email was sent (null = never sent)
+  dealAlertSentAt: timestamp("deal_alert_sent_at"),
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -145,6 +149,7 @@ export const insertPropertySchema = createInsertSchema(properties, {
 }).omit({
   id: true,
   slug: true,
+  dealAlertSentAt: true,
   createdAt: true,
   updatedAt: true,
 });

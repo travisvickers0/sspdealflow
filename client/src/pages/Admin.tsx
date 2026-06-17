@@ -7,13 +7,14 @@ import { useProperties, useAdminProperties, useBulkEditor, useUpload } from "@/h
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical, Users, Heart, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, FileText, Image, Save, X, RefreshCw, Building2, DollarSign, TrendingUp, FileUp, Download, Check, AlertCircle, Star, GripVertical, Users, Heart, Loader2, Mail, MailCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Property, InsertProperty, UpdateProperty, PropertyStatus, Lead, PropertyInterest } from "@shared/schema";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
@@ -78,10 +79,11 @@ export default function Admin() {
   const { data: closedDeals = [], refetch: refetchClosedDeals } = useQuery<any[]>({
     queryKey: ["/api/closed-deals"],
   });
-  const { createProperty, updateProperty, deleteProperty } = useAdminProperties();
+  const { createProperty, updateProperty, deleteProperty, sendDealAlert } = useAdminProperties();
   const { uploadPhoto, uploadPhotos, uploadDocument } = useUpload();
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [sendAlertOnCreate, setSendAlertOnCreate] = useState(true);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [pdfUploading, setPdfUploading] = useState(false);
   const [pdfExtracted, setPdfExtracted] = useState<any>(null);
@@ -93,6 +95,32 @@ export default function Admin() {
   const [pdfPhotoDragActive, setPdfPhotoDragActive] = useState(false);
   const [editingPhotoId, setEditingPhotoId] = useState<number | null>(null);
   const [photoUrl, setPhotoUrl] = useState("");
+  const [sendingAlertId, setSendingAlertId] = useState<string | null>(null);
+
+  const handleSendDealAlert = async (property: Property) => {
+    const alreadySent = !!property.dealAlertSentAt;
+    const confirmMsg = alreadySent
+      ? `An alert was already sent for ${property.address}. Send it again to all investors?`
+      : `Send the deal alert email for ${property.address} to all investors?`;
+    if (!confirm(confirmMsg)) return;
+
+    setSendingAlertId(property.id);
+    try {
+      const result = await sendDealAlert.mutateAsync({ id: property.id, force: alreadySent });
+      toast({
+        title: "Deal Alert Sent",
+        description: `Emailed ${result.sent} of ${result.recipients} investors${result.failed ? ` (${result.failed} failed)` : ""}.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Couldn't Send Alert",
+        description: error instanceof Error ? error.message : "Failed to send deal alert.",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingAlertId(null);
+    }
+  };
   const { toast } = useToast();
 
   // Sort properties to match marketplace: status priority, then by newest
@@ -341,14 +369,32 @@ export default function Admin() {
                 <DialogHeader>
                   <DialogTitle>Add New Property</DialogTitle>
                 </DialogHeader>
+                <div className="flex items-start justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 mb-4">
+                  <div className="flex-1">
+                    <Label htmlFor="send-alert-toggle" className="text-sm font-medium text-[var(--text-primary)]">
+                      Email this deal to investors now
+                    </Label>
+                    <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                      Only sends for AVAILABLE deals. Turn this off when backfilling deals, then send each alert later from the property list.
+                    </p>
+                  </div>
+                  <Switch
+                    id="send-alert-toggle"
+                    checked={sendAlertOnCreate}
+                    onCheckedChange={setSendAlertOnCreate}
+                    data-testid="switch-send-alert"
+                  />
+                </div>
                 <PropertyForm
                   onSubmit={async (data) => {
                     try {
-                      await createProperty.mutateAsync(data as InsertProperty);
+                      await createProperty.mutateAsync({ ...(data as InsertProperty), sendAlert: sendAlertOnCreate });
                       setIsCreateDialogOpen(false);
                       toast({
                         title: "Property Created",
-                        description: "The property has been added successfully.",
+                        description: sendAlertOnCreate
+                          ? "The property has been added and the deal alert is sending."
+                          : "The property has been added. No email was sent.",
                       });
                     } catch (error) {
                       console.error("Error creating property:", error);
@@ -505,6 +551,25 @@ export default function Admin() {
                           <td className="px-4 py-4 text-sm text-[var(--text-tertiary)]">{property.closingDate}</td>
                           <td className="px-4 py-4 text-right">
                             <div className="flex justify-end gap-2">
+                              {property.status === 'AVAILABLE' && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className={property.dealAlertSentAt ? "text-[var(--green-hex)]" : "text-blue-400 hover:text-blue-300 hover:bg-[rgba(59,130,246,0.1)]"}
+                                  disabled={sendingAlertId === property.id}
+                                  onClick={() => handleSendDealAlert(property)}
+                                  title={property.dealAlertSentAt ? `Alert sent ${new Date(property.dealAlertSentAt).toLocaleString()} — click to resend` : "Send deal alert email to investors"}
+                                  data-testid={`button-send-alert-${property.id}`}
+                                >
+                                  {sendingAlertId === property.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : property.dealAlertSentAt ? (
+                                    <MailCheck className="h-4 w-4" />
+                                  ) : (
+                                    <Mail className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              )}
                               <Button 
                                 variant="ghost" 
                                 size="sm"
@@ -595,6 +660,25 @@ export default function Admin() {
                         </div>
                         
                         <div className="flex gap-2">
+                          {property.status === 'AVAILABLE' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`flex-1 ${property.dealAlertSentAt ? "text-[var(--green-hex)]" : "text-blue-400"}`}
+                              disabled={sendingAlertId === property.id}
+                              onClick={() => handleSendDealAlert(property)}
+                              data-testid={`button-send-alert-${property.id}`}
+                            >
+                              {sendingAlertId === property.id ? (
+                                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              ) : property.dealAlertSentAt ? (
+                                <MailCheck className="h-4 w-4 mr-1" />
+                              ) : (
+                                <Mail className="h-4 w-4 mr-1" />
+                              )}
+                              {property.dealAlertSentAt ? "Resend" : "Email"}
+                            </Button>
+                          )}
                           <Button 
                             variant="outline" 
                             size="sm" 
@@ -1614,6 +1698,16 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
       return;
     }
 
+    const MAX_BPO_BYTES = 50 * 1024 * 1024;
+    if (file.size > MAX_BPO_BYTES) {
+      toast({
+        title: "File Too Large",
+        description: `BPO/valuation PDFs must be ${MAX_BPO_BYTES / (1024 * 1024)}MB or smaller. Compress the PDF or reduce scan resolution and try again.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsProcessingBPO(true);
 
     try {
@@ -2070,7 +2164,7 @@ function PropertyForm({ property, onSubmit, isLoading, uploadPhoto, uploadPhotos
                 </div>
               ) : (
                 <p className="text-xs text-[var(--text-tertiary)] mt-1">
-                  Upload a BPO PDF to automatically extract comparable sales data
+                  Upload a BPO or valuation PDF (up to 50MB) to automatically extract comparable sales data
                 </p>
               )}
             </div>

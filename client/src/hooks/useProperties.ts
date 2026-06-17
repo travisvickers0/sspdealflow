@@ -39,7 +39,7 @@ export function useAdminProperties() {
   const queryClient = useQueryClient();
 
   const createProperty = useMutation({
-    mutationFn: async (property: InsertProperty) => {
+    mutationFn: async (property: InsertProperty & { sendAlert?: boolean }) => {
       const response = await fetch(`${API_BASE}/admin/properties`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -50,6 +50,24 @@ export function useAdminProperties() {
         throw new Error(error.error || "Failed to create property");
       }
       return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["properties"] });
+    },
+  });
+
+  const sendDealAlert = useMutation({
+    mutationFn: async ({ id, force }: { id: string; force?: boolean }) => {
+      const response = await fetch(`${API_BASE}/admin/properties/${id}/send-alert`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force: force ?? false }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send deal alert");
+      }
+      return data as { sent: number; failed: number; recipients: number };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -91,7 +109,7 @@ export function useAdminProperties() {
     },
   });
 
-  return { createProperty, updateProperty, deleteProperty };
+  return { createProperty, updateProperty, deleteProperty, sendDealAlert };
 }
 
 // Bulk operations
