@@ -1807,6 +1807,9 @@ ${pdfTextForExtraction}`,
         return res.status(400).json({ error: "Properties must be an array" });
       }
       
+      // Capture the per-row "send to investors" flag before validation strips it
+      // (sendAlert isn't a property column). Index lines up with created[] below.
+      const sendFlags = propertyList.map(p => p?.sendAlert === true);
       const validatedProperties = propertyList.map(p => insertPropertySchema.parse(p));
       const created = await storage.bulkCreateProperties(validatedProperties);
       
@@ -1815,8 +1818,21 @@ ${pdfTextForExtraction}`,
         resourceType: "property",
         details: { bulkImport: true, count: created.length },
       });
+
+      // Fire deal alerts for the rows the admin opted in on. sendDealAlertEmails
+      // no-ops for non-AVAILABLE deals and won't re-send if dealAlertSentAt is set.
+      const toAlert = created.filter((_, i) => sendFlags[i]);
+      let alerted = 0;
+      for (const property of toAlert) {
+        if (property.status === "AVAILABLE") {
+          alerted++;
+          sendDealAlertEmails(property).catch((err) =>
+            console.error("[deal-alert] Bulk import background send failed:", err)
+          );
+        }
+      }
       
-      res.status(201).json({ created: created.length, properties: created });
+      res.status(201).json({ created: created.length, properties: created, alerting: alerted });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: "Validation failed", details: error.errors });

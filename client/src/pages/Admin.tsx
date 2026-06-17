@@ -37,6 +37,7 @@ interface NewPropertyRow {
   closingDate: string;
   bpoValue: number;
   rehabBudget: number;
+  sendToInvestors: boolean;
   isValid: boolean;
 }
 
@@ -55,6 +56,7 @@ const createEmptyRow = (): NewPropertyRow => ({
   closingDate: "",
   bpoValue: 0,
   rehabBudget: 0,
+  sendToInvestors: true,
   isValid: false,
 });
 
@@ -1396,12 +1398,12 @@ function SortablePhoto({ id, url, onSetHero, onRemove }: SortablePhotoProps) {
       <div 
         {...attributes} 
         {...listeners}
-        className="absolute top-1 left-1 p-1.5 bg-white/90 rounded cursor-grab active:cursor-grabbing touch-none"
+        className="absolute top-1 left-1 z-20 p-1.5 bg-white/90 rounded cursor-grab active:cursor-grabbing touch-none"
         title="Drag to reorder"
       >
         <GripVertical className="h-4 w-4 text-[var(--text-tertiary)]" />
       </div>
-      <div className={`absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center gap-2 transition-opacity ${showActions || !isDragging ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+      <div className={`absolute inset-0 z-10 bg-black/50 rounded-lg flex items-center justify-center gap-2 transition-opacity ${isDragging ? 'opacity-0 pointer-events-none' : showActions ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
         <button
           type="button"
           className="p-2 bg-amber-500 text-white rounded-full hover:bg-amber-600 active:scale-95 transition-transform"
@@ -2311,6 +2313,11 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
     setRows(prev => prev.map(row => {
       if (row.id !== id) return row;
       const updated = { ...row, [field]: value };
+      // Auto-derive equity from BPO minus purchase price (same formula as the
+      // single-property form). Admins can still override the equity field after.
+      if (field === "bpoValue" || field === "purchasePrice") {
+        updated.estimatedEquity = Math.max(0, (updated.bpoValue || 0) - (updated.purchasePrice || 0));
+      }
       updated.isValid = validateRow(updated);
       return updated;
     }));
@@ -2350,9 +2357,10 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
         galleryPhotoUrls: [],
         documents: [],
         description: "",
+        sendAlert: row.sendToInvestors,
       }));
       
-      await bulkImport.mutateAsync(properties as InsertProperty[]);
+      await bulkImport.mutateAsync(properties as (InsertProperty & { sendAlert?: boolean })[]);
       setRows([createEmptyRow(), createEmptyRow(), createEmptyRow()]);
       onSuccess();
     } catch (error: any) {
@@ -2413,8 +2421,18 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
               case 'closingdate': case 'closing_date': row.closingDate = value; break;
               case 'bpovalue': case 'bpo_value': case 'bpo': row.bpoValue = parseInt(value) || 0; break;
               case 'rehabbudget': case 'rehab_budget': case 'rehab': row.rehabBudget = parseInt(value) || 0; break;
+              case 'sendtoinvestors': case 'send_to_investors': case 'sendalert': case 'send_alert': case 'notify': {
+                const v = value.trim().toLowerCase();
+                row.sendToInvestors = v === '' ? true : ['true', '1', 'yes', 'y'].includes(v);
+                break;
+              }
             }
           });
+
+          // Auto-derive equity from BPO minus price when the CSV didn't supply it.
+          if (!row.estimatedEquity && (row.bpoValue || row.purchasePrice)) {
+            row.estimatedEquity = Math.max(0, row.bpoValue - row.purchasePrice);
+          }
           
           row.isValid = validateRow(row);
           return row;
@@ -2428,8 +2446,8 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
   };
 
   const downloadTemplate = () => {
-    const headers = "address,city,state,zip,status,purchasePrice,estimatedEquity,beds,baths,squareFeet,closingDate,bpoValue,rehabBudget";
-    const example = "123 Main St,Atlanta,GA,30301,AVAILABLE,250000,50000,3,2,1500,2025-03-15,300000,25000";
+    const headers = "address,city,state,zip,status,purchasePrice,estimatedEquity,beds,baths,squareFeet,closingDate,bpoValue,rehabBudget,sendToInvestors";
+    const example = "123 Main St,Atlanta,GA,30301,AVAILABLE,250000,50000,3,2,1500,2025-03-15,300000,25000,true";
     const csv = `${headers}\n${example}`;
     
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -2481,6 +2499,11 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
 
       {importMode === "table" ? (
         <>
+          <p className="text-xs text-[var(--text-tertiary)]">
+            Equity auto-fills from BPO minus price (you can still override it). Turn the
+            <span className="font-medium text-[var(--text-secondary)]"> Investors </span>
+            toggle on to email the deal to all investors on import — only AVAILABLE deals are sent.
+          </p>
           <div className="bg-[var(--surface-hex)] rounded-xl border border-[var(--line)] overflow-x-auto">
             <table className="w-full min-w-[1200px]">
               <thead className="bg-[var(--surface-2-hex)] border-b border-[var(--line)]">
@@ -2492,12 +2515,13 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">ZIP *</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Status</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Price *</th>
-                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Equity *</th>
+                  <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Equity * (auto)</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Beds *</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Baths *</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">SqFt *</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">BPO *</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)]">Closing *</th>
+                  <th className="px-2 py-2 text-center text-xs font-semibold text-[var(--text-secondary)]">Investors</th>
                   <th className="px-2 py-2 text-left text-xs font-semibold text-[var(--text-secondary)] w-8"></th>
                 </tr>
               </thead>
@@ -2619,6 +2643,13 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
                         className="h-7 text-xs w-32"
                       />
                     </td>
+                    <td className="px-2 py-1.5 text-center">
+                      <Switch
+                        checked={row.sendToInvestors}
+                        onCheckedChange={(v) => updateRow(row.id, "sendToInvestors", v)}
+                        aria-label="Send this deal to investors"
+                      />
+                    </td>
                     <td className="px-2 py-1.5">
                       <Button
                         variant="ghost"
@@ -2685,7 +2716,8 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
     "squareFeet": 1500,
     "closingDate": "2025-03-15",
     "bpoValue": 300000,
-    "rehabBudget": 25000
+    "rehabBudget": 25000,
+    "sendAlert": true
   }
 ]`}
               className="font-mono text-sm"

@@ -117,7 +117,7 @@ export function useBulkEditor() {
   const queryClient = useQueryClient();
 
   const bulkImport = useMutation({
-    mutationFn: async (properties: InsertProperty[]) => {
+    mutationFn: async (properties: (InsertProperty & { sendAlert?: boolean })[]) => {
       const response = await fetch(`${API_BASE}/admin/properties/bulk_import`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
