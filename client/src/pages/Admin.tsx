@@ -21,6 +21,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEn
 import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { getPropertyDisplayStatus, getPropertyStatusLabel } from "@/lib/propertyStatus";
+import { isDealAlertEligible } from "@shared/propertyStatus";
 
 interface NewPropertyRow {
   id: string;
@@ -377,7 +378,7 @@ export default function Admin() {
                       Email this deal to investors now
                     </Label>
                     <p className="text-xs text-[var(--text-tertiary)] mt-1">
-                      Only sends for AVAILABLE deals. Turn this off when backfilling deals, then send each alert later from the property list.
+                      Only sends for deals that need funding. Turn this off when backfilling deals, then send each alert later from the property list.
                     </p>
                   </div>
                   <Switch
@@ -553,7 +554,7 @@ export default function Admin() {
                           <td className="px-4 py-4 text-sm text-[var(--text-tertiary)]">{property.closingDate}</td>
                           <td className="px-4 py-4 text-right">
                             <div className="flex justify-end gap-2">
-                              {property.status === 'AVAILABLE' && (
+                              {isDealAlertEligible(property.status) && (
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -662,7 +663,7 @@ export default function Admin() {
                         </div>
                         
                         <div className="flex gap-2">
-                          {property.status === 'AVAILABLE' && (
+                          {isDealAlertEligible(property.status) && (
                             <Button
                               variant="outline"
                               size="sm"
@@ -2502,7 +2503,7 @@ function BulkAddEditor({ onSuccess }: { onSuccess: () => void }) {
           <p className="text-xs text-[var(--text-tertiary)]">
             Equity auto-fills from BPO minus price (you can still override it). Turn the
             <span className="font-medium text-[var(--text-secondary)]"> Investors </span>
-            toggle on to email the deal to all investors on import — only AVAILABLE deals are sent.
+            toggle on to email the deal to all investors on import — only deals that need funding are sent.
           </p>
           <div className="bg-[var(--surface-hex)] rounded-xl border border-[var(--line)] overflow-x-auto">
             <table className="w-full min-w-[1200px]">

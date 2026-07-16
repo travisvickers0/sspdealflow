@@ -18,7 +18,9 @@ import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { sendFacebookPixelEvent, type FacebookPixelEvent, createLeadEvent } from "./services/facebookPixel";
 import nodemailer from "nodemailer";
 import { sendQualificationConfirmation } from "./services/resend";
+import { sendSms, isTwilioConfigured } from "./services/twilio";
 import { appendLeadToSheet } from "./lib/googleSheets";
+import { isDealAlertEligible } from "@shared/propertyStatus";
 
 const requireFunc = typeof require !== "undefined" ? require : createRequire(import.meta.url);
 const { parsePDF } = requireFunc(path.join(process.cwd(), "server", "utils", "pdfParser.cjs")) as {
@@ -52,8 +54,9 @@ export function verifyUnsubscribeToken(token: string): string | null {
 async function sendDealAlertEmails(property: Property): Promise<{ sent: number; failed: number; recipients: number }> {
   try {
     // Only announce deals that are actually live/available.
-    if (property.status !== "AVAILABLE") {
-      console.log(`[deal-alert] Skipped — property ${property.id} status is "${property.status}" (not AVAILABLE)`);
+    // Admin form writes "needs_funding"; older rows may still use "AVAILABLE".
+    if (!isDealAlertEligible(property.status)) {
+      console.log(`[deal-alert] Skipped — property ${property.id} status is "${property.status}" (not open for funding)`);
       return { sent: 0, failed: 0, recipients: 0 };
     }
 
@@ -880,10 +883,45 @@ export async function registerRoutes(
         );
       }
 
+      let smsSent = false;
+      try {
+        const alertPhone = process.env.ALERT_PHONE?.trim();
+
+        if (!alertPhone) {
+          console.warn("[property-interest] ALERT_PHONE not set — skipping text notification");
+        } else if (!isTwilioConfigured()) {
+          console.warn(
+            "[property-interest] Twilio secrets missing — set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_FROM_NUMBER in Replit Secrets",
+          );
+        } else {
+          const smsBody = [
+            `New investor interest on SSP Deal Flow`,
+            `Property: ${propertyAddress || "N/A"}`,
+            `Name: ${fullName}`,
+            `Email: ${email}`,
+            `Phone: ${phone || "Not provided"}`,
+            message ? `Message: ${message}` : null,
+          ]
+            .filter(Boolean)
+            .join("\n");
+
+          await sendSms({ to: alertPhone, body: smsBody });
+          smsSent = true;
+          console.log(`[property-interest] Text notification sent to ${alertPhone}`);
+        }
+      } catch (smsErr: unknown) {
+        const err = smsErr as { message?: string; stack?: string };
+        console.error(
+          "[property-interest] SMS failed:",
+          err?.message || smsErr,
+          err?.stack ? `\n${err.stack}` : "",
+        );
+      }
+
       console.log(
-        `[property-interest] response interestId=${interest.id} emailSent=${emailSent}`,
+        `[property-interest] response interestId=${interest.id} emailSent=${emailSent} smsSent=${smsSent}`,
       );
-      res.json({ success: true, id: interest.id, emailSent });
+      res.json({ success: true, id: interest.id, emailSent, smsSent });
     } catch (error) {
       console.error("Error creating property interest:", error);
       res.status(500).json({ error: "Failed to save interest" });
@@ -1494,7 +1532,7 @@ ${pdfTextForExtraction}`,
       // Only email investors when the admin opted in on the form. This lets
       // deals be backfilled silently and alerted later (one at a time) via the
       // manual "Send email alert" button. The send fn also no-ops for
-      // non-AVAILABLE deals and won't re-send if dealAlertSentAt is already set.
+      // non-open deals and won't re-send if dealAlertSentAt is already set.
       if (req.body?.sendAlert === true) {
         sendDealAlertEmails(property).catch((err) =>
           console.error("[deal-alert] Background send failed:", err)
@@ -1521,9 +1559,9 @@ ${pdfTextForExtraction}`,
         return res.status(404).json({ error: "Property not found" });
       }
 
-      if (property.status !== "AVAILABLE") {
+      if (!isDealAlertEligible(property.status)) {
         return res.status(400).json({
-          error: `Deal alerts can only be sent for AVAILABLE deals (this one is "${property.status}").`,
+          error: `Deal alerts can only be sent for deals that need funding (this one is "${property.status}").`,
         });
       }
 
@@ -1820,11 +1858,11 @@ ${pdfTextForExtraction}`,
       });
 
       // Fire deal alerts for the rows the admin opted in on. sendDealAlertEmails
-      // no-ops for non-AVAILABLE deals and won't re-send if dealAlertSentAt is set.
+      // no-ops for non-open deals and won't re-send if dealAlertSentAt is set.
       const toAlert = created.filter((_, i) => sendFlags[i]);
       let alerted = 0;
       for (const property of toAlert) {
-        if (property.status === "AVAILABLE") {
+        if (isDealAlertEligible(property.status)) {
           alerted++;
           sendDealAlertEmails(property).catch((err) =>
             console.error("[deal-alert] Bulk import background send failed:", err)
