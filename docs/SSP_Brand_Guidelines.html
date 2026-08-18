@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SSP Deal Flow — Brand Design Guidelines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream-base: #f7f4ef;
+    --cream-alt: #ede9e1;
+    --cream-surface: #fffcf7;
+    --cream-ink: #0d0c0b;
+    --cream-ink-muted: rgba(13, 12, 11, 0.62);
+    --cream-ink-soft: rgba(13, 12, 11, 0.42);
+    --cream-border: rgba(13, 12, 11, 0.10);
+    --bg: #0f0e0d;
+    --surface: #181614;
+    --surface-2: #201e1b;
+    --line: #2a2724;
+    --text-primary: #f0ebe3;
+    --text-secondary: #a89e91;
+    --text-tertiary: #6b6158;
+    --accent: #e8432d;
+    --accent-hover: #d63520;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --amber: #f59e0b;
+    --page-w: 8.5in;
+    --page-h: 11in;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #1a1917;
+    color: var(--cream-ink);
+    font-family: "DM Sans", system-ui, sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: var(--page-w);
+    height: var(--page-h);
+    margin: 0 auto 24px;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  @media print {
+    html, body { background: white; }
+    .page {
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+    }
+  }
+
+  /* ——— Cover ——— */
+  .cover {
+    background: var(--bg);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.7in 0.75in 0.65in;
+  }
+
+  .cover-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .cover-meta {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .cover-accent-bar {
+    width: 48px;
+    height: 3px;
+    background: var(--accent);
+    margin-bottom: 28px;
+  }
+
+  .cover-brand {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.08em;
+    color: var(--text-primary);
+  }
+
+  .cover-brand .bracket {
+    color: var(--accent);
+    font-size: 34px;
+    vertical-align: -2px;
+  }
+
+  .cover-title {
+    font-size: clamp(52px, 7vw, 68px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+    max-width: 6.2in;
+    margin-top: 0.35in;
+  }
+
+  .cover-title em {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+    display: block;
+  }
+
+  .cover-sub {
+    margin-top: 28px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    max-width: 4.8in;
+  }
+
+  .cover-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid var(--line);
+    padding-top: 22px;
+  }
+
+  .cover-footer-left {
+    font-family: "DM Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .cover-footer-right {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .cover-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(240, 235, 227, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(240, 235, 227, 0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
+  }
+
+  /* ——— Interior pages ——— */
+  .interior {
+    background: var(--cream-base);
+    padding: 0.55in 0.65in 0.5in;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.35in;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cream-border);
+  }
+
+  .page-header .logo {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    color: var(--cream-ink);
+  }
+
+  .page-header .logo .bracket {
+    color: var(--accent);
+    font-size: 18px;
+  }
+
+  .page-header .section-num {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cream-ink-soft);
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  h1.section-title {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--cream-ink);
+    margin-bottom: 12px;
+  }
+
+  h1.section-title em {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .lede {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--cream-ink-muted);
+    max-width: 5.8in;
+    margin-bottom: 28px;
+  }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cream-ink);
+    margin: 22px 0 12px;
+  }
+
+  p, li {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--cream-ink-muted);
+  }
+
+  .page-footer {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--cream-border);
+    display: flex;
+    justify-content: space-between;
+    font-family: "DM Mono", monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cream-ink-soft);
+  }
+
+  /* ——— Dark interior ——— */
+  .interior.dark {
+    background: var(--bg);
+    color: var(--text-primary);
+  }
+
+  .interior.dark .page-header {
+    border-bottom-color: var(--line);
+  }
+
+  .interior.dark .page-header .logo {
+    color: var(--text-primary);
+  }
+
+  .interior.dark .page-header .section-num,
+  .interior.dark .page-footer {
+    color: var(--text-tertiary);
+    border-top-color: var(--line);
+  }
+
+  .interior.dark h1.section-title {
+    color: var(--text-primary);
+  }
+
+  .interior.dark .lede,
+  .interior.dark p,
+  .interior.dark li {
+    color: var(--text-secondary);
+  }
+
+  .interior.dark h2 {
+    color: var(--text-primary);
+  }
+
+  /* ——— Color swatches ——— */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .swatch {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--cream-border);
+    background: white;
+  }
+
+  .swatch-chip {
+    height: 72px;
+  }
+
+  .swatch-meta {
+    padding: 10px 12px 12px;
+  }
+
+  .swatch-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cream-ink);
+    margin-bottom: 2px;
+  }
+
+  .swatch-hex {
+    font-family: "DM Mono", monospace;
+    font-size: 10px;
+    color: var(--cream-ink-soft);
+    letter-spacing: 0.02em;
+  }
+
+  .swatch-use {
+    font-size: 10px;
+    color: var(--cream-ink-soft);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--cream-border);
+    border-radius: 16px;
+    padding: 18px;
+  }
+
+  .card.dark-card {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+
+  .card h3 {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--cream-ink);
+  }
+
+  .card.dark-card h3 {
+    color: var(--text-primary);
+  }
+
+  .card p {
+    font-size: 12px;
+  }
+
+  /* ——— Logo lockups ——— */
+  .logo-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .logo-lockup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 110px;
+    border-radius: 14px;
+    font-family: "Bebas Neue", sans-serif;
+    letter-spacing: 0.08em;
+  }
+
+  .logo-lockup.cream {
+    background: var(--cream-base);
+    border: 1px solid var(--cream-border);
+    color: #0d0c0b;
+    font-size: 28px;
+  }
+
+  .logo-lockup.dark {
+    background: var(--bg);
+    color: #f0ebe3;
+    font-size: 28px;
+  }
+
+  .logo-lockup .b {
+    color: var(--accent);
+    font-size: 34px;
+  }
+
+  .dont {
+    opacity: 0.55;
+    position: relative;
+  }
+
+  .dont::after {
+    content: "DON'T";
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    background: rgba(232, 67, 45, 0.1);
+    padding: 3px 7px;
+    border-radius: 4px;
+  }
+
+  /* ——— Type specimens ——— */
+  .type-row {
+    display: grid;
+    grid-template-columns: 1.4in 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--cream-border);
+  }
+
+  .type-meta {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cream-ink-soft);
+    padding-top: 4px;
+  }
+
+  .type-meta strong {
+    display: block;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--cream-ink);
+    margin-bottom: 4px;
+  }
+
+  /* ——— Buttons ——— */
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 12px;
+    padding: 12px 22px;
+    border: none;
+  }
+
+  .btn-primary-cream {
+    background: #0d0c0b;
+    color: white;
+  }
+
+  .btn-primary-dark {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: white;
+    color: rgba(13, 12, 11, 0.65);
+    border: 1px solid rgba(13, 12, 11, 0.1);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: #0d0c0b;
+    border: 1px solid rgba(13, 12, 11, 0.12);
+    border-radius: 999px;
+    font-size: 12px;
+    padding: 9px 16px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(232, 67, 45, 0.06);
+    border: 1px solid rgba(232, 67, 45, 0.16);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .pill .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  /* ——— Status ——— */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .status-item {
+    background: white;
+    border: 1px solid var(--cream-border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+  }
+
+  .status-label {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cream-ink);
+  }
+
+  .status-desc {
+    font-size: 10px;
+    color: var(--cream-ink-soft);
+    margin-top: 4px;
+  }
+
+  /* ——— Voice ——— */
+  .voice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .voice-card {
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+
+  .voice-card.do {
+    background: white;
+    border: 1px solid var(--cream-border);
+  }
+
+  .voice-card.dont-card {
+    background: rgba(232, 67, 45, 0.04);
+    border: 1px solid rgba(232, 67, 45, 0.14);
+  }
+
+  .voice-label {
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .voice-card.do .voice-label { color: var(--green); }
+  .voice-card.dont-card .voice-label { color: var(--accent); }
+
+  .voice-card p {
+    font-size: 13px;
+    color: var(--cream-ink);
+    line-height: 1.5;
+  }
+
+  .voice-card.dont-card p {
+    color: var(--cream-ink-muted);
+  }
+
+  /* ——— Palette split demo ——— */
+  .palette-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .palette-panel {
+    border-radius: 16px;
+    padding: 22px;
+    min-height: 180px;
+  }
+
+  .palette-panel.cream-panel {
+    background: var(--cream-base);
+    border: 1px solid var(--cream-border);
+    color: var(--cream-ink);
+  }
+
+  .palette-panel.dark-panel {
+    background: var(--bg);
+    color: var(--text-primary);
+  }
+
+  .palette-panel h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .palette-panel.cream-panel h3 { color: var(--accent); }
+  .palette-panel.dark-panel h3 { color: var(--accent); }
+
+  .palette-panel .big {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .palette-panel .big em {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .palette-panel p {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .palette-panel.cream-panel p { color: var(--cream-ink-muted); }
+  .palette-panel.dark-panel p { color: var(--text-secondary); }
+
+  .stat-demo {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .stat-box {
+    flex: 1;
+    background: white;
+    border: 1px solid rgba(13,12,11,0.06);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .stat-box.red {
+    background: var(--accent);
+    border: none;
+  }
+
+  .stat-num {
+    font-family: "DM Mono", monospace;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--cream-ink);
+  }
+
+  .stat-box.red .stat-num { color: white; }
+
+  .stat-lbl {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(13,12,11,0.3);
+    margin-top: 6px;
+  }
+
+  .stat-box.red .stat-lbl { color: rgba(255,255,255,0.55); }
+
+  .token-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  .token-table th {
+    text-align: left;
+    font-family: "DM Mono", monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cream-ink-soft);
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--cream-border);
+    font-weight: 500;
+  }
+
+  .token-table td {
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(13,12,11,0.06);
+    vertical-align: middle;
+    color: var(--cream-ink-muted);
+  }
+
+  .token-table td:first-child {
+    font-family: "DM Mono", monospace;
+    font-size: 10px;
+    color: var(--cream-ink);
+  }
+
+  .mini-chip {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .rule-list {
+    list-style: none;
+  }
+
+  .rule-list li {
+    position: relative;
+    padding-left: 16px;
+    margin-bottom: 8px;
+  }
+
+  .rule-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .toc-list {
+    list-style: none;
+    margin-top: 8px;
+  }
+
+  .toc-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--cream-border);
+    font-size: 15px;
+    color: var(--cream-ink);
+    font-weight: 500;
+  }
+
+  .toc-list li span:first-child {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+
+  .toc-num {
+    font-family: "DM Mono", monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  .toc-page {
+    font-family: "DM Mono", monospace;
+    font-size: 11px;
+    color: var(--cream-ink-soft);
+  }
+
+  .radius-demo {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+  }
+
+  .radius-box {
+    background: white;
+    border: 1px solid var(--cream-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "DM Mono", monospace;
+    font-size: 9px;
+    color: var(--cream-ink-soft);
+    width: 72px;
+    height: 72px;
+  }
+
+  .spacing-note {
+    background: white;
+    border: 1px solid var(--cream-border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 8px;
+  }
+
+  .spacing-note code {
+    font-family: "DM Mono", monospace;
+    font-size: 11px;
+    color: var(--cream-ink);
+    background: var(--cream-alt);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<section class="page cover">
+  <div class="cover-grid"></div>
+  <div class="cover-top">
+    <div>
+      <div class="cover-accent-bar"></div>
+      <div class="cover-brand"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    </div>
+    <div class="cover-meta">Brand Guidelines · 2026</div>
+  </div>
+
+  <div>
+    <h1 class="cover-title">
+      Brand design
+      <em>guidelines</em>
+    </h1>
+    <p class="cover-sub">
+      Visual identity, color, typography, and UI patterns for SSP Deal Flow —
+      a real estate JV investment platform for accredited investors.
+      A division of Southern Specialty Properties.
+    </p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-footer-left">Confidential · Internal use</div>
+    <div class="cover-footer-right">Version 1.0 · July 2026</div>
+  </div>
+</section>
+
+<!-- ===================== TOC ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Contents</div>
+  </div>
+
+  <p class="eyebrow">Overview</p>
+  <h1 class="section-title">What's <em>inside</em></h1>
+  <p class="lede">
+    Use this document to keep every screen, deck, and asset on-brand.
+    When in doubt: cream for marketing, dark luxury for investor tools, accent red for emphasis only.
+  </p>
+
+  <ul class="toc-list">
+    <li><span><span class="toc-num">01</span> Brand identity &amp; voice</span><span class="toc-page">03</span></li>
+    <li><span><span class="toc-num">02</span> Logo &amp; lockups</span><span class="toc-page">04</span></li>
+    <li><span><span class="toc-num">03</span> Color system</span><span class="toc-page">05</span></li>
+    <li><span><span class="toc-num">04</span> Typography</span><span class="toc-page">07</span></li>
+    <li><span><span class="toc-num">05</span> Layout, radius &amp; motion</span><span class="toc-page">08</span></li>
+    <li><span><span class="toc-num">06</span> Components &amp; patterns</span><span class="toc-page">09</span></li>
+    <li><span><span class="toc-num">07</span> Status, copy &amp; do / don't</span><span class="toc-page">10</span></li>
+  </ul>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>02</span>
+  </div>
+</section>
+
+<!-- ===================== 01 IDENTITY ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Section 01</div>
+  </div>
+
+  <p class="eyebrow">Brand identity</p>
+  <h1 class="section-title">Confident. Premium.<br /><em>Numbers-forward.</em></h1>
+  <p class="lede">
+    SSP Deal Flow is a JV investment platform for accredited investors.
+    The brand feels like a luxury real estate brochure on marketing pages,
+    and a private investor dashboard on deal surfaces.
+  </p>
+
+  <div class="two-col">
+    <div class="card">
+      <h3>Voice</h3>
+      <p>
+        Short. Declarative. Transparent. Lead with numbers, not hype.
+        Avoid buzzwords, emojis, and salesy superlatives.
+      </p>
+      <p style="margin-top:10px; font-style: italic; color: var(--cream-ink);">
+        “Vetted off-market acquisitions. 50/50 profit split at sale. No fees, no pooled capital.”
+      </p>
+    </div>
+    <div class="card">
+      <h3>Visual mood</h3>
+      <p>
+        Two coexisting aesthetics — never mixed on the same surface:
+      </p>
+      <ul class="rule-list" style="margin-top:10px;">
+        <li><strong style="color:var(--cream-ink)">Cream / editorial</strong> — Home, Track Record, How It Works, Contact</li>
+        <li><strong style="color:var(--cream-ink)">Dark luxury</strong> — Property Detail, Invest, Qualify, dialogs</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="palette-split">
+    <div class="palette-panel cream-panel">
+      <h3>Cream / editorial</h3>
+      <div class="big">Real estate<br /><em>built for</em><br />investors</div>
+      <p>Warm off-white, ink type, accent red for emphasis. Brochure energy.</p>
+    </div>
+    <div class="palette-panel dark-panel">
+      <h3>Dark luxury</h3>
+      <div class="big">Deal terms<br /><em>that hold up</em></div>
+      <p>Near-black, cream type, red CTAs. Private investor dashboard.</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>03</span>
+  </div>
+</section>
+
+<!-- ===================== 02 LOGO ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Section 02</div>
+  </div>
+
+  <p class="eyebrow">Logo</p>
+  <h1 class="section-title">Wordmark &amp; <em>lockups</em></h1>
+  <p class="lede">
+    The logo is set in Bebas Neue, all caps, with tracking 0.08em.
+    Brackets are accent red and slightly larger than the wordmark.
+  </p>
+
+  <div class="logo-demo">
+    <div class="two-col">
+      <div>
+        <p style="font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--cream-ink-soft); margin-bottom:8px;">On cream</p>
+        <div class="logo-lockup cream"><span class="b">[</span>SSP DEAL FLOW<span class="b">]</span></div>
+      </div>
+      <div>
+        <p style="font-size:10px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--cream-ink-soft); margin-bottom:8px;">On dark</p>
+        <div class="logo-lockup dark"><span class="b">[</span>SSP DEAL FLOW<span class="b">]</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Construction</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>Do</h3>
+      <ul class="rule-list">
+        <li>Use Bebas Neue only for the logo</li>
+        <li>Keep brackets in accent red <code style="font-family:DM Mono;font-size:10px;">#e8432d</code></li>
+        <li>Wordmark: ink on cream, cream on dark</li>
+        <li>Nav size ~22px word / 28px brackets</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Don't</h3>
+      <ul class="rule-list">
+        <li>Stretch, outline, or add drop shadows</li>
+        <li>Recolor brackets to black or white</li>
+        <li>Set the wordmark in sentence case</li>
+        <li>Place on busy photography without a clear panel</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Incorrect treatments</h2>
+  <div class="two-col">
+    <div class="logo-lockup cream dont" style="font-family: Georgia, serif; letter-spacing:0; text-transform:none; font-size:22px;">
+      Ssp Deal Flow
+    </div>
+    <div class="logo-lockup dark dont" style="color: var(--accent);">
+      [SSP DEAL FLOW]
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>04</span>
+  </div>
+</section>
+
+<!-- ===================== 03 COLOR CREAM ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Section 03</div>
+  </div>
+
+  <p class="eyebrow">Color system</p>
+  <h1 class="section-title">Cream <em>palette</em></h1>
+  <p class="lede">
+    Primary marketing surfaces. Prefer CSS variables from
+    <code style="font-family:DM Mono;font-size:11px;background:var(--cream-alt);padding:2px 6px;border-radius:4px;">client/src/index.css</code>
+    over raw hex in product UI.
+  </p>
+
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#f7f4ef;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Cream Base</div>
+        <div class="swatch-hex">#F7F4EF</div>
+        <div class="swatch-use">Primary page background</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#ede9e1;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Cream Alt</div>
+        <div class="swatch-hex">#EDE9E1</div>
+        <div class="swatch-use">Secondary sections</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#fffcf7; border-bottom:1px solid rgba(13,12,11,0.06);"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Cream Surface</div>
+        <div class="swatch-hex">#FFFCF7</div>
+        <div class="swatch-use">Elevated cards</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#0d0c0b;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Cream Ink</div>
+        <div class="swatch-hex">#0D0C0B</div>
+        <div class="swatch-use">Primary text / CTAs</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Brand &amp; semantic accents</h2>
+  <div class="swatch-grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#e8432d;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Accent Red</div>
+        <div class="swatch-hex">#E8432D</div>
+        <div class="swatch-use">CTAs, brackets, hot moments</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#22c55e;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Success Green</div>
+        <div class="swatch-hex">#22C55E</div>
+        <div class="swatch-use">Profit, live, available</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#3b82f6;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Equity Blue</div>
+        <div class="swatch-hex">#3B82F6</div>
+        <div class="swatch-use">Committed, projections</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-chip" style="background:#f59e0b;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name">Amber</div>
+        <div class="swatch-hex">#F59E0B</div>
+        <div class="swatch-use">Sold, cash deal, warnings</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Usage rules</h2>
+  <ul class="rule-list">
+    <li>Accent red is for emphasis only — never long body copy</li>
+    <li>Muted ink on cream: rgba(13,12,11,0.62) body · 0.42 tertiary</li>
+    <li>Hover for accent: #d63520 · soft fill: rgba(232,67,45,0.08–0.12)</li>
+  </ul>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>05</span>
+  </div>
+</section>
+
+<!-- ===================== 03 COLOR DARK ===================== -->
+<section class="page interior dark">
+  <div class="page-header">
+    <div class="logo"><span class="bracket" style="color:var(--accent)">[</span>SSP DEAL FLOW<span class="bracket" style="color:var(--accent)">]</span></div>
+    <div class="section-num">Section 03 · Cont.</div>
+  </div>
+
+  <p class="eyebrow">Color system</p>
+  <h1 class="section-title">Dark <em>luxury</em></h1>
+  <p class="lede">
+    Investor-facing detail surfaces. Near-black foundation, warm cream type,
+    red primary actions. Footer is always dark under both palettes.
+  </p>
+
+  <div class="swatch-grid">
+    <div class="swatch" style="background:var(--surface); border-color:var(--line);">
+      <div class="swatch-chip" style="background:#0f0e0d;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name" style="color:var(--text-primary)">Background</div>
+        <div class="swatch-hex" style="color:var(--text-tertiary)">#0F0E0D</div>
+        <div class="swatch-use" style="color:var(--text-tertiary)">App canvas</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:var(--surface); border-color:var(--line);">
+      <div class="swatch-chip" style="background:#181614;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name" style="color:var(--text-primary)">Surface</div>
+        <div class="swatch-hex" style="color:var(--text-tertiary)">#181614</div>
+        <div class="swatch-use" style="color:var(--text-tertiary)">Cards &amp; panels</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:var(--surface); border-color:var(--line);">
+      <div class="swatch-chip" style="background:#201e1b;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name" style="color:var(--text-primary)">Surface 2</div>
+        <div class="swatch-hex" style="color:var(--text-tertiary)">#201E1B</div>
+        <div class="swatch-use" style="color:var(--text-tertiary)">Inset / hover fills</div>
+      </div>
+    </div>
+    <div class="swatch" style="background:var(--surface); border-color:var(--line);">
+      <div class="swatch-chip" style="background:#2a2724;"></div>
+      <div class="swatch-meta">
+        <div class="swatch-name" style="color:var(--text-primary)">Line</div>
+        <div class="swatch-hex" style="color:var(--text-tertiary)">#2A2724</div>
+        <div class="swatch-use" style="color:var(--text-tertiary)">Borders</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 style="color:var(--text-primary); margin-top:28px;">Type on dark</h2>
+  <table class="token-table" style="margin-top:8px;">
+    <thead>
+      <tr>
+        <th>Token</th>
+        <th>Hex</th>
+        <th>Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="color:var(--text-primary)"><span class="mini-chip" style="background:#f0ebe3;"></span>--text-primary</td>
+        <td style="color:var(--text-secondary)">#F0EBE3</td>
+        <td style="color:var(--text-secondary)">Headings</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text-primary)"><span class="mini-chip" style="background:#a89e91;"></span>--text-secondary</td>
+        <td style="color:var(--text-secondary)">#A89E91</td>
+        <td style="color:var(--text-secondary)">Body</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text-primary)"><span class="mini-chip" style="background:#6b6158;"></span>--text-tertiary</td>
+        <td style="color:var(--text-secondary)">#6B6158</td>
+        <td style="color:var(--text-secondary)">Labels, hints</td>
+      </tr>
+      <tr>
+        <td style="color:var(--text-primary)"><span class="mini-chip" style="background:#e8432d;"></span>--accent</td>
+        <td style="color:var(--text-secondary)">#E8432D</td>
+        <td style="color:var(--text-secondary)">Primary CTA</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:28px; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px;">
+    <div class="pill" style="margin-bottom:14px;"><span class="dot"></span>Open for Funding</div>
+    <div style="font-family:DM Mono; font-size:32px; font-weight:500; letter-spacing:-0.02em; color:var(--text-primary);">$275,744</div>
+    <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-tertiary); margin-top:6px; font-weight:600;">Investor Capital</div>
+    <div style="margin-top:16px;">
+      <span class="btn btn-primary-dark" style="display:inline-flex;">I'm In · Contact Me →</span>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>06</span>
+  </div>
+</section>
+
+<!-- ===================== 04 TYPOGRAPHY ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Section 04</div>
+  </div>
+
+  <p class="eyebrow">Typography</p>
+  <h1 class="section-title">Four families.<br /><em>One system.</em></h1>
+  <p class="lede">
+    DM Sans for UI. Instrument Serif italic for editorial accent words.
+    DM Mono for every number. Bebas Neue for the logo only.
+  </p>
+
+  <div class="type-row">
+    <div class="type-meta"><strong>DM Sans</strong>UI / Body</div>
+    <div>
+      <div style="font-size:28px; font-weight:700; letter-spacing:-0.03em; line-height:1; color:var(--cream-ink);">
+        The quick brown fox jumps
+      </div>
+      <p style="margin-top:6px;">Default for headlines, body, buttons, and navigation.</p>
+    </div>
+  </div>
+
+  <div class="type-row">
+    <div class="type-meta"><strong>Instrument Serif</strong>Editorial</div>
+    <div>
+      <div style="font-family:'Instrument Serif',Georgia,serif; font-style:italic; font-size:36px; font-weight:400; color:var(--accent); line-height:1;">
+        built for · deals · Every number.
+      </div>
+      <p style="margin-top:6px;">One italic accent word inside hero headlines. Signature pattern.</p>
+    </div>
+  </div>
+
+  <div class="type-row">
+    <div class="type-meta"><strong>DM Mono</strong>Numbers</div>
+    <div>
+      <div style="font-family:'DM Mono',monospace; font-size:28px; font-weight:500; letter-spacing:-0.02em; color:var(--cream-ink);">
+        $6.1M · 15.3% · 94d · 119
+      </div>
+      <p style="margin-top:6px;">Prices, ROI, ticker labels, micro-labels. Never sans for figures.</p>
+    </div>
+  </div>
+
+  <div class="type-row" style="border-bottom:none;">
+    <div class="type-meta"><strong>Bebas Neue</strong>Logo only</div>
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:32px; letter-spacing:0.08em; color:var(--cream-ink);">
+        <span style="color:var(--accent); font-size:38px;">[</span>SSP DEAL FLOW<span style="color:var(--accent); font-size:38px;">]</span>
+      </div>
+      <p style="margin-top:6px;">Do not use Bebas Neue for UI copy or section titles.</p>
+    </div>
+  </div>
+
+  <h2>Scale (mobile-first)</h2>
+  <table class="token-table">
+    <thead>
+      <tr><th>Role</th><th>Size</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Display hero</td><td>clamp(52px, 6vw, 76px)</td><td>Bold · tracking -0.03em · leading 0.88</td></tr>
+      <tr><td>Section title</td><td>clamp(36px, 4vw, 50px)</td><td>Bold · tracking -0.025em</td></tr>
+      <tr><td>Body</td><td>15–16px</td><td>Leading 1.75</td></tr>
+      <tr><td>Micro / eyebrow</td><td>10–11px</td><td>Semibold · tracking 0.10–0.14em · uppercase</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>07</span>
+  </div>
+</section>
+
+<!-- ===================== 05 LAYOUT ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Section 05</div>
+  </div>
+
+  <p class="eyebrow">Layout &amp; motion</p>
+  <h1 class="section-title">Space, radius, <em>presence</em></h1>
+  <p class="lede">
+    Generous containers, soft large radii on cards, restrained motion that lifts
+    hierarchy — never noise.
+  </p>
+
+  <h2>Containers</h2>
+  <div class="spacing-note">
+    <p style="margin-bottom:8px; color:var(--cream-ink);">
+      Marketing: <code>max-w-[1360px]</code> · <code>px-6 sm:px-10 lg:px-14</code>
+    </p>
+    <p style="margin-bottom:8px; color:var(--cream-ink);">
+      Property gallery: <code>max-w-[1280px]</code>
+    </p>
+    <p style="color:var(--cream-ink);">
+      App content: <code>container mx-auto px-4 sm:px-8</code>
+    </p>
+  </div>
+
+  <h2>Radius scale</h2>
+  <div class="radius-demo">
+    <div class="radius-box" style="border-radius:8px;">8px<br />sm</div>
+    <div class="radius-box" style="border-radius:12px;">12px<br />md</div>
+    <div class="radius-box" style="border-radius:16px;">16px<br />lg</div>
+    <div class="radius-box" style="border-radius:20px; width:88px; height:88px;">20px<br />cards</div>
+    <div class="radius-box" style="border-radius:24px; width:96px; height:96px;">24px<br />xl</div>
+  </div>
+  <p style="margin-top:10px;">Prefer <code style="font-family:DM Mono;font-size:11px;background:var(--cream-alt);padding:2px 6px;border-radius:4px;">rounded-[20px]</code> for large property / hero cards.</p>
+
+  <h2>Shadows</h2>
+  <div class="three-col">
+    <div class="card" style="box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      <h3>Rest</h3>
+      <p>0 2px 8px · 4%</p>
+    </div>
+    <div class="card" style="box-shadow:0 20px 48px rgba(0,0,0,0.10);">
+      <h3>Hover lift</h3>
+      <p>0 20px 48px · 10%</p>
+    </div>
+    <div class="card" style="background:var(--accent); border:none; box-shadow:0 8px 28px rgba(232,67,45,0.30);">
+      <h3 style="color:white;">CTA glow</h3>
+      <p style="color:rgba(255,255,255,0.75);">Red 30% shadow</p>
+    </div>
+  </div>
+
+  <h2>Motion</h2>
+  <ul class="rule-list">
+    <li><strong style="color:var(--cream-ink)">fade-up</strong> — card / list entrance with stagger</li>
+    <li><strong style="color:var(--cream-ink)">ken-burns</strong> — slow hero photo zoom</li>
+    <li><strong style="color:var(--cream-ink)">Buttons</strong> — hover:-translate-y-px / -0.5 on primary</li>
+    <li><strong style="color:var(--cream-ink)">Cards</strong> — hover:-translate-y-1 + image scale 1.03–1.04</li>
+  </ul>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>08</span>
+  </div>
+</section>
+
+<!-- ===================== 06 COMPONENTS ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Section 06</div>
+  </div>
+
+  <p class="eyebrow">Components</p>
+  <h1 class="section-title">Patterns that <em>repeat</em></h1>
+  <p class="lede">
+    Reuse these building blocks. New surfaces should compose from existing tokens —
+    not invent new colors or fonts.
+  </p>
+
+  <h2>Buttons</h2>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="btn-row">
+      <span class="btn btn-primary-cream">Explore Properties →</span>
+      <span class="btn btn-secondary">How It Works</span>
+      <span class="btn btn-ghost">View All →</span>
+      <span class="btn btn-primary-dark">I'm In · Contact Me →</span>
+    </div>
+    <p style="margin-top:14px;">
+      Cream primary starts black and flips to accent red on hover.
+      Dark surfaces use full red CTAs with a soft red glow on hover.
+    </p>
+  </div>
+
+  <h2>Accent pill &amp; stats</h2>
+  <div class="two-col">
+    <div class="card">
+      <div class="pill"><span class="dot"></span>Accredited Investors Only</div>
+      <p style="margin-top:14px;">Eyebrow with live dot. Mono micro-label, red tint fill.</p>
+    </div>
+    <div class="card" style="padding:14px;">
+      <div class="stat-demo" style="margin-top:0;">
+        <div class="stat-box">
+          <div class="stat-num">119</div>
+          <div class="stat-lbl">Deals Closed</div>
+        </div>
+        <div class="stat-box red">
+          <div class="stat-num">$6.1M</div>
+          <div class="stat-lbl">Total Equity</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Iconography</h2>
+  <div class="card">
+    <p>
+      Library: <strong style="color:var(--cream-ink)">lucide-react</strong> · stroke only, never fill.
+      Sizes: 12px meta · 14px button trailing · 16px leading · 20px nav.
+      Color follows <code style="font-family:DM Mono;font-size:11px;">currentColor</code>.
+    </p>
+  </div>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>09</span>
+  </div>
+</section>
+
+<!-- ===================== 07 STATUS & VOICE ===================== -->
+<section class="page interior">
+  <div class="page-header">
+    <div class="logo"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <div class="section-num">Section 07</div>
+  </div>
+
+  <p class="eyebrow">Status &amp; copy</p>
+  <h1 class="section-title">Clarity over <em>hype</em></h1>
+  <p class="lede">
+    Status colors and formatting conventions keep deal state scannable.
+    Marketing copy stays short and declarative.
+  </p>
+
+  <h2>Deal status</h2>
+  <div class="status-grid">
+    <div class="status-item">
+      <div class="status-dot" style="background:var(--green);"></div>
+      <div class="status-label">Available</div>
+      <div class="status-desc">Open for funding</div>
+    </div>
+    <div class="status-item">
+      <div class="status-dot" style="background:var(--blue);"></div>
+      <div class="status-label">Committed</div>
+      <div class="status-desc">Capital reserved</div>
+    </div>
+    <div class="status-item">
+      <div class="status-dot" style="background:var(--blue);"></div>
+      <div class="status-label">Funded</div>
+      <div class="status-desc">+ grayscale photo</div>
+    </div>
+    <div class="status-item">
+      <div class="status-dot" style="background:var(--amber);"></div>
+      <div class="status-label">Sold</div>
+      <div class="status-desc">Completed deal</div>
+    </div>
+    <div class="status-item">
+      <div class="status-dot" style="background:var(--amber);"></div>
+      <div class="status-label">Cash Deal</div>
+      <div class="status-desc">No JV structure</div>
+    </div>
+  </div>
+
+  <h2>Number formatting</h2>
+  <div class="three-col" style="margin-bottom:8px;">
+    <div class="card">
+      <div style="font-family:DM Mono; font-size:16px; color:var(--cream-ink);">$275,744</div>
+      <p style="margin-top:4px;">Full currency</p>
+    </div>
+    <div class="card">
+      <div style="font-family:DM Mono; font-size:16px; color:var(--cream-ink);">$84k · $6.4M</div>
+      <p style="margin-top:4px;">Compact ≥1k / ≥1M</p>
+    </div>
+    <div class="card">
+      <div style="font-family:DM Mono; font-size:16px; color:var(--cream-ink);">15.3% · 94d</div>
+      <p style="margin-top:4px;">ROI &amp; days held</p>
+    </div>
+  </div>
+
+  <h2>Voice — do / don't</h2>
+  <div class="voice-grid">
+    <div class="voice-card do">
+      <div class="voice-label">Do say</div>
+      <p>Vetted off-market acquisitions across the Southeast. 50/50 profit split at sale.</p>
+    </div>
+    <div class="voice-card dont-card">
+      <div class="voice-label">Don't say</div>
+      <p>🚀 Unlock insane returns with our revolutionary deal pipeline!!!</p>
+    </div>
+    <div class="voice-card do">
+      <div class="voice-label">Do say</div>
+      <p>You fund the purchase. SSP handles rehab &amp; management.</p>
+    </div>
+    <div class="voice-card dont-card">
+      <div class="voice-label">Don't say</div>
+      <p>Passive income dreams made easy for everyone.</p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>SSP Deal Flow Brand Guidelines</span>
+    <span>10</span>
+  </div>
+</section>
+
+<!-- ===================== BACK COVER ===================== -->
+<section class="page cover" style="justify-content:center; align-items:flex-start;">
+  <div class="cover-grid"></div>
+  <div style="position:relative; z-index:1; width:100%;">
+    <div class="cover-accent-bar"></div>
+    <div class="cover-brand" style="margin-bottom:32px;"><span class="bracket">[</span>SSP DEAL FLOW<span class="bracket">]</span></div>
+    <h1 class="cover-title" style="font-size:48px;">
+      Stay on tokens.
+      <em>Stay on brand.</em>
+    </h1>
+    <p class="cover-sub">
+      Every new surface should be expressible with the tokens in this guide.
+      If a design needs a new color or font, push back — extend the system, don't break it.
+    </p>
+    <div style="margin-top:48px; border-top:1px solid var(--line); padding-top:22px; display:flex; justify-content:space-between;">
+      <div class="cover-footer-left">DESIGN_SYSTEM.md · Source of truth</div>
+      <div class="cover-footer-right">Southern Specialty Properties</div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
